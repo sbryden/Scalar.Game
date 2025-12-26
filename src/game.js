@@ -287,10 +287,7 @@ function update() {
     // Destroy projectiles that go out of bounds
     projectiles.children.entries.forEach(proj => {
         if (proj.x < 0 || proj.x > WORLD_WIDTH) {
-            console.log(`Projectile out of bounds at X=${proj.x}, destroying`);
             proj.destroy();
-        } else {
-            console.log(`Projectile at X=${proj.x}, VelX=${proj.body.velocity.x}`);
         }
     });
     
@@ -345,6 +342,13 @@ function changeSize(newSize) {
     
     // Refresh physics body to match new scale
     player.body.updateFromGameObject();
+    
+    // Scale enemies inversely (when player is small, enemies are big)
+    const enemyScale = 1 / newScale;
+    enemies.children.entries.forEach(enemy => {
+        enemy.setScale(enemyScale);
+        enemy.body.updateFromGameObject();
+    });
     
     // Reset cooldown timer
     sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
@@ -429,9 +433,6 @@ function fireProjectile(scene) {
     projectile.body.setBounce(0, 0);
     projectile.body.setVelocity(velocityX, 0);
     projectile.damage = config.damage;
-    
-    console.log(`Projectile fired at (${player.x}, ${player.y})! VelX: ${velocityX}`);
-    console.log(`Body velocity after set: X=${projectile.body.velocity.x}, Y=${projectile.body.velocity.y}`);
 }
 
 function damageEnemy(projectile, enemy) {
@@ -454,9 +455,21 @@ function spawnXPOrb(scene, x, y, xpValue) {
         Phaser.Math.Between(-50, 50),
         Phaser.Math.Between(-100, -50)
     );
+    orb.body.setCollideWorldBounds(true);
+    orb.body.setBounce(0.5, 0.5);
     orb.xpValue = xpValue;
     
     xpOrbs.add(orb);
+    
+    // Collision with platforms
+    scene.physics.add.collider(orb, platforms);
+    
+    // Collision with player (collect)
+    scene.physics.add.overlap(player, orb, (p, o) => {
+        playerStats.xp += o.xpValue;
+        o.destroy();
+        checkLevelUp();
+    });
 }
 
 function damagePlayer(damage) {
