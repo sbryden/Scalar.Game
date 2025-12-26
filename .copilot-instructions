@@ -1,0 +1,101 @@
+# Copilot Instructions for Vehicle Side Scroller
+
+## Project Context
+This is a 2D side-scrolling game built with Phaser 3 and Vite. The game features a controllable vehicle that moves across platforms with physics-based gravity and collision detection.
+
+## Technology Stack
+- **Framework**: Phaser 3.55.2
+- **Build Tool**: Vite 5.x
+- **Language**: JavaScript (ES6+)
+- **Physics**: Arcade Physics (built into Phaser)
+
+## Code Style Guidelines
+- Use ES6+ syntax (arrow functions, const/let, destructuring)
+- Follow Phaser 3 conventions for game scenes and lifecycle methods
+- Keep functions concise and focused on single responsibilities
+- Use descriptive variable names (e.g., `player`, `platforms`, `cursors`)
+- Comment complex logic and game mechanics
+
+## Project Structure
+```
+src/game.js          - Main game configuration and scene logic
+index.html           - HTML entry point with Phaser CDN
+style.css            - Game styling
+vite.config.js       - Build configuration
+```
+
+## Common Patterns in This Project
+- Scene lifecycle: `preload()`, `create()`, `update()`
+- Input handling via `this.input.keyboard.createCursorKeys()`
+- Physics bodies: `this.physics.add.existing()`, collision groups
+- Static vs dynamic game objects
+- Camera following with `this.cameras.main.startFollow()`
+
+## Development Workflow
+
+### During Feature Development
+1. Make changes to `src/game.js` or related files
+2. Test in development mode with `npm run dev`
+3. Use hot module reloading during development
+
+### After Completing a Feature - QUALITY GATES
+When a feature is complete, the following checks MUST pass before committing:
+1. **Compilation Check**: Run `npm run build` to ensure the app compiles without errors
+2. **Unit Tests**: Run any available test suites (if configured)
+3. **Lint Rules**: Run linter to ensure code style compliance (if configured)
+4. **Stage Changes**: Stage modified files with `git add`
+5. **Draft Commit Message**: Create a clear, descriptive commit message following conventional commits format
+6. **User Approval**: ALWAYS prompt the user for approval before executing `git commit`
+   - Show the staged files
+   - Show the proposed commit message
+   - Wait for explicit user approval (yes/no)
+   - Only proceed with `git commit` if user approves
+
+### Git Commit Message Format
+Use conventional commits:
+```
+type(scope): description
+
+- Detailed explanation of changes
+- Key features or fixes
+```
+
+Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf`
+
+## When Helping with Code
+- **New Features**: Ask clarifying questions about game mechanics and user experience
+- **Bug Fixes**: Identify whether issues are physics-related, input-related, or rendering-related
+- **Refactoring**: Suggest improvements while maintaining Phaser 3 best practices
+- **Performance**: Consider rendering efficiency and physics calculations
+
+## Key Game Mechanics to Understand
+- **Player Control**: Arrow keys for movement, spacebar for jumping
+- **Gravity**: Y gravity is 300 pixels/second² (physics config)
+- **Jumping**: Only possible when player is touching ground (`body.touching.down`)
+- **Camera**: Follows player at all times, bounds set to 2048x768
+- **Platforms**: Static physics objects that player collides with
+
+## Planned Features (Future Consideration)
+- Vehicle shrinking/growing mechanics
+- Multiple platforms and obstacles
+- Collectibles and scoring system
+- Sound effects and visual effects
+- Level progression
+
+## Dependencies to Know
+- **phaser**: Game framework with built-in physics, input, graphics
+- **vite**: Development server and build tool
+- **@vitejs/plugin-basic-ssl**: HTTPS support during development
+
+## Testing & Validation
+- Test controls responsiveness during gameplay
+- Verify collision detection works as expected
+- Check camera bounds and world limits
+- Ensure gravity behaves naturally
+- Monitor performance with Phaser debug tools
+
+## Common Issues & Solutions
+- **Jump not working**: Verify `body.touching.down` state is true
+- **Camera not following**: Check `startFollow()` is called on correct object
+- **Platform collisions failing**: Ensure static group collision is set up
+- **Performance issues**: Review physics body count and update loop complexity
