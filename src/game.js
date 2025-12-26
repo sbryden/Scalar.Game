@@ -29,6 +29,18 @@ let wasdKeys;
 let platforms;
 let camera;
 let debugText;
+let enemies;
+let projectiles;
+let xpOrbs;
+
+// Player stats
+let playerStats = {
+    level: 1,
+    maxHealth: 100,
+    health: 100,
+    xp: 0,
+    xpToLevel: 100
+};
 
 // Size system variables
 let playerSize = 'normal'; // 'small', 'normal', 'large'
@@ -55,6 +67,34 @@ const SIZE_CONFIG = {
         color: 0xFF8C00 // Orange
     }
 };
+
+// Enemy configuration
+const ENEMY_CONFIG = {
+    generic: {
+        width: 30,
+        height: 30,
+        color: 0xFF0000, // Red
+        speed: 80,
+        health: 20,
+        damage: 10,
+        xpReward: 25,
+        patrolDistance: 300
+    }
+};
+
+// Projectile configuration
+const PROJECTILE_CONFIG = {
+    basic: {
+        width: 8,
+        height: 8,
+        color: 0xFFFF00, // Yellow
+        speed: 10000,
+        damage: 10,
+        cooldown: 500 // milliseconds between shots
+    }
+};
+
+let lastProjectileTime = 0;
 
 function preload() {
     // Assets will be loaded here
@@ -122,6 +162,44 @@ function create() {
     // Collision between player and platforms
     this.physics.add.collider(player, platforms);
     
+    // Create enemies group
+    enemies = this.physics.add.group();
+    
+    // Create projectiles group
+    projectiles = this.physics.add.group();
+    
+    // Create XP orbs group
+    xpOrbs = this.physics.add.group();
+    
+    // Spawn initial enemies
+    spawnEnemy(this, 800, 680);
+    spawnEnemy(this, 1600, 680);
+    spawnEnemy(this, 2400, 680);
+    
+    // Collision between enemies and platforms
+    this.physics.add.collider(enemies, platforms);
+    
+    // Collision between projectiles and platforms
+    this.physics.add.collider(projectiles, platforms, function(proj) {
+        proj.destroy();
+    });
+    
+    // Collision between projectiles and enemies
+    this.physics.add.overlap(projectiles, enemies, function(proj, enemy) {
+        damageEnemy(proj, enemy);
+    });
+    
+    // Collision between player and enemies
+    this.physics.add.overlap(player, enemies, function(p, enemy) {
+        damagePlayer(enemy.damage || 10);
+    });
+    
+    // Collision between player and XP orbs
+    this.physics.add.overlap(player, xpOrbs, function(p, orb) {
+        gainXP(orb.xpValue || 25);
+        orb.destroy();
+    });
+    
     // Input
     cursors = this.input.keyboard.createCursorKeys();
     wasdKeys = this.input.keyboard.addKeys('W,A,S,D');
@@ -149,6 +227,11 @@ function create() {
         changeSize('normal');
     });
     
+    // Attack handler - fire projectile
+    this.input.keyboard.on('keydown-F', function() {
+        fireProjectile(player.scene);
+    });
+    
     // Create debug text
     debugText = this.add.text(10, 10, 'X: 0', {
         fontSize: '16px',
@@ -174,7 +257,7 @@ function create() {
 
 function update() {
     // Update debug text with player position
-    debugText.setText(`X: ${Math.round(player.x)} / ${WORLD_WIDTH}`);
+    debugText.setText(`X: ${Math.round(player.x)} / ${WORLD_WIDTH} | LV: ${playerStats.level} | HP: ${playerStats.health}/${playerStats.maxHealth}`);
     
     // Update size change cooldown
     if (sizeChangeTimer > 0) {
@@ -193,6 +276,23 @@ function update() {
     } else {
         player.body.setVelocityX(0);
     }
+    
+    // Update enemy AI
+    enemies.children.entries.forEach(enemy => {
+        if (enemy.active) {
+            updateEnemyAI(enemy);
+        }
+    });
+    
+    // Destroy projectiles that go out of bounds
+    projectiles.children.entries.forEach(proj => {
+        if (proj.x < 0 || proj.x > WORLD_WIDTH) {
+            console.log(`Projectile out of bounds at X=${proj.x}, destroying`);
+            proj.destroy();
+        } else {
+            console.log(`Projectile at X=${proj.x}, VelX=${proj.body.velocity.x}`);
+        }
+    });
     
     // Clamp camera to world bounds while allowing player to reach edges
     const camera = player.scene.cameras.main;
@@ -248,4 +348,139 @@ function changeSize(newSize) {
     
     // Reset cooldown timer
     sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+}
+
+// Enemy functions
+function spawnEnemy(scene, x, y) {
+    const config = ENEMY_CONFIG.generic;
+    const enemy = scene.add.rectangle(x, y, config.width, config.height, config.color);
+    scene.physics.add.existing(enemy);
+    enemy.body.setBounce(0.2);
+    enemy.body.setCollideWorldBounds(true);
+    
+    // Enemy-specific properties
+    enemy.health = config.health;
+    enemy.maxHealth = config.health;
+    enemy.damage = config.damage;
+    enemy.xpReward = config.xpReward;
+    enemy.speed = config.speed;
+    enemy.patrolDistance = config.patrolDistance;
+    enemy.startX = x;
+    enemy.direction = 1; // 1 for right, -1 for left
+    enemy.hasHitBoundary = false; // Track if we've hit the boundary
+    
+    enemies.add(enemy);
+    return enemy;
+}
+
+function updateEnemyAI(enemy) {
+    // Simple patrol AI with boundary detection
+    const maxDistance = enemy.patrolDistance / 2;
+    const distFromStart = Math.abs(enemy.x - enemy.startX);
+    
+    // Change direction at patrol boundaries
+    if (distFromStart > maxDistance) {
+        if (!enemy.hasHitBoundary) {
+            enemy.direction *= -1;
+            enemy.hasHitBoundary = true;
+        }
+    } else {
+        enemy.hasHitBoundary = false;
+    }
+    
+    enemy.body.setVelocityX(enemy.speed * enemy.direction);
+}
+
+function fireProjectile(scene) {
+    const now = Date.now();
+    
+    // Check cooldown
+    if (now - lastProjectileTime < PROJECTILE_CONFIG.basic.cooldown) {
+        return;
+    }
+    
+    lastProjectileTime = now;
+    
+    const config = PROJECTILE_CONFIG.basic;
+    
+    // Default fire to the right, unless holding left movement key
+    let direction = 1; // Default right
+    if (wasdKeys.A.isDown || cursors.left.isDown) {
+        direction = -1; // Fire left if holding A or left arrow
+    }
+    
+    const velocityX = config.speed * direction;
+    
+    // Create projectile rectangle
+    const projectile = scene.add.rectangle(
+        player.x,
+        player.y,
+        config.width,
+        config.height,
+        config.color
+    );
+    
+    // Add to physics group
+    projectiles.add(projectile);
+    
+    // Add physics body
+    scene.physics.add.existing(projectile);
+    projectile.body.setAllowGravity(false);
+    projectile.body.setBounce(0, 0);
+    projectile.body.setVelocity(velocityX, 0);
+    projectile.damage = config.damage;
+    
+    console.log(`Projectile fired at (${player.x}, ${player.y})! VelX: ${velocityX}`);
+    console.log(`Body velocity after set: X=${projectile.body.velocity.x}, Y=${projectile.body.velocity.y}`);
+}
+
+function damageEnemy(projectile, enemy) {
+    const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
+    enemy.health -= damage;
+    
+    projectile.destroy();
+    
+    if (enemy.health <= 0) {
+        // Drop XP orb
+        spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
+        enemy.destroy();
+    }
+}
+
+function spawnXPOrb(scene, x, y, xpValue) {
+    const orb = scene.add.circle(x, y, 6, 0xFFD700); // Gold color
+    scene.physics.add.existing(orb);
+    orb.body.setVelocity(
+        Phaser.Math.Between(-50, 50),
+        Phaser.Math.Between(-100, -50)
+    );
+    orb.xpValue = xpValue;
+    
+    xpOrbs.add(orb);
+}
+
+function damagePlayer(damage) {
+    playerStats.health = Math.max(0, playerStats.health - damage);
+    
+    if (playerStats.health <= 0) {
+        console.log('Player defeated! Game Over.');
+        // TODO: Implement game over screen
+    }
+}
+
+function gainXP(amount) {
+    playerStats.xp += amount;
+    
+    // Check for level up
+    while (playerStats.xp >= playerStats.xpToLevel) {
+        playerStats.xp -= playerStats.xpToLevel;
+        playerStats.level += 1;
+        
+        // Increase stats on level up
+        playerStats.maxHealth += 20;
+        playerStats.health = playerStats.maxHealth;
+        playerStats.xpToLevel = Math.floor(playerStats.xpToLevel * 1.1);
+        
+        console.log(`Level Up! Now level ${playerStats.level}`);
+    }
 }
