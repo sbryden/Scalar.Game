@@ -36,10 +36,17 @@ export function changeSize(newSize) {
     const newHeight = baseHeight * newScale;
     const heightDifference = newHeight - oldHeight;
     
-    player.y -= heightDifference / 2;
     player.setScale(config.scale);
-    player.setFillStyle(config.color);
+    player.y -= heightDifference / 2;
     player.body.updateFromGameObject();
+    
+    // Clamp player above ground (ground is at y: 750, player center needs buffer)
+    const groundY = 750;
+    const playerRadius = (baseHeight * config.scale) / 2;
+    const minY = groundY - playerRadius;
+    if (player.y > minY) {
+        player.y = minY;
+    }
     
     // Scale enemies inversely
     const enemyScale = 1 / newScale;

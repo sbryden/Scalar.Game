@@ -37,7 +37,35 @@ let debugText;
 let uiElements;
 
 function preload() {
-    // Assets will be loaded here
+    // Create car texture facing right
+    const carGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+    
+    // Car body (red rectangle)
+    carGraphics.fillStyle(0xFF4444, 1);
+    carGraphics.fillRect(4, 8, 32, 16);
+    
+    // Car cabin (darker red)
+    carGraphics.fillStyle(0xCC0000, 1);
+    carGraphics.fillRect(6, 4, 20, 8);
+    
+    // Windshield/window on left (front, facing right)
+    carGraphics.fillStyle(0x87CEEB, 1);
+    carGraphics.fillRect(8, 5, 8, 5);
+    
+    // Left wheel (black circle)
+    carGraphics.fillStyle(0x000000, 1);
+    carGraphics.fillCircle(10, 25, 4);
+    
+    // Right wheel (black circle)
+    carGraphics.fillCircle(30, 25, 4);
+    
+    // Wheels rims (gray)
+    carGraphics.fillStyle(0x444444, 1);
+    carGraphics.fillCircle(10, 25, 2);
+    carGraphics.fillCircle(30, 25, 2);
+    
+    carGraphics.generateTexture('car', 40, 30);
+    carGraphics.destroy();
 }
 
 function create() {
@@ -78,8 +106,9 @@ function create() {
     ground.setOrigin(0.5, 0.5);
     ground.setScale(1).refreshBody();
     
-    // Create player
-    player = this.add.rectangle(100, 650, 40, 40, 0x00ff00);
+    // Create player (car)
+    player = this.add.sprite(100, 650, 'car');
+    player.setScale(2);
     this.physics.add.existing(player);
     player.body.setBounce(0.2);
     player.body.setCollideWorldBounds(true);
@@ -177,8 +206,10 @@ function update() {
     
     if (wasdKeys.A.isDown || cursors.left.isDown) {
         player.body.setVelocityX(-baseSpeed * speedMultiplier);
+        player.setFlipX(true);  // Face left
     } else if (wasdKeys.D.isDown || cursors.right.isDown) {
         player.body.setVelocityX(baseSpeed * speedMultiplier);
+        player.setFlipX(false); // Face right
     } else {
         player.body.setVelocityX(0);
     }

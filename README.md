@@ -36,22 +36,20 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 
 ## How to Play
 
-Use the **arrow keys** to move left and right, and **spacebar** to jump. Navigate across platforms and avoid falling off the world!
+Control your car to navigate platforms, defeat enemies, and progress through the game!
 
-- ⬅️ **Left Arrow** - Move left
-- ➡️ **Right Arrow** - Move right
+**Movement & Jumping:**
+- ⬅️ **Left Arrow / A** - Move left
+- ➡️ **Right Arrow / D** - Move right
 - **Space** - Jump
 
-## Project Layout
+**Size Mechanics:**
+- **Q** - Shrink (small size, faster movement)
+- **E** - Grow (large size, slower movement)
+- **R** - Reset to normal size
 
-```
-├── index.html              # HTML entry point
-├── style.css               # Game styling
-├── vite.config.js          # Vite build configuration
-├── package.json            # Dependencies and scripts
-└── src/
-    └── game.js             # Game logic and scenes
-```
+**Combat:**
+- **F** - Shoot projectiles
 
 ## Scripts
 
@@ -74,15 +72,3 @@ This project is set up as a foundation for adding:
 - Score and progression system
 - Multiple levels and worlds
 - Sound effects and music
-
-## Contributing
-
-Feel free to modify and extend the game! The codebase is clean and well-structured, making it easy to add new features.
-
-## License
-
-Open source - use freely for learning and development
-
-## Support
-
-For issues or questions, check the [INSTRUCTIONS.md](INSTRUCTIONS.md) file for detailed setup and troubleshooting guidance.
