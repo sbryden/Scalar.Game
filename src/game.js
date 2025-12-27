@@ -64,6 +64,14 @@ function preload() {
     carGraphics.fillCircle(10, 25, 2);
     carGraphics.fillCircle(30, 25, 2);
     
+    // Cannon on front (right side) - barrel
+    carGraphics.fillStyle(0x333333, 1);
+    carGraphics.fillRect(34, 12, 8, 4);
+    
+    // Cannon base (dark gray)
+    carGraphics.fillStyle(0x555555, 1);
+    carGraphics.fillCircle(34, 14, 3);
+    
     carGraphics.generateTexture('car', 40, 30);
     carGraphics.destroy();
 }

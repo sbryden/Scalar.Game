@@ -28,6 +28,11 @@ export function fireProjectile(scene) {
     
     const velocityX = config.speed * direction;
     
+    // Offset projectile spawn behind the vehicle (opposite of direction)
+    const spawnOffsetX = direction === 1 ? 40 : -40;
+    const projectileX = player.x + spawnOffsetX;
+    const projectileY = player.y;
+    
     // Create centered triangle projectile
     const size = 6;
     let points;
@@ -47,8 +52,9 @@ export function fireProjectile(scene) {
         ];
     }
     
-    const projectile = scene.add.polygon(player.x, player.y, points, 0x000000); // Black
+    const projectile = scene.add.polygon(projectileX, projectileY, points, 0x000000); // Black
     projectile.setOrigin(0.5, 0.5); // Center the origin
+    projectile.setDepth(0); // Same level as car
     
     projectiles.add(projectile);
     scene.physics.add.existing(projectile);
