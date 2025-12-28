@@ -14,7 +14,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     },
     scene: {
@@ -37,43 +37,10 @@ let debugText;
 let uiElements;
 
 function preload() {
-    // Create car texture facing right
-    const carGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-    
-    // Car body (red rectangle)
-    carGraphics.fillStyle(0xFF4444, 1);
-    carGraphics.fillRect(4, 8, 32, 16);
-    
-    // Car cabin (darker red)
-    carGraphics.fillStyle(0xCC0000, 1);
-    carGraphics.fillRect(6, 4, 20, 8);
-    
-    // Windshield/window on left (front, facing right)
-    carGraphics.fillStyle(0x87CEEB, 1);
-    carGraphics.fillRect(8, 5, 8, 5);
-    
-    // Left wheel (black circle)
-    carGraphics.fillStyle(0x000000, 1);
-    carGraphics.fillCircle(10, 25, 4);
-    
-    // Right wheel (black circle)
-    carGraphics.fillCircle(30, 25, 4);
-    
-    // Wheels rims (gray)
-    carGraphics.fillStyle(0x444444, 1);
-    carGraphics.fillCircle(10, 25, 2);
-    carGraphics.fillCircle(30, 25, 2);
-    
-    // Cannon on front (right side) - barrel
-    carGraphics.fillStyle(0x333333, 1);
-    carGraphics.fillRect(34, 12, 8, 4);
-    
-    // Cannon base (dark gray)
-    carGraphics.fillStyle(0x555555, 1);
-    carGraphics.fillCircle(34, 14, 3);
-    
-    carGraphics.generateTexture('car', 40, 30);
-    carGraphics.destroy();
+    // Load tank image
+    this.load.image('car', './assets/tank.png');
+    // Load rockgiant enemy image
+    this.load.image('enemy', './assets/rockgiant.png');
 }
 
 function create() {
@@ -114,9 +81,9 @@ function create() {
     ground.setOrigin(0.5, 0.5);
     ground.setScale(1).refreshBody();
     
-    // Create player (car)
+    // Create player (tank)
     player = this.add.sprite(100, 650, 'car');
-    player.setScale(2);
+    player.setScale(0.25);
     this.physics.add.existing(player);
     player.body.setBounce(0.2);
     player.body.setCollideWorldBounds(true);

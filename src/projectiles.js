@@ -31,7 +31,10 @@ export function fireProjectile(scene) {
     // Offset projectile spawn behind the vehicle (opposite of direction)
     const spawnOffsetX = direction === 1 ? 40 : -40;
     const projectileX = player.x + spawnOffsetX;
-    const projectileY = player.y;
+    
+    // Projectile spawns at 1/6 height of tank (1/6 from top)
+    const tankHeight = player.displayHeight;
+    const projectileY = player.y - tankHeight / 2 + (1 / 6) * tankHeight;
     
     // Create centered triangle projectile
     const size = 6;

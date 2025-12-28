@@ -30,23 +30,17 @@ export function changeSize(newSize) {
     playerSize = newSize;
     const config = SIZE_CONFIG[newSize];
     
-    // Adjust Y position to keep feet on the ground
-    const baseHeight = 40;
-    const oldHeight = baseHeight * oldScale;
-    const newHeight = baseHeight * newScale;
-    const heightDifference = newHeight - oldHeight;
+    // Base scale for the tank sprite (0.25 to make it ~100px)
+    const baseDisplayScale = 0.25;
     
-    player.setScale(config.scale);
-    player.y -= heightDifference / 2;
+    // Apply new scale
+    player.setScale(baseDisplayScale * config.scale);
     player.body.updateFromGameObject();
     
-    // Clamp player above ground (ground is at y: 750, player center needs buffer)
-    const groundY = 750;
-    const playerRadius = (baseHeight * config.scale) / 2;
-    const minY = groundY - playerRadius;
-    if (player.y > minY) {
-        player.y = minY;
-    }
+    // Small jump to account for size change
+    const sizeDifference = Math.abs(newScale - oldScale);
+    const jumpPower = 50 + (sizeDifference * 150);
+    player.body.setVelocityY(-jumpPower);
     
     // Scale enemies inversely
     const enemyScale = 1 / newScale;
