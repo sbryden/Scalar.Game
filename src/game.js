@@ -1,9 +1,10 @@
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING, SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG, PROJECTILE_CONFIG } from './config.js';
-import { changeSize, setPlayer as setPlayerPlayer, setEnemies as setEnemiesPlayer, getPlayerSize, getSizeChangeTimer, setSizeChangeTimer } from './player.js';
-import { spawnEnemy, updateEnemyAI, damageEnemy, setEnemies as setEnemiesEnemies, setPlatforms as setPlatformsEnemies } from './enemies.js';
-import { fireProjectile, setPlayer as setPlayerProjectiles, setProjectiles, setInputs as setInputsProjectiles, updateProjectiles } from './projectiles.js';
-import { spawnXPOrb, gainXP, checkLevelUp, damagePlayer, setPlayer as setPlayerXP, setPlatforms as setPlatformsXP, setXPOrbs, setLevelText, getPlayerStats, updateXPOrbMagnetism, setScene as setSceneXP, setSpawnEnemyFunc } from './xpOrbs.js';
+import { changeSize, getPlayerSize, getSizeChangeTimer, setSizeChangeTimer } from './player.js';
+import { spawnEnemy, updateEnemyAI, damageEnemy } from './enemies.js';
+import { fireProjectile, setInputs as setInputsProjectiles, updateProjectiles } from './projectiles.js';
+import { spawnXPOrb, gainXP, damagePlayer, getPlayerStats, updateXPOrbMagnetism } from './xpOrbs.js';
 import { createUIElements, updateUIBars } from './ui.js';
+import gameState from './utils/gameState.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -101,22 +102,18 @@ function create() {
     projectiles = this.physics.add.group();
     xpOrbs = this.physics.add.group();
     
-    // Setup module references
-    setPlayerPlayer(player);
-    setEnemiesPlayer(enemies);
-    setPlayerProjectiles(player);
-    setProjectiles(projectiles);
-    setPlayerXP(player);
-    setPlatformsXP(platforms);
-    setXPOrbs(xpOrbs);
-    setSceneXP(this);
-    setSpawnEnemyFunc(spawnEnemy);
-    setEnemiesEnemies(enemies);
-    setPlatformsEnemies(platforms);
+    // Initialize gameState with all game objects
+    gameState.player = player;
+    gameState.enemies = enemies;
+    gameState.projectiles = projectiles;
+    gameState.xpOrbs = xpOrbs;
+    gameState.platforms = platforms;
+    gameState.scene = this;
+    gameState.spawnEnemyFunc = spawnEnemy;
     
     // Create UI
     uiElements = createUIElements(this);
-    setLevelText(uiElements.levelText);
+    gameState.levelText = uiElements.levelText;
     
     // Spawn initial enemies
     for (let x = 300; x < WORLD_WIDTH; x += 300) {
@@ -132,6 +129,8 @@ function create() {
     // Input
     cursors = this.input.keyboard.createCursorKeys();
     wasdKeys = this.input.keyboard.addKeys('W,A,S,D');
+    gameState.cursors = cursors;
+    gameState.wasdKeys = wasdKeys;
     setInputsProjectiles(cursors, wasdKeys);
     
     // Jump

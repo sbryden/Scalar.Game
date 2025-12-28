@@ -1,14 +1,12 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config.js';
+import gameState from './utils/gameState.js';
 
-let player;
-let projectiles;
-let cursors;
-let wasdKeys;
 let lastProjectileTime = 0;
 
-export function setPlayer(p) { player = p; }
-export function setProjectiles(pr) { projectiles = pr; }
-export function setInputs(c, w) { cursors = c; wasdKeys = w; }
+export function setInputs(c, w) { 
+    gameState.cursors = c; 
+    gameState.wasdKeys = w; 
+}
 
 export function fireProjectile(scene) {
     const now = Date.now();
@@ -22,7 +20,7 @@ export function fireProjectile(scene) {
     const config = PROJECTILE_CONFIG.basic;
     
     let direction = 1;
-    if (wasdKeys.A.isDown || cursors.left.isDown) {
+    if (gameState.wasdKeys.A.isDown || gameState.cursors.left.isDown) {
         direction = -1;
     }
     
@@ -30,11 +28,11 @@ export function fireProjectile(scene) {
     
     // Offset projectile spawn behind the vehicle (opposite of direction)
     const spawnOffsetX = direction === 1 ? 40 : -40;
-    const projectileX = player.x + spawnOffsetX;
+    const projectileX = gameState.player.x + spawnOffsetX;
     
     // Projectile spawns at 1/6 height of tank (1/6 from top)
-    const tankHeight = player.displayHeight;
-    const projectileY = player.y - tankHeight / 2 + (1 / 6) * tankHeight;
+    const tankHeight = gameState.player.displayHeight;
+    const projectileY = gameState.player.y - tankHeight / 2 + (1 / 6) * tankHeight;
     
     // Create centered triangle projectile
     const size = 6;
@@ -59,7 +57,7 @@ export function fireProjectile(scene) {
     projectile.setOrigin(0.5, 0.5); // Center the origin
     projectile.setDepth(0); // Same level as car
     
-    projectiles.add(projectile);
+    gameState.projectiles.add(projectile);
     scene.physics.add.existing(projectile);
     projectile.body.setAllowGravity(false);
     projectile.body.setBounce(0, 0);
@@ -69,7 +67,7 @@ export function fireProjectile(scene) {
 }
 
 export function updateProjectiles() {
-    projectiles.children.entries.forEach(proj => {
+    gameState.projectiles.children.entries.forEach(proj => {
         if (proj.x < 0 || proj.x > WORLD_WIDTH) {
             proj.destroy();
         }

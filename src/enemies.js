@@ -1,10 +1,5 @@
 import { ENEMY_CONFIG, PROJECTILE_CONFIG } from './config.js';
-
-let enemies;
-let platforms;
-
-export function setEnemies(e) { enemies = e; }
-export function setPlatforms(p) { platforms = p; }
+import gameState from './utils/gameState.js';
 
 export function spawnEnemy(scene, x, y) {
     const config = ENEMY_CONFIG.generic;
@@ -34,7 +29,7 @@ export function spawnEnemy(scene, x, y) {
     enemy.healthBarBg.setDepth(50);
     enemy.healthBarOffsetY = healthBarOffsetY;
     
-    enemies.add(enemy);
+    gameState.enemies.add(enemy);
     return enemy;
 }
 
