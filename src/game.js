@@ -2,7 +2,7 @@ import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING, SIZE_CONFIG, SIZE_CHANGE_COO
 import { changeSize, setPlayer as setPlayerPlayer, setEnemies as setEnemiesPlayer, getPlayerSize, getSizeChangeTimer, setSizeChangeTimer } from './player.js';
 import { spawnEnemy, updateEnemyAI, damageEnemy, setEnemies as setEnemiesEnemies, setPlatforms as setPlatformsEnemies } from './enemies.js';
 import { fireProjectile, setPlayer as setPlayerProjectiles, setProjectiles, setInputs as setInputsProjectiles, updateProjectiles } from './projectiles.js';
-import { spawnXPOrb, gainXP, checkLevelUp, damagePlayer, setPlayer as setPlayerXP, setPlatforms as setPlatformsXP, setXPOrbs, setLevelText, getPlayerStats, updateXPOrbMagnetism } from './xpOrbs.js';
+import { spawnXPOrb, gainXP, checkLevelUp, damagePlayer, setPlayer as setPlayerXP, setPlatforms as setPlatformsXP, setXPOrbs, setLevelText, getPlayerStats, updateXPOrbMagnetism, setScene as setSceneXP, setSpawnEnemyFunc } from './xpOrbs.js';
 import { createUIElements, updateUIBars } from './ui.js';
 
 const config = {
@@ -37,8 +37,12 @@ let debugText;
 let uiElements;
 
 function preload() {
-    // Load tank image
-    this.load.image('car', './assets/tank.png');
+    // Load car images for different levels
+    this.load.image('car_1', './assets/car_1.png');
+    this.load.image('car_2', './assets/car_2.png');
+    this.load.image('car_3', './assets/car_3.png');
+    this.load.image('car_4', './assets/car_4.png');
+    this.load.image('car_5', './assets/car_5.png');
     // Load rockgiant enemy image
     this.load.image('enemy', './assets/rockgiant.png');
 }
@@ -81,8 +85,8 @@ function create() {
     ground.setOrigin(0.5, 0.5);
     ground.setScale(1).refreshBody();
     
-    // Create player (tank)
-    player = this.add.sprite(100, 650, 'car');
+    // Create player (car)
+    player = this.add.sprite(100, 650, 'car_1');
     player.setScale(0.25);
     this.physics.add.existing(player);
     player.body.setBounce(0.2);
@@ -105,6 +109,8 @@ function create() {
     setPlayerXP(player);
     setPlatformsXP(platforms);
     setXPOrbs(xpOrbs);
+    setSceneXP(this);
+    setSpawnEnemyFunc(spawnEnemy);
     setEnemiesEnemies(enemies);
     setPlatformsEnemies(platforms);
     
@@ -113,9 +119,9 @@ function create() {
     setLevelText(uiElements.levelText);
     
     // Spawn initial enemies
-    spawnEnemy(this, 800, 680);
-    spawnEnemy(this, 1600, 680);
-    spawnEnemy(this, 2400, 680);
+    for (let x = 300; x < WORLD_WIDTH; x += 300) {
+        spawnEnemy(this, x, 680);
+    }
     
     // Collisions
     this.physics.add.collider(enemies, platforms);

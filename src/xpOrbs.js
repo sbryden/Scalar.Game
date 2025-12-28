@@ -4,6 +4,8 @@ let player;
 let platforms;
 let xpOrbs;
 let levelText;
+let scene;
+let spawnEnemyFunc;
 const MAGNETISM_RANGE = 150; // Distance to start pulling orbs
 const MAGNETISM_SPEED = 250; // Speed to pull orbs
 
@@ -19,6 +21,8 @@ export function setPlayer(p) { player = p; }
 export function setPlatforms(pl) { platforms = pl; }
 export function setXPOrbs(x) { xpOrbs = x; }
 export function setLevelText(lt) { levelText = lt; }
+export function setScene(s) { scene = s; }
+export function setSpawnEnemyFunc(func) { spawnEnemyFunc = func; }
 export function getPlayerStats() { return playerStats; }
 export function updatePlayerStats(stats) { playerStats = stats; }
 
@@ -70,11 +74,36 @@ export function checkLevelUp() {
         playerStats.health = playerStats.maxHealth;
         playerStats.xpToLevel = Math.floor(playerStats.xpToLevel * 1.1);
         
+        // Upgrade car sprite based on level
+        upgradePlayerCar();
+        
         if (levelText) {
             levelText.setText(`LEVEL ${playerStats.level}`);
         }
         
         console.log(`Level Up! Now level ${playerStats.level}`);
+    }
+}
+
+export function upgradePlayerCar() {
+    if (!player) return;
+    
+    // Cars are car_1 through car_5 (levels 1-5)
+    const carLevel = Math.min(playerStats.level, 5);
+    const carTexture = `car_${carLevel}`;
+    
+    player.setTexture(carTexture);
+    
+    // Spawn additional enemies based on level
+    if (spawnEnemyFunc && scene) {
+        const enemiesToSpawn = Math.min(playerStats.level - 1, 3); // Spawn 0-3 additional enemies
+        const spawnOffsets = [300, 800, 1600];
+        
+        for (let i = 0; i < enemiesToSpawn; i++) {
+            const xOffset = spawnOffsets[i];
+            const spawnX = player.x + xOffset;
+            spawnEnemyFunc(scene, spawnX, 680);
+        }
     }
 }
 
