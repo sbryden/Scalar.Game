@@ -1,5 +1,6 @@
 import { ENEMY_CONFIG, PROJECTILE_CONFIG } from './config.js';
 import gameState from './utils/gameState.js';
+import combatSystem from './systems/CombatSystem.js';
 
 export function spawnEnemy(scene, x, y) {
     const config = ENEMY_CONFIG.generic;
@@ -71,18 +72,5 @@ export function updateEnemyAI(enemy) {
 }
 
 export async function damageEnemy(projectile, enemy) {
-    if (!projectile.active) return;
-    
-    const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
-    enemy.health -= damage;
-    
-    projectile.destroy();
-    
-    if (enemy.health <= 0) {
-        const { spawnXPOrb } = await import('./xpOrbs.js');
-        spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
-        if (enemy.healthBar) enemy.healthBar.destroy();
-        if (enemy.healthBarBg) enemy.healthBarBg.destroy();
-        enemy.destroy();
-    }
+    combatSystem.damageEnemy(projectile, enemy);
 }

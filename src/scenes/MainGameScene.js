@@ -1,0 +1,187 @@
+/**
+ * Main Game Scene
+ * Primary gameplay scene
+ */
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../config.js';
+import { spawnEnemy, updateEnemyAI } from '../enemies.js';
+import { updateProjectiles } from '../projectiles.js';
+import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
+import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
+import gameState from '../utils/gameState.js';
+import { InputManager } from '../managers/InputManager.js';
+import { CollisionManager } from '../managers/CollisionManager.js';
+import { CameraManager } from '../managers/CameraManager.js';
+import { HUD } from '../ui/HUD.js';
+import { DebugDisplay } from '../ui/DebugDisplay.js';
+
+export default class MainGameScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'MainGameScene' });
+        
+        // Scene variables
+        this.player = null;
+        this.platforms = null;
+        this.enemies = null;
+        this.projectiles = null;
+        this.xpOrbs = null;
+        this.hud = null;
+        this.debugDisplay = null;
+        
+        // Managers
+        this.inputManager = null;
+        this.collisionManager = null;
+        this.cameraManager = null;
+    }
+    
+    create() {
+        this.createBackground();
+        this.createGround();
+        this.createPlayer();
+        this.createGroups();
+        this.initializeGameState();
+        this.createUI();
+        this.spawnInitialEnemies();
+        this.setupManagers();
+        this.createDebugText();
+    }
+    
+    createBackground() {
+        // Create background
+        const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        bgGraphics.fillStyle(0x87CEEB, 1);
+        bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        bgGraphics.lineStyle(1, 0x4DA6D6, 0.3);
+        for (let i = 0; i < WORLD_WIDTH; i += 100) {
+            bgGraphics.lineBetween(i, 0, i, WORLD_HEIGHT);
+        }
+        for (let i = 0; i < WORLD_HEIGHT; i += 100) {
+            bgGraphics.lineBetween(0, i, WORLD_WIDTH, i);
+        }
+        bgGraphics.generateTexture('background', WORLD_WIDTH, WORLD_HEIGHT);
+        bgGraphics.destroy();
+        
+        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'background')
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
+    
+    createGround() {
+        // Create ground texture
+        const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        groundGraphics.fillStyle(0x8B7355, 1);
+        groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
+        groundGraphics.fillStyle(0x6B5345, 1);
+        for (let x = 0; x < WORLD_WIDTH; x += 50) {
+            for (let y = 0; y < 50; y += 25) {
+                const offset = (y === 25) ? 25 : 0;
+                groundGraphics.fillRect(x + offset, y, 25, 10);
+            }
+        }
+        groundGraphics.generateTexture('ground', WORLD_WIDTH, 50);
+        groundGraphics.destroy();
+        
+        // Create platforms
+        this.platforms = this.physics.add.staticGroup();
+        this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        const ground = this.platforms.create(WORLD_WIDTH / 2, 750, 'ground');
+        ground.setOrigin(0.5, 0.5);
+        ground.setScale(1).refreshBody();
+    }
+    
+    createPlayer() {
+        // Create player (car)
+        this.player = this.add.sprite(100, 650, 'car_1');
+        this.player.setScale(0.25);
+        this.physics.add.existing(this.player);
+        this.player.body.setBounce(0.2);
+        this.player.body.setCollideWorldBounds(true);
+        this.player.body.setDrag(0, 0);
+        this.player.scene = this;
+        
+        this.physics.add.collider(this.player, this.platforms);
+    }
+    
+    createGroups() {
+        // Create groups
+        this.enemies = this.physics.add.group();
+        this.projectiles = this.physics.add.group();
+        this.xpOrbs = this.physics.add.group();
+    }
+    
+    initializeGameState() {
+        // Initialize gameState with all game objects
+        gameState.player = this.player;
+        gameState.enemies = this.enemies;
+        gameState.projectiles = this.projectiles;
+        gameState.xpOrbs = this.xpOrbs;
+        gameState.platforms = this.platforms;
+        gameState.scene = this;
+        gameState.spawnEnemyFunc = spawnEnemy;
+    }
+    
+    createUI() {
+        // Create HUD
+        this.hud = new HUD(this);
+        gameState.levelText = this.hud.levelText;
+    }
+    
+    spawnInitialEnemies() {
+        // Spawn initial enemies
+        for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            spawnEnemy(this, x, 680);
+        }
+    }
+    
+    setupManagers() {
+        // Setup managers
+        this.inputManager = new InputManager(this);
+        this.inputManager.setupInput();
+        
+        this.collisionManager = new CollisionManager(this);
+        this.collisionManager.setupCollisions();
+        
+        this.cameraManager = new CameraManager(this);
+        this.cameraManager.setupCamera();
+    }
+    
+    createDebugText() {
+        // Create debug display
+        this.debugDisplay = new DebugDisplay(this);
+    }
+    
+    update() {
+        const playerStats = getPlayerStats();
+        
+        // Update debug display
+        this.debugDisplay.update(this.player.x, playerStats);
+        
+        // Update HUD
+        this.hud.update(playerStats);
+        
+        // Update size change cooldown
+        let timer = getSizeChangeTimer();
+        if (timer > 0) {
+            timer -= 1000 / 60;
+            setSizeChangeTimer(timer);
+        }
+        
+        // Handle player movement
+        this.inputManager.handleMovement();
+        
+        // Update enemies
+        this.enemies.children.entries.forEach(enemy => {
+            if (enemy.active) {
+                updateEnemyAI(enemy);
+            }
+        });
+        
+        // Update projectiles
+        updateProjectiles();
+        
+        // Update XP orb magnetism
+        updateXPOrbMagnetism();
+        
+        // Update camera
+        this.cameraManager.update();
+    }
+}
