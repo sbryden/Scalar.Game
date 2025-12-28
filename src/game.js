@@ -1,10 +1,13 @@
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING, SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG, PROJECTILE_CONFIG } from './config.js';
 import { changeSize, getPlayerSize, getSizeChangeTimer, setSizeChangeTimer } from './player.js';
 import { spawnEnemy, updateEnemyAI, damageEnemy } from './enemies.js';
-import { fireProjectile, setInputs as setInputsProjectiles, updateProjectiles } from './projectiles.js';
+import { fireProjectile, updateProjectiles } from './projectiles.js';
 import { spawnXPOrb, gainXP, damagePlayer, getPlayerStats, updateXPOrbMagnetism } from './xpOrbs.js';
 import { createUIElements, updateUIBars } from './ui.js';
 import gameState from './utils/gameState.js';
+import { InputManager } from './managers/InputManager.js';
+import { CollisionManager } from './managers/CollisionManager.js';
+import { CameraManager } from './managers/CameraManager.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -36,6 +39,11 @@ let projectiles;
 let xpOrbs;
 let debugText;
 let uiElements;
+
+// Managers
+let inputManager;
+let collisionManager;
+let cameraManager;
 
 function preload() {
     // Load car images for different levels
@@ -120,36 +128,15 @@ function create() {
         spawnEnemy(this, x, 680);
     }
     
-    // Collisions
-    this.physics.add.collider(enemies, platforms);
-    this.physics.add.collider(projectiles, platforms, (proj) => proj.destroy());
-    this.physics.add.collider(projectiles, enemies, (proj, enemy) => damageEnemy(proj, enemy), null, this);
-    this.physics.add.overlap(player, enemies, (p, enemy) => damagePlayer(enemy.damage || 10));
+    // Setup managers
+    inputManager = new InputManager(this);
+    inputManager.setupInput();
     
-    // Input
-    cursors = this.input.keyboard.createCursorKeys();
-    wasdKeys = this.input.keyboard.addKeys('W,A,S,D');
-    gameState.cursors = cursors;
-    gameState.wasdKeys = wasdKeys;
-    setInputsProjectiles(cursors, wasdKeys);
+    collisionManager = new CollisionManager(this);
+    collisionManager.setupCollisions();
     
-    // Jump
-    this.input.keyboard.on('keydown-SPACE', () => {
-        if (player.body.touching.down) {
-            const currentVelocityX = player.body.velocity.x;
-            const jumpPower = 330 * SIZE_CONFIG[getPlayerSize()].jumpMultiplier;
-            player.body.setVelocityY(-jumpPower);
-            player.body.setVelocityX(currentVelocityX);
-        }
-    });
-    
-    // Size changes
-    this.input.keyboard.on('keydown-Q', () => changeSize('small'));
-    this.input.keyboard.on('keydown-E', () => changeSize('large'));
-    this.input.keyboard.on('keydown-R', () => changeSize('normal'));
-    
-    // Attack
-    this.input.keyboard.on('keydown-F', () => fireProjectile(player.scene));
+    cameraManager = new CameraManager(this);
+    cameraManager.setupCamera();
     
     // Debug text
     debugText = this.add.text(10, 10, 'X: 0', {
@@ -159,11 +146,6 @@ function create() {
         padding: { x: 5, y: 5 }
     });
     debugText.setScrollFactor(0);
-    
-    // Camera
-    this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    this.cameras.main.startFollow(player);
-    this.cameras.main.setLerp(0.1, 0);
 }
 
 function update() {
@@ -180,19 +162,8 @@ function update() {
         setSizeChangeTimer(timer);
     }
     
-    // Movement
-    const baseSpeed = 160;
-    const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
-    
-    if (wasdKeys.A.isDown || cursors.left.isDown) {
-        player.body.setVelocityX(-baseSpeed * speedMultiplier);
-        player.setFlipX(true);  // Face left
-    } else if (wasdKeys.D.isDown || cursors.right.isDown) {
-        player.body.setVelocityX(baseSpeed * speedMultiplier);
-        player.setFlipX(false); // Face right
-    } else {
-        player.body.setVelocityX(0);
-    }
+    // Handle player movement
+    inputManager.handleMovement();
     
     // Update enemies
     enemies.children.entries.forEach(enemy => {
@@ -208,9 +179,5 @@ function update() {
     updateXPOrbMagnetism();
     
     // Update camera
-    const camera = player.scene.cameras.main;
-    const targetPlayerScreenX = CAMERA_PADDING;
-    let targetCameraX = player.x - targetPlayerScreenX;
-    targetCameraX = Phaser.Math.Clamp(targetCameraX, 0, WORLD_WIDTH - camera.width);
-    camera.setScroll(targetCameraX, 0);
+    cameraManager.update();
 }
