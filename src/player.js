@@ -5,20 +5,38 @@ export function getPlayerSize() { return gameState.playerSize; }
 export function getSizeChangeTimer() { return gameState.sizeChangeTimer; }
 export function setSizeChangeTimer(t) { gameState.sizeChangeTimer = t; }
 
-export function changeSize(newSize) {
+export function changeSize(direction) {
     // Check cooldown
     if (gameState.sizeChangeTimer > 0) {
         return; // Can't change size yet
     }
     
+    const currentSize = gameState.playerSize;
+    const sizeOrder = ['small', 'normal', 'large'];
+    const currentIndex = sizeOrder.indexOf(currentSize);
+    
+    let newSize;
+    if (direction === 'smaller') {
+        // Can't go smaller than small
+        if (currentIndex <= 0) return;
+        newSize = sizeOrder[currentIndex - 1];
+    } else if (direction === 'larger') {
+        // Can't go larger than large
+        if (currentIndex >= sizeOrder.length - 1) return;
+        newSize = sizeOrder[currentIndex + 1];
+    } else {
+        // Direct size specification (for backwards compatibility)
+        newSize = direction;
+    }
+    
     // Don't change if already that size
-    if (newSize === gameState.playerSize) {
+    if (newSize === currentSize) {
         return;
     }
     
     // Check for scene transitions
     const currentScene = gameState.currentSceneKey;
-    const oldSize = gameState.playerSize;
+    const oldSize = currentSize;
     
     // Transition to MicroScene when going to small from MainGameScene
     if (newSize === 'small' && currentScene === 'MainGameScene') {

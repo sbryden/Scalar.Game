@@ -39,10 +39,9 @@ export class InputManager {
             this.handleJump();
         });
         
-        // Size changes
-        this.scene.input.keyboard.on('keydown-Q', () => changeSize('small'));
-        this.scene.input.keyboard.on('keydown-E', () => changeSize('large'));
-        this.scene.input.keyboard.on('keydown-R', () => changeSize('normal'));
+        // Size changes - Q for smaller, E for larger (one step at a time)
+        this.scene.input.keyboard.on('keydown-Q', () => changeSize('smaller'));
+        this.scene.input.keyboard.on('keydown-E', () => changeSize('larger'));
         
         // Attack
         this.scene.input.keyboard.on('keydown-F', () => {

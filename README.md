@@ -1,6 +1,6 @@
-# Vehicle Side Scroller
+# Scalar
 
-A fun, interactive side-scrolling game built with **Phaser 3** and powered by **Vite**. Control a vehicle, navigate platforms, and experience dynamic gravity-based gameplay.
+A fun, interactive side-scrolling game built with **Phaser 3** and powered by **Vite**. Control a character with size-shifting abilities, navigate platforms, and experience dynamic gravity-based gameplay.
 
 ## Overview
 
@@ -36,7 +36,7 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 
 ## How to Play
 
-Control your car to navigate platforms, defeat enemies, and progress through the game!
+Control your character to navigate platforms, defeat enemies, and progress through the game!
 
 **Movement & Jumping:**
 - ⬅️ **Left Arrow / A** - Move left

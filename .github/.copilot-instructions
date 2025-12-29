@@ -1,4 +1,4 @@
-# Copilot Instructions for Vehicle Side Scroller
+# Copilot Instructions for Scalar
 
 ## Project Context
 This is a 2D side-scrolling game built with Phaser 3 and Vite. The game features a controllable vehicle that moves across platforms with physics-based gravity and collision detection.

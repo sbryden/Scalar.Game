@@ -9,7 +9,7 @@ import MicroScene from './scenes/MicroScene.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 1024,
+    width: 1400,
     height: 768,
     parent: 'game-container',
     physics: {
