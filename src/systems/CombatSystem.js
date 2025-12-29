@@ -16,6 +16,14 @@ export class CombatSystem {
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
         enemy.health -= damage;
         
+        // Visual feedback: flash enemy red
+        enemy.setTint(0xff0000);
+        enemy.scene.time.delayedCall(100, () => {
+            if (enemy.active) {
+                enemy.clearTint();
+            }
+        });
+        
         projectile.destroy();
         
         if (enemy.health <= 0) {
