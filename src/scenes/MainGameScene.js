@@ -139,6 +139,7 @@ export default class MainGameScene extends Phaser.Scene {
                 const enemy = spawnEnemy(this, enemyData.x, enemyData.y, 'generic');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
+                enemy.startY = enemyData.startY || enemyData.y;
                 enemy.direction = enemyData.direction;
             });
         } else {
@@ -211,7 +212,9 @@ export default class MainGameScene extends Phaser.Scene {
                 y: enemy.y,
                 health: enemy.health,
                 startX: enemy.startX,
-                direction: enemy.direction
+                startY: enemy.startY,
+                direction: enemy.direction,
+                enemyType: enemy.enemyType
             }));
         
         // Save player position

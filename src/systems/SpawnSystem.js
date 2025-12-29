@@ -71,10 +71,13 @@ export class SpawnSystem {
         const enemiesToSpawn = Math.min(stats.level - 1, 3); // Spawn 0-3 additional enemies
         const spawnOffsets = [300, 800, 1600];
         
+        // Determine enemy type based on current scene
+        const enemyType = gameState.currentSceneKey === 'MicroScene' ? 'micro' : 'generic';
+        
         for (let i = 0; i < enemiesToSpawn; i++) {
             const xOffset = spawnOffsets[i];
             const spawnX = gameState.player.x + xOffset;
-            gameState.spawnEnemyFunc(gameState.scene, spawnX, 680);
+            gameState.spawnEnemyFunc(gameState.scene, spawnX, 680, enemyType);
         }
     }
 }

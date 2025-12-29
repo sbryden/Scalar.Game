@@ -55,11 +55,17 @@ export function fireProjectile(scene) {
     projectile.body.setCollideWorldBounds(true);
     projectile.body.setVelocity(velocityX, 0);
     projectile.damage = config.damage;
+    
+    // Track projectile spawn position and max range (1.5x screen width)
+    projectile.spawnX = projectileX;
+    projectile.maxRange = 1024 * 1.5; // 1.5x screen width
 }
 
 export function updateProjectiles() {
     gameState.projectiles.children.entries.forEach(proj => {
-        if (proj.x < 0 || proj.x > WORLD_WIDTH) {
+        // Destroy projectile if it exceeds max range or goes off world
+        const distanceTraveled = Math.abs(proj.x - proj.spawnX);
+        if (distanceTraveled > proj.maxRange || proj.x < 0 || proj.x > WORLD_WIDTH) {
             proj.destroy();
         }
     });

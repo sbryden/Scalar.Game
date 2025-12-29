@@ -162,7 +162,9 @@ export default class MicroScene extends Phaser.Scene {
                 const enemy = spawnEnemy(this, enemyData.x, enemyData.y, 'micro');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
+                enemy.startY = enemyData.startY || enemyData.y;
                 enemy.direction = enemyData.direction;
+                enemy.floatAngle = enemyData.floatAngle || 0;
             });
         } else {
             // Spawn initial bacteria enemies
@@ -234,7 +236,10 @@ export default class MicroScene extends Phaser.Scene {
                 y: enemy.y,
                 health: enemy.health,
                 startX: enemy.startX,
-                direction: enemy.direction
+                startY: enemy.startY,
+                direction: enemy.direction,
+                enemyType: enemy.enemyType,
+                floatAngle: enemy.floatAngle
             }));
         
         // Save player position
