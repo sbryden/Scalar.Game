@@ -8,6 +8,7 @@ import { updateProjectiles } from '../projectiles.js';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
 import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
 import gameState from '../utils/gameState.js';
+import playerStatsSystem from '../systems/PlayerStatsSystem.js';
 import { InputManager } from '../managers/InputManager.js';
 import { CollisionManager } from '../managers/CollisionManager.js';
 import { CameraManager } from '../managers/CameraManager.js';
@@ -34,6 +35,13 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     create() {
+        // Initialize difficulty if this is first time entering game
+        const difficulty = this.registry.get('difficulty') || 'normal';
+        if (!gameState.difficultyInitialized) {
+            playerStatsSystem.initializeDifficulty(difficulty);
+            gameState.difficultyInitialized = true;
+        }
+        
         this.createBackground();
         this.createGround();
         this.createPlayer();

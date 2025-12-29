@@ -3,6 +3,7 @@
  * Initializes Phaser game with scene configuration
  */
 import BootScene from './scenes/BootScene.js';
+import MenuScene from './scenes/MenuScene.js';
 import MainGameScene from './scenes/MainGameScene.js';
 import MicroScene from './scenes/MicroScene.js';
 
@@ -18,7 +19,7 @@ const config = {
             debug: false
         }
     },
-    scene: [BootScene, MainGameScene, MicroScene]
+    scene: [BootScene, MenuScene, MainGameScene, MicroScene]
 };
 
 const game = new Phaser.Game(config);

@@ -14,6 +14,22 @@ export class PlayerStatsSystem {
             xp: 0,
             xpToLevel: 100
         };
+        this.difficulty = 'normal';
+    }
+    
+    /**
+     * Initialize stats based on difficulty
+     */
+    initializeDifficulty(difficulty) {
+        this.difficulty = difficulty;
+        
+        if (difficulty === 'godMode') {
+            this.stats.maxHealth = 10000000;
+            this.stats.health = 10000000;
+        } else {
+            this.stats.maxHealth = 100;
+            this.stats.health = 100;
+        }
     }
     
     /**

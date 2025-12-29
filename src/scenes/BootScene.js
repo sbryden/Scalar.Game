@@ -60,7 +60,7 @@ export default class BootScene extends Phaser.Scene {
     }
     
     create() {
-        // Once loading is complete, start the main game scene
-        this.scene.start('MainGameScene');
+        // Once loading is complete, start the menu scene
+        this.scene.start('MenuScene');
     }
 }

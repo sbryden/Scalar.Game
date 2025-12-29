@@ -35,6 +35,9 @@ class GameState {
             MicroScene: []
         };
         
+        // Difficulty
+        this.difficultyInitialized = false;
+        
         // Function references
         this.spawnEnemyFunc = null;
     }
