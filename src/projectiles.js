@@ -34,28 +34,19 @@ export function fireProjectile(scene) {
     const tankHeight = gameState.player.displayHeight;
     const projectileY = gameState.player.y - tankHeight / 2 + (1 / 6) * tankHeight;
     
-    // Create centered triangle projectile
-    const size = 6;
-    let points;
-    if (direction === 1) {
-        // Triangle pointing right - centered
-        points = [
-            size, 0,           // Right tip (center-y)
-            -size, -size,      // Top left
-            -size, size        // Bottom left
-        ];
-    } else {
-        // Triangle pointing left - centered
-        points = [
-            -size, 0,          // Left tip (center-y)
-            size, -size,       // Top right
-            size, size         // Bottom right
-        ];
-    }
+    // Create beam projectile
+    const projectile = scene.add.image(projectileX, projectileY, 'beam');
+    projectile.setOrigin(0.5, 0.5);
+    projectile.setDepth(0);
     
-    const projectile = scene.add.polygon(projectileX, projectileY, points, 0x000000); // Black
-    projectile.setOrigin(0.5, 0.5); // Center the origin
-    projectile.setDepth(0); // Same level as car
+    // Scale projectile based on player scale
+    const playerScale = gameState.player.scaleX;
+    projectile.setScale(playerScale);
+    
+    // Flip the image if firing left
+    if (direction === -1) {
+        projectile.setFlipX(true);
+    }
     
     gameState.projectiles.add(projectile);
     scene.physics.add.existing(projectile);

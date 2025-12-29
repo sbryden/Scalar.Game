@@ -18,6 +18,12 @@ export default class BootScene extends Phaser.Scene {
         // Load rockgiant enemy image
         this.load.image('enemy', './assets/rockgiant.png');
         
+        // Load bacteria enemy image for micro scene
+        this.load.image('bacteria', './assets/bacteria.png');
+        
+        // Load projectile image
+        this.load.image('beam', './assets/beam.png');
+        
         // Optional: Add loading progress bar
         this.createLoadingBar();
     }

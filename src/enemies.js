@@ -2,9 +2,10 @@ import { ENEMY_CONFIG, PROJECTILE_CONFIG } from './config.js';
 import gameState from './utils/gameState.js';
 import combatSystem from './systems/CombatSystem.js';
 
-export function spawnEnemy(scene, x, y) {
-    const config = ENEMY_CONFIG.generic;
-    const enemy = scene.add.sprite(x, y, 'enemy');
+export function spawnEnemy(scene, x, y, enemyType = 'generic') {
+    const config = ENEMY_CONFIG[enemyType];
+    const texture = enemyType === 'micro' ? 'bacteria' : 'enemy';
+    const enemy = scene.add.sprite(x, y, texture);
     enemy.setScale(0.2);
     scene.physics.add.existing(enemy);
     enemy.body.setBounce(0.2);

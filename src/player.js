@@ -16,8 +16,28 @@ export function changeSize(newSize) {
         return;
     }
     
+    // Check for scene transitions
+    const currentScene = gameState.currentSceneKey;
+    const oldSize = gameState.playerSize;
+    
+    // Transition to MicroScene when going to small from MainGameScene
+    if (newSize === 'small' && currentScene === 'MainGameScene') {
+        gameState.playerSize = newSize;
+        gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+        gameState.scene.scene.start('MicroScene');
+        return;
+    }
+    
+    // Transition back to MainGameScene when going to normal from MicroScene
+    if (newSize === 'normal' && currentScene === 'MicroScene') {
+        gameState.playerSize = newSize;
+        gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+        gameState.scene.scene.start('MainGameScene');
+        return;
+    }
+    
     // Get old scale before changing
-    const oldScale = SIZE_CONFIG[gameState.playerSize].scale;
+    const oldScale = SIZE_CONFIG[oldSize].scale;
     const newScale = SIZE_CONFIG[newSize].scale;
     
     // Apply new size

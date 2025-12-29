@@ -1,6 +1,6 @@
 /**
- * Main Game Scene
- * Primary gameplay scene
+ * Micro Scene
+ * Cellular-level gameplay scene with bacteria enemies
  */
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config.js';
 import { spawnEnemy, updateEnemyAI } from '../enemies.js';
@@ -14,9 +14,9 @@ import { CameraManager } from '../managers/CameraManager.js';
 import { HUD } from '../ui/HUD.js';
 import { DebugDisplay } from '../ui/DebugDisplay.js';
 
-export default class MainGameScene extends Phaser.Scene {
+export default class MicroScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'MainGameScene' });
+        super({ key: 'MicroScene' });
         
         // Scene variables
         this.player = null;
@@ -34,6 +34,9 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     create() {
+        // Set reduced gravity for micro scene (half of normal)
+        this.physics.world.gravity.y = 150;
+        
         this.createBackground();
         this.createGround();
         this.createPlayer();
@@ -46,51 +49,71 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     createBackground() {
-        // Create background
+        // Create cellular-themed background (purple/pink tones)
         const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-        bgGraphics.fillStyle(0x87CEEB, 1);
+        
+        // Base cellular fluid color
+        bgGraphics.fillStyle(0x2D1B3D, 1);
         bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.lineStyle(1, 0x4DA6D6, 0.3);
-        for (let i = 0; i < WORLD_WIDTH; i += 100) {
-            bgGraphics.lineBetween(i, 0, i, WORLD_HEIGHT);
+        
+        // Add cellular membrane-like patterns
+        bgGraphics.lineStyle(2, 0x5A3D6B, 0.4);
+        for (let i = 0; i < WORLD_WIDTH; i += 150) {
+            for (let j = 0; j < WORLD_HEIGHT; j += 150) {
+                // Draw cellular circles
+                const offsetX = (j / 150) % 2 === 0 ? 75 : 0;
+                bgGraphics.strokeCircle(i + offsetX, j, 60);
+            }
         }
-        for (let i = 0; i < WORLD_HEIGHT; i += 100) {
-            bgGraphics.lineBetween(0, i, WORLD_WIDTH, i);
+        
+        // Add organic looking dots (organelles)
+        bgGraphics.fillStyle(0x8B4F8B, 0.3);
+        for (let i = 0; i < 50; i++) {
+            const x = Math.random() * WORLD_WIDTH;
+            const y = Math.random() * WORLD_HEIGHT;
+            const radius = 10 + Math.random() * 20;
+            bgGraphics.fillCircle(x, y, radius);
         }
-        bgGraphics.generateTexture('background', WORLD_WIDTH, WORLD_HEIGHT);
+        
+        bgGraphics.generateTexture('microBackground', WORLD_WIDTH, WORLD_HEIGHT);
         bgGraphics.destroy();
         
-        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'background')
+        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'microBackground')
             .setOrigin(0.5, 0.5)
             .setScrollFactor(0);
     }
     
     createGround() {
-        // Create ground texture
+        // Create cellular membrane-like ground
         const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
-        groundGraphics.fillStyle(0x8B7355, 1);
+        
+        // Base membrane color
+        groundGraphics.fillStyle(0x4A2D5A, 1);
         groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
-        groundGraphics.fillStyle(0x6B5345, 1);
-        for (let x = 0; x < WORLD_WIDTH; x += 50) {
-            for (let y = 0; y < 50; y += 25) {
-                const offset = (y === 25) ? 25 : 0;
-                groundGraphics.fillRect(x + offset, y, 25, 10);
+        
+        // Add membrane texture
+        groundGraphics.fillStyle(0x5A3D6A, 1);
+        for (let x = 0; x < WORLD_WIDTH; x += 40) {
+            for (let y = 0; y < 50; y += 20) {
+                const offset = (y === 20) ? 20 : 0;
+                groundGraphics.fillCircle(x + offset + 10, y + 10, 8);
             }
         }
-        groundGraphics.generateTexture('ground', WORLD_WIDTH, 50);
+        
+        groundGraphics.generateTexture('microGround', WORLD_WIDTH, 50);
         groundGraphics.destroy();
         
         // Create platforms
         this.platforms = this.physics.add.staticGroup();
         this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        const ground = this.platforms.create(WORLD_WIDTH / 2, 750, 'ground');
+        const ground = this.platforms.create(WORLD_WIDTH / 2, 750, 'microGround');
         ground.setOrigin(0.5, 0.5);
         ground.setScale(1).refreshBody();
     }
     
     createPlayer() {
         // Restore player position or use default
-        const savedPos = gameState.savedPositions.MainGameScene;
+        const savedPos = gameState.savedPositions.MicroScene;
         
         // Create player (car)
         this.player = this.add.sprite(savedPos.x, savedPos.y, 'car_1');
@@ -119,7 +142,7 @@ export default class MainGameScene extends Phaser.Scene {
         gameState.xpOrbs = this.xpOrbs;
         gameState.platforms = this.platforms;
         gameState.scene = this;
-        gameState.currentSceneKey = 'MainGameScene';
+        gameState.currentSceneKey = 'MicroScene';
         gameState.spawnEnemyFunc = spawnEnemy;
     }
     
@@ -131,20 +154,20 @@ export default class MainGameScene extends Phaser.Scene {
     
     restoreOrSpawnEnemies() {
         // Check if we have saved enemies for this scene
-        const savedEnemies = gameState.savedEnemies.MainGameScene;
+        const savedEnemies = gameState.savedEnemies.MicroScene;
         
         if (savedEnemies.length > 0) {
             // Restore saved enemies
             savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, 'generic');
+                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, 'micro');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Spawn initial enemies
+            // Spawn initial bacteria enemies
             for (let x = 300; x < WORLD_WIDTH; x += 300) {
-                spawnEnemy(this, x, 680, 'generic');
+                spawnEnemy(this, x, 680, 'micro');
             }
         }
     }
@@ -185,7 +208,7 @@ export default class MainGameScene extends Phaser.Scene {
         // Handle player movement
         this.inputManager.handleMovement();
         
-        // Update enemies
+        // Update enemies (bacteria)
         this.enemies.children.entries.forEach(enemy => {
             if (enemy.active) {
                 updateEnemyAI(enemy);
@@ -204,7 +227,7 @@ export default class MainGameScene extends Phaser.Scene {
     
     shutdown() {
         // Save enemy states before leaving scene
-        gameState.savedEnemies.MainGameScene = this.enemies.children.entries
+        gameState.savedEnemies.MicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
             .map(enemy => ({
                 x: enemy.x,
@@ -216,7 +239,7 @@ export default class MainGameScene extends Phaser.Scene {
         
         // Save player position
         if (this.player) {
-            gameState.savedPositions.MainGameScene = {
+            gameState.savedPositions.MicroScene = {
                 x: this.player.x,
                 y: this.player.y
             };

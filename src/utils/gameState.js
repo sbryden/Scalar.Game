@@ -24,6 +24,17 @@ class GameState {
         this.sizeChangeTimer = 0;
         this.playerSize = 'normal';
         
+        // Scene management
+        this.currentSceneKey = 'MainGameScene';
+        this.savedPositions = {
+            MainGameScene: { x: 100, y: 650 },
+            MicroScene: { x: 100, y: 650 }
+        };
+        this.savedEnemies = {
+            MainGameScene: [],
+            MicroScene: []
+        };
+        
         // Function references
         this.spawnEnemyFunc = null;
     }

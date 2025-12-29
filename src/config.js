@@ -38,6 +38,16 @@ export const ENEMY_CONFIG = {
         damage: 10,
         xpReward: 25,
         patrolDistance: 300
+    },
+    micro: {
+        width: 30,
+        height: 30,
+        color: 0x00FF88, // Green-cyan (bacteria)
+        speed: 60,
+        health: 5,
+        damage: 5,
+        xpReward: 10,
+        patrolDistance: 200
     }
 };
 
