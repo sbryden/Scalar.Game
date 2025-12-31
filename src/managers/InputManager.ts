@@ -11,11 +11,13 @@ export class InputManager {
     scene: Phaser.Scene;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     wasdKeys!: any;
+    spaceKey!: Phaser.Input.Keyboard.Key;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.cursors = null;
         this.wasdKeys = null;
+        this.spaceKey = null;
     }
     
     /**
@@ -25,6 +27,7 @@ export class InputManager {
         // Create cursor keys and WASD
         this.cursors = this.scene.input.keyboard.createCursorKeys();
         this.wasdKeys = this.scene.input.keyboard.addKeys('W,A,S,D');
+        this.spaceKey = this.scene.input.keyboard.addKey('SPACE');
         
         // Store in gameState for other modules
         gameState.cursors = this.cursors;
@@ -137,7 +140,7 @@ export class InputManager {
         }
         
         // Vertical thrust controls (W for up, S for down, Space also for up)
-        if (this.wasdKeys.W.isDown || this.cursors.up.isDown || this.scene.input.keyboard.addKey('SPACE').isDown) {
+        if (this.wasdKeys.W.isDown || this.cursors.up.isDown || this.spaceKey.isDown) {
             // Thrust upward
             const currentVelY = gameState.player.body.velocity.y;
             gameState.player.body.setVelocityY(Math.max(currentVelY - thrustPower * 0.15, -thrustPower));
