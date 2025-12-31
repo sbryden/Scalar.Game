@@ -1,14 +1,15 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
 import gameState from './utils/gameState';
+import type { WASDKeys } from './types/game';
 
 let lastProjectileTime = 0;
 
-export function setInputs(c, w) { 
+export function setInputs(c: Phaser.Types.Input.Keyboard.CursorKeys, w: WASDKeys): void { 
     gameState.cursors = c; 
     gameState.wasdKeys = w; 
 }
 
-export function fireProjectile(scene) {
+export function fireProjectile(scene: Phaser.Scene): void {
     const now = Date.now();
     
     if (now - lastProjectileTime < PROJECTILE_CONFIG.basic.cooldown) {
@@ -67,7 +68,7 @@ export function fireProjectile(scene) {
     projectile.maxRange = 1024 * 1.5; // 1.5x screen width
 }
 
-export function updateProjectiles() {
+export function updateProjectiles(): void {
     gameState.projectiles.children.entries.forEach(proj => {
         // Destroy projectile if it exceeds max range or goes off world
         const distanceTraveled = Math.abs(proj.x - proj.spawnX);

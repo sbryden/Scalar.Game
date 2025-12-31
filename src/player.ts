@@ -1,11 +1,12 @@
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config';
 import gameState from './utils/gameState';
+import type { PlayerSize } from './types/game';
 
-export function getPlayerSize() { return gameState.playerSize; }
-export function getSizeChangeTimer() { return gameState.sizeChangeTimer; }
-export function setSizeChangeTimer(t) { gameState.sizeChangeTimer = t; }
+export function getPlayerSize(): PlayerSize { return gameState.playerSize; }
+export function getSizeChangeTimer(): number { return gameState.sizeChangeTimer; }
+export function setSizeChangeTimer(t: number): void { gameState.sizeChangeTimer = t; }
 
-export function changeSize(direction) {
+export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     // Check cooldown
     if (gameState.sizeChangeTimer > 0) {
         return; // Can't change size yet

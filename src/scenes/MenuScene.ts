@@ -30,7 +30,7 @@ export default class MenuScene extends Phaser.Scene {
         this.environmentDropdownOpen = false;
     }
     
-    create() {
+    create(): void {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
@@ -94,7 +94,7 @@ export default class MenuScene extends Phaser.Scene {
         instructions.setAlpha(0.6);
     }
     
-    createDifficultyDropdown(centerX, y) {
+    createDifficultyDropdown(centerX: number, y: number): void {
         const dropdownWidth = 250;
         const dropdownHeight = 50;
         const optionHeight = 45;
@@ -183,19 +183,19 @@ export default class MenuScene extends Phaser.Scene {
         this.dropdownContainer.setDepth(100);
     }
     
-    toggleDropdown() {
+    toggleDropdown(): void {
         this.dropdownOpen = !this.dropdownOpen;
         this.optionsContainer.setVisible(this.dropdownOpen);
         this.dropdownArrow.setText(this.dropdownOpen ? '▲' : '▼');
     }
     
-    selectOption(value, label) {
+    selectOption(value: string, label: string): void {
         this.selectedDifficulty = value;
         this.selectedText.setText(label);
         this.toggleDropdown();
     }
     
-    createEnvironmentDropdown(centerX, y) {
+    createEnvironmentDropdown(centerX: number, y: number): void {
         const dropdownWidth = 250;
         const dropdownHeight = 50;
         const optionHeight = 45;
@@ -292,20 +292,20 @@ export default class MenuScene extends Phaser.Scene {
         this.environmentDropdownContainer.setDepth(100);
     }
     
-    toggleEnvironmentDropdown() {
+    toggleEnvironmentDropdown(): void {
         this.environmentDropdownOpen = !this.environmentDropdownOpen;
         this.environmentOptionsContainer.setVisible(this.environmentDropdownOpen);
         this.environmentDropdownArrow.setText(this.environmentDropdownOpen ? '▲' : '▼');
     }
     
-    selectEnvironmentOption(value, label) {
+    selectEnvironmentOption(value: string, label: string): void {
         this.selectedEnvironment = value;
         this.environmentSelectedText.setText(label);
         this.toggleEnvironmentDropdown();
     }
 
     
-    createStartButton(centerX, y) {
+    createStartButton(centerX: number, y: number): void {
         const buttonWidth = 200;
         const buttonHeight = 70;
         
