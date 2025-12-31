@@ -15,9 +15,8 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     const currentSize = gameState.playerSize;
     const currentScene = gameState.currentSceneKey;
     
-    // Underwater scenes only allow small and normal sizes (no large)
-    const isUnderwater = currentScene === 'UnderwaterScene' || currentScene === 'UnderwaterMicroScene';
-    const sizeOrder = isUnderwater ? ['small', 'normal'] : ['small', 'normal', 'large'];
+    // All scenes only allow small and normal sizes
+    const sizeOrder = ['small', 'normal'];
     const currentIndex = sizeOrder.indexOf(currentSize);
     
     let newSize;
@@ -26,7 +25,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
         if (currentIndex <= 0) return;
         newSize = sizeOrder[currentIndex - 1];
     } else if (direction === 'larger') {
-        // Can't go larger than max for current environment
+        // Can't go larger than normal
         if (currentIndex >= sizeOrder.length - 1) return;
         newSize = sizeOrder[currentIndex + 1];
     } else {
@@ -76,11 +75,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
         return;
     }
     
-    // Get old scale before changing
-    const oldScale = SIZE_CONFIG[oldSize].scale;
-    const newScale = SIZE_CONFIG[newSize].scale;
-    
-    // Apply new size
+    // Apply new size (simplified - no complex scaling needed)
     gameState.playerSize = newSize;
     const config = SIZE_CONFIG[newSize];
     
@@ -92,22 +87,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     gameState.player.body.updateFromGameObject();
     
     // Small jump to account for size change
-    const sizeDifference = Math.abs(newScale - oldScale);
-    const jumpPower = 50 + (sizeDifference * 150);
-    gameState.player.body.setVelocityY(-jumpPower);
-    
-    // Scale enemies inversely
-    const enemyScale = 1 / newScale;
-    const enemyBaseHeight = 30;
-    const enemyOldHeight = enemyBaseHeight * (1 / oldScale);
-    const enemyNewHeight = enemyBaseHeight * enemyScale;
-    const enemyHeightDifference = enemyNewHeight - enemyOldHeight;
-    
-    gameState.enemies.children.entries.forEach(enemy => {
-        enemy.setScale(enemyScale);
-        enemy.y -= enemyHeightDifference / 2;
-        enemy.body.updateFromGameObject();
-    });
+    gameState.player.body.setVelocityY(-200);
     
     // Reset cooldown timer
     gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;

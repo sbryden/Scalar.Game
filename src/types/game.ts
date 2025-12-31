@@ -109,7 +109,7 @@ export type Difficulty = 'normal' | 'godMode';
 /**
  * Player size states
  */
-export type PlayerSize = 'small' | 'normal' | 'large';
+export type PlayerSize = 'small' | 'normal';
 
 /**
  * Scene keys
