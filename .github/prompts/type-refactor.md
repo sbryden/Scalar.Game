@@ -51,18 +51,27 @@ Systematic elimination of `any` types and improvement of type safety across the 
 
 ## Remaining Work
 
-### Phase 7: Enable Strict Mode ⚠️ BLOCKED
-**Status:** Requires significant additional work (100+ type errors)
+### Phase 7: Add Return Types to Legacy Modules ✅
+- [x] Add explicit return types to all functions in `player.ts`
+- [x] Add explicit return types to all functions in `enemies.ts`
+- [x] Add explicit return types to all functions in `projectiles.ts`
+- [x] Add explicit return types to all functions in `xpOrbs.ts`
+- [x] Add explicit return types to all functions in `ui.ts`
+- [x] Add explicit return types to MenuScene methods
+- [x] Convert imports to `import type` for type-only imports (fixes verbatimModuleSyntax errors)
+
+### Phase 8: Enable Strict Mode ⚠️ BLOCKED
+**Status:** Requires Phase 7 completion + additional work (100+ type errors)
 
 **Blockers:**
 - [ ] Enable `"strict": true` in tsconfig.json
 - [ ] Enable `"noImplicitAny": true` 
-- [ ] Fix implicit any types in function-based modules
+- [ ] Fix implicit any types in function-based modules (Phase 7 prerequisite)
 - [ ] Add proper Phaser type extensions
 - [ ] Fix Phaser Body type union issues
 
 **Specific Issues:**
-1. **Function Module Refactoring**: Files like `player.ts`, `enemies.ts`, `projectiles.ts`, `xpOrbs.ts`, `ui.ts` use plain functions and need proper type signatures
+1. **Function Module Refactoring**: Files like `player.ts`, `enemies.ts`, `projectiles.ts`, `xpOrbs.ts`, `ui.ts` use plain functions and need proper type signatures (Phase 7 addresses this)
 
 2. **Phaser Body Type Issues**: Union type `Body | StaticBody` doesn't have common methods like `setVelocityX`. Need custom type guards.
 
@@ -71,14 +80,6 @@ Systematic elimination of `any` types and improvement of type safety across the 
 4. **SavedEnemy Interface**: Missing properties: `startX`, `startY`, `direction`, `floatAngle`
 
 5. **Scene Type Casting**: Enemy restoration needs proper casting from `GameObject` to `Enemy`
-
-### Phase 8: Add Return Types to Legacy Modules 📋 TODO
-- [ ] Add explicit return types to all functions in `player.ts`
-- [ ] Add explicit return types to all functions in `enemies.ts`
-- [ ] Add explicit return types to all functions in `projectiles.ts`
-- [ ] Add explicit return types to all functions in `xpOrbs.ts`
-- [ ] Add explicit return types to all functions in `ui.ts`
-- [ ] Add explicit return types to MenuScene methods
 
 ### Phase 9: Refactor Function Modules to Classes 🔮 FUTURE
 - [ ] Convert `player.ts` to class-based module
@@ -98,37 +99,41 @@ Systematic elimination of `any` types and improvement of type safety across the 
 ## Summary
 
 ### ✅ Completed Work
-- **Type Definitions**: Created comprehensive `src/types/game.d.ts` with all game interfaces
+- **Type Definitions**: Created comprehensive `src/types/game.ts` with all game interfaces
 - **GameState**: Eliminated ALL `any` types (12 properties fixed) with proper Phaser types
 - **UI Components**: Fully typed HUD and DebugDisplay (8 `any` types removed)
 - **Systems**: Fully typed PlayerStatsSystem, CombatSystem, SpawnSystem, MagnetismSystem
 - **Managers**: Fully typed InputManager, CollisionManager, CameraManager
 - **Scenes**: Fixed constructor patterns, added proper type imports
-- **Return Types**: Added return types to all class methods
+- **Return Types**: Added return types to all class methods AND legacy function modules
+- **Function Modules**: Added parameter types and return types to `player.ts`, `enemies.ts`, `projectiles.ts`, `xpOrbs.ts`, `ui.ts`
+- **MenuScene**: Added parameter types and return types to all methods
 
 ### 📊 Current Status
 - **Intentional `any` types remaining**: 2 (in `CombatSystem.calculateDamage` for extensibility)
 - **Build status**: ✅ Passing with current settings
 - **Functionality**: ✅ No breaking changes
-- **Type safety improvement**: ~80% of explicit `any` types eliminated from core modules
+- **Type safety improvement**: ~85% of explicit `any` types eliminated
 
 ### 🚧 Remaining Issues
-- **Strict mode**: ❌ Would reveal 100+ errors requiring comprehensive refactor
-- **Function modules**: Still need proper type signatures (5 files)
+- **Strict mode**: ❌ Would reveal 95+ errors requiring comprehensive refactor
 - **Phaser extensions**: Custom properties need proper type declarations
 - **Type guards**: Need guards for Phaser Body type unions
+- **SavedEnemy**: Missing properties in interface (startX, startY, direction, floatAngle)
 
 ### 🎯 Next Steps (Future PR)
-1. Add type signatures to function-based modules
-2. Create Phaser type extensions for custom properties
-3. Extend SavedEnemy interface with missing properties
-4. Add type guards for Phaser.Physics.Arcade.Body
-5. Enable `noImplicitAny` gradually, file by file
-6. Eventually enable full `strict` mode
+1. **Phase 8 Prerequisites**: Create Phaser type extensions for custom properties (lastDamageTime, stunVelocity, xpValue)
+2. **Phase 8 Prerequisites**: Extend SavedEnemy interface with missing properties
+3. **Phase 8 Prerequisites**: Add type guards for Phaser.Physics.Arcade.Body
+4. **Phase 8**: Enable `noImplicitAny` gradually, file by file
+5. **Phase 8**: Eventually enable full `strict` mode
+6. **Phase 9-10**: Consider class refactoring and constant extraction
 
 ---
 
 ## Notes
 - All changes are committed to `typescript-typing` branch
 - Build verified with `npm run build` - passes successfully
-- TypeScript check with `npx tsc --noEmit` reveals remaining work needed for strict mode
+- TypeScript check with `npx tsc --noEmit` reveals ~95 errors remaining for strict mode
+- Renamed `src/types/game.d.ts` to `src/types/game.ts` for proper module imports
+- All type-only imports converted to `import type` syntax to fix verbatimModuleSyntax warnings
