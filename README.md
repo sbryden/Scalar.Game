@@ -82,6 +82,22 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 - `npm run build` - Build for production
 - `npm run preview` - Preview the production build
 
+## Deployment
+
+This project is configured for automatic deployment to GitHub Pages:
+
+1. Push changes to the `main` or `master` branch
+2. GitHub Actions will automatically build and deploy to `https://sbryden.github.io/Scalar.Game/`
+3. The `.github/workflows/gh-pages.yml` handles the deployment process
+
+**Local Preview:**
+After building, test the production build locally:
+```bash
+npm run build
+npm run preview
+```
+Visit `http://localhost:4173/Scalar.Game/` to preview.
+
 ## Technologies
 
 - **Phaser 3** - Powerful 2D game framework

@@ -11,11 +11,11 @@ export default class BootScene extends Phaser.Scene {
     
     preload() {
         // Load car images for different levels
-        this.load.image('car_1', './assets/car_1.png');
-        this.load.image('car_2', './assets/car_2.png');
-        this.load.image('car_3', './assets/car_3.png');
-        this.load.image('car_4', './assets/car_4.png');
-        this.load.image('car_5', './assets/car_5.png');
+        this.load.image('car_1', '/Scalar.Game/car_1.png');
+        this.load.image('car_2', '/Scalar.Game/car_2.png');
+        this.load.image('car_3', '/Scalar.Game/car_3.png');
+        this.load.image('car_4', '/Scalar.Game/car_4.png');
+        this.load.image('car_5', '/Scalar.Game/car_5.png');
         
         // Load submarine images for underwater levels
         this.load.image('sub_1', './assets/sub_1.png');
@@ -23,14 +23,14 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('sub_3', './assets/sub_3.png');
         
         // Load rockgiant enemy image
-        this.load.image('enemy', './assets/rockgiant.png');
+        this.load.image('enemy', '/Scalar.Game/rockgiant.png');
         
         // Load bacteria enemy image for micro scene
-        this.load.image('bacteria', './assets/bacteria.png');
+        this.load.image('bacteria', '/Scalar.Game/bacteria.png');
         
         // Load projectile images
-        this.load.image('beam', './assets/beam.png');
-        this.load.image('torpedo', './assets/torpedo.png');
+        this.load.image('torpedo', '/Scalar.Game/torpedo.png');
+        this.load.image('beam', '/Scalar.Game/beam.png');
         
         // Optional: Add loading progress bar
         this.createLoadingBar();
