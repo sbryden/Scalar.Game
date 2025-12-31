@@ -4,7 +4,7 @@ A fun, interactive side-scrolling game built with **Phaser 3** and powered by **
 
 ## Overview
 
-This is a classic 2D side-scroller game where you control a vehicle navigating through a world of platforms. Jump, move left and right, and explore the expanding game world. The camera follows your vehicle, revealing new areas as you progress.
+Scalar is a classic 2D side-scroller where you control a vehicle navigating through diverse environments. With dynamic size-shifting mechanics, physics-based combat, and intelligent enemy AI, experience evolving gameplay as you explore land and underwater worlds. Enemies patrol their territories but will aggressively chase you when provoked!
 
 ## Features
 
@@ -15,6 +15,8 @@ This is a classic 2D side-scroller game where you control a vehicle navigating t
 - Static platforms for navigation
 - **Multiple environments**: Land and Underwater levels
 - **Environment-specific mechanics**: Submarine controls with vertical thrust in water
+- **Enemy AI with Aggro System**: Enemies patrol areas but will chase and attack when provoked
+- **Combat System**: Shoot projectiles to damage enemies and trigger aggro behavior
 
 ⚙️ **Technical Stack**
 - Phaser 3 game framework
@@ -32,6 +34,18 @@ This is a classic 2D side-scroller game where you control a vehicle navigating t
 - XP orbs float instead of falling
 - Microscopic plankton level when shrinking
 - Blue ocean background with kelp and coral decorations
+
+🤖 **Enemy AI & Aggro System**
+- Enemies patrol their designated areas by default
+- **Aggro Triggers**: Enemies become aggressive when:
+  - Hit by a projectile
+  - Player enters aggro range (5× enemy size)
+  - Direct collision with player
+- **Intelligent Pathfinding**: Aggroed enemies chase the player at 1.5× speed
+- **Physics-Aware Movement**:
+  - Swimming enemies (fish, micro, plankton) move freely in 2D space
+  - Ground enemies (crab, generic) run horizontally and jump intelligently to reach player
+- **Combat Feedback**: Visual indicators (color flashes, health bars) and camera shake effects
 
 ## Quick Start
 
@@ -75,6 +89,8 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 
 **Combat:**
 - **F** - Shoot projectiles (slower underwater)
+- Hitting enemies with projectiles triggers aggro behavior
+- Enemies will chase and attack when aggroed
 
 ## Scripts
 
@@ -107,11 +123,14 @@ Visit `http://localhost:4173/Scalar.Game/` to preview.
 
 ## Future Roadmap
 
-This project is set up as a foundation for adding:
+This project continues to evolve with planned features:
+- ✅ Enemy aggro system (completed)
+- ✅ TypeScript typing improvements (completed)
 - Enhanced vehicle transformation mechanics
 - Minimap
-- Dynamic obstacles and enemies
+- More enemy types and boss battles
 - Collectible items and power-ups
-- Score and progression system
+- Enhanced score and progression system
 - Multiple levels and worlds
 - Sound effects and music
+- Particle effects and visual polish
