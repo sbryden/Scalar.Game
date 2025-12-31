@@ -3,36 +3,39 @@
  * Single source of truth for all shared game state.
  * Eliminates the need for setter functions across modules.
  */
+import Phaser from 'phaser';
+import type { Player, Enemy, Projectile, XPOrb, WASDKeys, SavedPosition, SavedEnemy, PlayerSize, SceneKey } from '../types/game';
+
 class GameState {
     // Core game objects
-    player: any;
-    enemies: any;
-    projectiles: any;
-    xpOrbs: any;
-    platforms: any;
+    player: Player | null;
+    enemies: Phaser.Physics.Arcade.Group | null;
+    projectiles: Phaser.Physics.Arcade.Group | null;
+    xpOrbs: Phaser.Physics.Arcade.Group | null;
+    platforms: Phaser.Physics.Arcade.StaticGroup | null;
     
     // Scene and input references
-    scene: any;
-    cursors: any;
-    wasdKeys: any;
+    scene: Phaser.Scene | null;
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
+    wasdKeys: WASDKeys | null;
     
     // UI elements
-    levelText: any;
+    levelText: Phaser.GameObjects.Text | null;
     
     // Timers and state
     sizeChangeTimer: number;
-    playerSize: string;
+    playerSize: PlayerSize;
     
     // Scene management
-    currentSceneKey: string;
-    savedPositions: any;
-    savedEnemies: any;
+    currentSceneKey: SceneKey;
+    savedPositions: Record<SceneKey, SavedPosition>;
+    savedEnemies: Record<SceneKey, SavedEnemy[]>;
     
     // Difficulty
     difficultyInitialized: boolean;
     
     // Function references
-    spawnEnemyFunc: any;
+    spawnEnemyFunc: ((scene: Phaser.Scene, x: number, y: number, enemyType?: string) => Enemy) | null;
 
     constructor() {
         // Core game objects
@@ -57,12 +60,16 @@ class GameState {
         // Scene management
         this.currentSceneKey = 'MainGameScene';
         this.savedPositions = {
+            BootScene: { x: 100, y: 650 },
+            MenuScene: { x: 100, y: 650 },
             MainGameScene: { x: 100, y: 650 },
             MicroScene: { x: 100, y: 650 },
             UnderwaterScene: { x: 100, y: 650 },
             UnderwaterMicroScene: { x: 100, y: 650 }
         };
         this.savedEnemies = {
+            BootScene: [],
+            MenuScene: [],
             MainGameScene: [],
             MicroScene: [],
             UnderwaterScene: [],
@@ -77,7 +84,7 @@ class GameState {
     }
     
     // Helper method to validate state initialization
-    isInitialized() {
+    isInitialized(): boolean {
         return this.player !== null && 
                this.scene !== null;
     }

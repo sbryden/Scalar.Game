@@ -2,15 +2,18 @@
  * HUD (Heads-Up Display)
  * Manages health bar, XP bar, and level display
  */
-export class HUD {
-    scene: any;
-    healthBar: any;
-    healthBarBackground: any;
-    xpBar: any;
-    xpBarBackground: any;
-    levelText: any;
+import Phaser from 'phaser';
+import type { PlayerStats } from '../types/game';
 
-    constructor(scene) {
+export class HUD {
+    scene: Phaser.Scene;
+    healthBar: Phaser.GameObjects.Rectangle | null;
+    healthBarBackground: Phaser.GameObjects.Rectangle | null;
+    xpBar: Phaser.GameObjects.Rectangle | null;
+    xpBarBackground: Phaser.GameObjects.Rectangle | null;
+    levelText: Phaser.GameObjects.Text | null;
+
+    constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.healthBar = null;
         this.healthBarBackground = null;
@@ -21,7 +24,7 @@ export class HUD {
         this.create();
     }
     
-    create() {
+    create(): void {
         const barWidth = 100;
         const barHeight = 8;
         
@@ -54,7 +57,7 @@ export class HUD {
     /**
      * Update health and XP bars based on player stats
      */
-    update(playerStats) {
+    update(playerStats: PlayerStats): void {
         const barWidth = 100;
         
         // Update health bar
@@ -71,7 +74,7 @@ export class HUD {
     /**
      * Clean up HUD elements
      */
-    destroy() {
+    destroy(): void {
         if (this.healthBar) this.healthBar.destroy();
         if (this.healthBarBackground) this.healthBarBackground.destroy();
         if (this.xpBar) this.xpBar.destroy();

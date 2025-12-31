@@ -12,7 +12,7 @@ export class MagnetismSystem {
     /**
      * Update all XP orbs - attract them to player if in range
      */
-    update() {
+    update(): void {
         if (!gameState.player || !gameState.xpOrbs) return;
         
         gameState.xpOrbs.children.entries.forEach(orb => {

@@ -5,12 +5,19 @@
 import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
 import spawnSystem from './SpawnSystem';
+import type { Player, Enemy, Projectile } from '../types/game';
+
+/**
+ * Union type for entities that can deal or receive damage
+ * This maintains type safety while allowing flexibility for damage calculations
+ */
+type DamageEntity = Player | Enemy | Projectile;
 
 export class CombatSystem {
     /**
      * Apply damage to an enemy from a projectile
      */
-    damageEnemy(projectile, enemy) {
+    damageEnemy(projectile: Projectile, enemy: Enemy): void {
         if (!projectile.active) return;
         
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
@@ -35,7 +42,7 @@ export class CombatSystem {
      * Handle player-enemy collision
      * Both player and enemy take damage, enemy gets knocked back
      */
-    handlePlayerEnemyCollision(player, enemy) {
+    handlePlayerEnemyCollision(player: Player, enemy: Enemy): void {
         const now = Date.now();
         
         // Check if entities are stunned (prevent knockback spam)
@@ -101,7 +108,7 @@ export class CombatSystem {
      * Update stun effects for entities
      * Call this every frame to handle stun state
      */
-    updateStunEffects(entities, player) {
+    updateStunEffects(entities: Phaser.Physics.Arcade.Group, player: Player): void {
         const now = Date.now();
         
         // Handle player stun
@@ -126,7 +133,7 @@ export class CombatSystem {
     /**
      * Apply knockback force to enemy based on player position
      */
-    applyEnemyKnockback(player, enemy) {
+    applyEnemyKnockback(player: Player, enemy: Enemy): void {
         // Calculate direction from player to enemy
         const angle = Math.atan2(enemy.y - player.y, enemy.x - player.x);
         
@@ -147,7 +154,7 @@ export class CombatSystem {
     /**
      * Apply knockback force to player based on enemy position
      */
-    applyPlayerKnockback(player, enemy) {
+    applyPlayerKnockback(player: Player, enemy: Enemy): void {
         // Calculate direction from enemy to player (opposite of enemy knockback)
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         
@@ -168,7 +175,7 @@ export class CombatSystem {
     /**
      * Kill an enemy and spawn XP orb
      */
-    killEnemy(enemy) {
+    killEnemy(enemy: Enemy): void {
         // Spawn XP orb at enemy location
         if (enemy.scene && enemy.xpReward) {
             spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
@@ -185,20 +192,24 @@ export class CombatSystem {
     /**
      * Apply damage to player
      */
-    damagePlayer(damage) {
+    damagePlayer(damage: number): void {
         playerStatsSystem.takeDamage(damage);
     }
     
     /**
      * Calculate damage with potential modifiers
-     * (Can be extended for critical hits, damage boosts, etc.)
+     * @param baseDamage - Base damage value before modifiers
+     * @param attacker - Entity dealing damage (Player, Enemy, or Projectile)
+     * @param target - Entity receiving damage (Player, Enemy, or Projectile)
+     * @returns Final calculated damage with modifiers applied
      */
-    calculateDamage(baseDamage, attacker, target) {
+    calculateDamage(baseDamage: number, attacker: DamageEntity, target: DamageEntity): number {
         let finalDamage = baseDamage;
         
-        // Future: Add damage modifiers here
-        // if (attacker.hasCritical) finalDamage *= 2;
-        // if (target.hasArmor) finalDamage *= 0.5;
+        // Future: Add damage modifiers here based on entity properties
+        // Example: Type guards can be used to check for properties on specific entity types
+        // if ('damage' in attacker && attacker.damage > 10) finalDamage *= 1.5; // Critical hit for high damage attackers
+        // if ('maxHealth' in target && target.maxHealth > 100) finalDamage *= 0.8; // Armored targets take less damage
         
         return finalDamage;
     }
