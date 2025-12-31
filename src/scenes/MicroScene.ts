@@ -17,6 +17,17 @@ import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 
 export default class MicroScene extends Phaser.Scene {
+    player: any;
+    platforms: any;
+    enemies: any;
+    projectiles: any;
+    xpOrbs: any;
+    hud: any;
+    debugDisplay: any;
+    inputManager: any;
+    collisionManager: any;
+    cameraManager: any;
+
     constructor() {
         super({ key: 'MicroScene' });
         

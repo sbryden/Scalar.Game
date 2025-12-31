@@ -5,6 +5,9 @@
 import Phaser from 'phaser';
 
 export default class MenuScene extends Phaser.Scene {
+    selectedDifficulty: any;
+    dropdownOpen: any;
+
     constructor() {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
