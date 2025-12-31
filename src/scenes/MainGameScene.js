@@ -9,6 +9,7 @@ import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
 import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
 import gameState from '../utils/gameState.js';
 import playerStatsSystem from '../systems/PlayerStatsSystem.js';
+import combatSystem from '../systems/CombatSystem.js';
 import { InputManager } from '../managers/InputManager.js';
 import { CollisionManager } from '../managers/CollisionManager.js';
 import { CameraManager } from '../managers/CameraManager.js';
@@ -200,6 +201,9 @@ export default class MainGameScene extends Phaser.Scene {
                 updateEnemyAI(enemy);
             }
         });
+        
+        // Update combat stun effects
+        combatSystem.updateStunEffects(this.enemies.children.entries, this.player);
         
         // Update projectiles
         updateProjectiles();

@@ -37,7 +37,8 @@ export const ENEMY_CONFIG = {
         health: 20,
         damage: 10,
         xpReward: 25,
-        patrolDistance: 300
+        patrolDistance: 300,
+        knockbackResistance: 1.0  // 1.0 = normal knockback, 0 = immune, >1 = takes more knockback
     },
     micro: {
         width: 30,
@@ -47,8 +48,19 @@ export const ENEMY_CONFIG = {
         health: 5,
         damage: 5,
         xpReward: 10,
-        patrolDistance: 200
+        patrolDistance: 200,
+        knockbackResistance: 0.8  // Lighter, knocked back less
     }
+};
+
+// Player combat configuration
+export const PLAYER_COMBAT_CONFIG = {
+    baseMeleeDamage: 5,           // Base damage when colliding with enemies
+    baseKnockbackForce: 300,      // Base knockback force applied to enemies
+    enemyToPlayerCooldown: 500,   // Milliseconds between enemy damaging player
+    playerToEnemyCooldown: 100,   // Milliseconds between player damaging enemy
+    invulnerabilityDuration: 150, // How long player flashes after taking damage (ms)
+    stunDuration: 500             // How long entities are stunned after knockback (ms)
 };
 
 // Projectile configuration

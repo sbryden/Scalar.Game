@@ -44,9 +44,8 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 - **Space** - Jump
 
 **Size Mechanics:**
-- **Q** - Shrink (small size, faster movement)
-- **E** - Grow (large size, slower movement)
-- **R** - Reset to normal size
+- **Q** - Shrink
+- **E** - Grow
 
 **Combat:**
 - **F** - Shoot projectiles
@@ -66,7 +65,8 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 ## Future Roadmap
 
 This project is set up as a foundation for adding:
-- Vehicle transformation mechanics (shrinking/growing)
+- Enhanced vehicle transformation mechanics
+- Minimap
 - Dynamic obstacles and enemies
 - Collectible items and power-ups
 - Score and progression system

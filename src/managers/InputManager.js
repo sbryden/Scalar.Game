@@ -71,6 +71,13 @@ export class InputManager {
     handleMovement() {
         if (!gameState.player) return;
         
+        // Check if player is stunned
+        const now = Date.now();
+        if (gameState.player.stunnedUntil && now < gameState.player.stunnedUntil) {
+            // Player is stunned, no input allowed
+            return;
+        }
+        
         const baseSpeed = 160;
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
         

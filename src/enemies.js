@@ -22,6 +22,7 @@ export function spawnEnemy(scene, x, y, enemyType = "generic") {
     enemy.xpReward = config.xpReward;
     enemy.speed = config.speed;
     enemy.patrolDistance = config.patrolDistance;
+    enemy.knockbackResistance = config.knockbackResistance;
     enemy.startX = x;
     enemy.startY = y;
     enemy.enemyType = enemyType;
@@ -56,6 +57,13 @@ export function spawnEnemy(scene, x, y, enemyType = "generic") {
 }
 
 export function updateEnemyAI(enemy) {
+    // Check if enemy is stunned
+    const now = Date.now();
+    if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
+        // Enemy is stunned, don't update AI
+        return;
+    }
+    
     // Different behavior for bacteria (floating) vs ground enemies
     if (enemy.enemyType === "micro") {
         // Bacteria float around their zone in a circular/wavy pattern
