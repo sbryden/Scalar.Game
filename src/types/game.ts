@@ -99,6 +99,10 @@ export interface SavedEnemy {
     y: number;
     health: number;
     enemyType: string;
+    startX: number;
+    startY: number;
+    direction: number;
+    floatAngle?: number;
 }
 
 /**

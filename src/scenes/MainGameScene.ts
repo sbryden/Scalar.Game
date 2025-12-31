@@ -196,14 +196,15 @@ export default class MainGameScene extends Phaser.Scene {
         this.inputManager.handleMovement();
         
         // Update enemies
-        this.enemies.children.entries.forEach(enemy => {
+        this.enemies.children.entries.forEach(obj => {
+            const enemy = obj as Enemy;
             if (enemy.active) {
                 updateEnemyAI(enemy);
             }
         });
         
         // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies.children.entries, this.player);
+        combatSystem.updateStunEffects(this.enemies, this.player);
         
         // Update projectiles
         updateProjectiles();

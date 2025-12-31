@@ -15,7 +15,7 @@ export class DebugDisplay {
         this.scene = scene;
         this.debugText = null;
         // Only enable debug display in development mode
-        this.enabled = import.meta.env.DEV || false;
+        this.enabled = (import.meta as any).env?.DEV || false;
         
         if (this.enabled) {
             this.create();
