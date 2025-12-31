@@ -16,6 +16,34 @@ type DamageEntity = Player | Enemy | Projectile;
 
 export class CombatSystem {
     /**
+     * Check if player is moving toward enemy
+     * Uses dot product to determine if player velocity is directed toward enemy
+     */
+    isPlayerMovingTowardEnemy(player: Player, enemy: Enemy): boolean {
+        if (!player.body) return false;
+        
+        // Calculate direction vector from player to enemy
+        const directionToEnemy = {
+            x: enemy.x - player.x,
+            y: enemy.y - player.y
+        };
+        
+        // Get player velocity
+        const playerVelocity = {
+            x: player.body.velocity.x,
+            y: player.body.velocity.y
+        };
+        
+        // Calculate dot product: positive = moving toward, negative = moving away
+        const dotProduct = 
+            (directionToEnemy.x * playerVelocity.x) + 
+            (directionToEnemy.y * playerVelocity.y);
+        
+        // Return true if moving toward with sufficient speed
+        return dotProduct > PLAYER_COMBAT_CONFIG.requiredApproachSpeed;
+    }
+    
+    /**
      * Apply damage to an enemy from a projectile
      */
     damageEnemy(projectile: Projectile, enemy: Enemy): void {
@@ -78,41 +106,66 @@ export class CombatSystem {
         
         // Check if enemy can damage player (cooldown per enemy)
         if (!enemy.lastDamageTime || now - enemy.lastDamageTime >= PLAYER_COMBAT_CONFIG.enemyToPlayerCooldown) {
-            // Enemy damages player
+            // Determine damage based on melee mode
             const enemyDamage = enemy.damage || 10;
-            this.damagePlayer(enemyDamage);
+            let damageToPlayer: number;
+            
+            if (player.isMeleeMode) {
+                // Player in melee mode - takes reduced damage
+                damageToPlayer = enemyDamage * PLAYER_COMBAT_CONFIG.meleeModeDamageReduction;
+            } else {
+                // Player not in melee mode - takes full damage
+                damageToPlayer = enemyDamage;
+            }
+            
+            this.damagePlayer(damageToPlayer);
             enemy.lastDamageTime = now;
             
             // Visual feedback: flash player red and shake camera
-            player.setTint(0xff0000);
-            enemy.scene.time.delayedCall(PLAYER_COMBAT_CONFIG.invulnerabilityDuration, () => {
-                if (player.active) {
-                    player.clearTint();
-                }
-            });
+            // Don't override melee mode tint if active
+            if (!player.isMeleeMode) {
+                player.setTint(0xff0000);
+                enemy.scene.time.delayedCall(PLAYER_COMBAT_CONFIG.invulnerabilityDuration, () => {
+                    if (player.active && !player.isMeleeMode) {
+                        player.clearTint();
+                    }
+                });
+            }
             
-            // Camera shake effect
-            enemy.scene.cameras.main.shake(100, 0.005);
+            // Camera shake effect (more intense if taking full damage)
+            const shakeIntensity = player.isMeleeMode ? 0.003 : 0.005;
+            enemy.scene.cameras.main.shake(100, shakeIntensity);
         }
         
         // Check if player can damage enemy (cooldown per enemy)
         if (!enemy.lastPlayerDamageTime || now - enemy.lastPlayerDamageTime >= PLAYER_COMBAT_CONFIG.playerToEnemyCooldown) {
-            // Player damages enemy (melee contact damage)
-            const playerDamage = PLAYER_COMBAT_CONFIG.baseMeleeDamage;
-            enemy.health -= playerDamage;
-            enemy.lastPlayerDamageTime = now;
+            let playerDamage = 0;
             
-            // Visual feedback: flash enemy white (different from projectile red)
-            enemy.setTint(0xffffff);
-            enemy.scene.time.delayedCall(100, () => {
-                if (enemy.active) {
-                    enemy.clearTint();
+            if (player.isMeleeMode) {
+                // Player in melee mode - deals full melee damage
+                playerDamage = PLAYER_COMBAT_CONFIG.meleeModePlayerDamage;
+            } else if (this.isPlayerMovingTowardEnemy(player, enemy)) {
+                // Player moving toward enemy without melee mode - deals partial damage
+                playerDamage = PLAYER_COMBAT_CONFIG.passiveModePlayerDamage;
+            }
+            // else: Player moving away or stationary - deals no damage
+            
+            if (playerDamage > 0) {
+                enemy.health -= playerDamage;
+                enemy.lastPlayerDamageTime = now;
+                
+                // Visual feedback: flash enemy white (different from projectile red)
+                enemy.setTint(0xffffff);
+                enemy.scene.time.delayedCall(100, () => {
+                    if (enemy.active) {
+                        enemy.clearTint();
+                    }
+                });
+                
+                // Check if enemy died from collision
+                if (enemy.health <= 0) {
+                    this.killEnemy(enemy);
                 }
-            });
-            
-            // Check if enemy died from collision
-            if (enemy.health <= 0) {
-                this.killEnemy(enemy);
             }
         }
     }

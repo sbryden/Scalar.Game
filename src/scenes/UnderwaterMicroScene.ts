@@ -214,15 +214,17 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     }
     
     createDebugText() {
-        // Create debug display
+        // Create debug display (only enabled in development)
         this.debugDisplay = new DebugDisplay(this);
     }
     
     update() {
         const playerStats = getPlayerStats();
         
-        // Update debug display
-        this.debugDisplay.update(this.player.x, playerStats);
+        // Update debug display (only if enabled)
+        if (this.debugDisplay?.enabled) {
+            this.debugDisplay.update(this.player.x, playerStats);
+        }
         
         // Update HUD
         this.hud.update(playerStats);

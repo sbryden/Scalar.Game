@@ -3,6 +3,14 @@ import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
 
+/**
+ * Helper function to check if an enemy type is a swimming enemy
+ * Swimming enemies can move freely in all directions and don't have gravity
+ */
+function isSwimmingEnemy(enemyType: string): boolean {
+    return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton";
+}
+
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
     const config = ENEMY_CONFIG[enemyType];
     
@@ -23,7 +31,7 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.body.setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
-    if (enemyType === "micro" || enemyType === "fish" || enemyType === "plankton") {
+    if (isSwimmingEnemy(enemyType)) {
         enemy.body.setAllowGravity(false);
     }
 
@@ -125,7 +133,7 @@ function updateAggroAI(enemy: Enemy): void {
     );
     
     // Different behavior for swimming vs ground enemies
-    if (enemy.enemyType === "micro" || enemy.enemyType === "fish" || enemy.enemyType === "plankton") {
+    if (isSwimmingEnemy(enemy.enemyType)) {
         // Swimming enemies can move freely in all directions
         const velocityX = Math.cos(angleToPlayer) * aggroSpeed;
         const velocityY = Math.sin(angleToPlayer) * aggroSpeed;
@@ -171,7 +179,7 @@ function updateAggroAI(enemy: Enemy): void {
 
 function updatePatrolAI(enemy: Enemy): void {
     // Different behavior for swimming enemies (fish, plankton, micro) vs ground enemies
-    if (enemy.enemyType === "micro" || enemy.enemyType === "fish" || enemy.enemyType === "plankton") {
+    if (isSwimmingEnemy(enemy.enemyType)) {
         // Swimming enemies float around their zone in a circular/wavy pattern
         const maxDistance = enemy.patrolDistance / 2;
         const distFromStart = Math.abs(enemy.x - enemy.startX);
