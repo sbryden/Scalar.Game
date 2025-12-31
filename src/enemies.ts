@@ -24,15 +24,15 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         texture = "enemy"; // Use enemy as placeholder for crabs
     }
     
-    const enemy = scene.add.sprite(x, y, texture);
+    const enemy = scene.add.sprite(x, y, texture) as Enemy;
     enemy.setScale(0.2);
     scene.physics.add.existing(enemy);
-    enemy.body.setBounce(0.2);
-    enemy.body.setCollideWorldBounds(true);
+    (enemy.body as Phaser.Physics.Arcade.Body).setBounce(0.2);
+    (enemy.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
     if (isSwimmingEnemy(enemyType)) {
-        enemy.body.setAllowGravity(false);
+        (enemy.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
 
     enemy.health = config.health;

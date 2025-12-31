@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import playerStatsSystem from './PlayerStatsSystem';
 import { gainXP } from '../xpOrbs';
+import type { XPOrb } from '../types/game';
 
 export class SpawnSystem {
     constructor() {
@@ -19,33 +20,34 @@ export class SpawnSystem {
      * Spawn an XP orb at the given location
      */
     spawnXPOrb(scene: Phaser.Scene, x: number, y: number, xpValue: number): void {
-        const orb = scene.add.circle(x, y, 6, 0xFFD700);
+        const orb = scene.add.circle(x, y, 6, 0xFFD700) as XPOrb;
         scene.physics.add.existing(orb);
-        orb.body.setVelocity(
+        (orb.body as Phaser.Physics.Arcade.Body).setVelocity(
             Phaser.Math.Between(-50, 50),
             Phaser.Math.Between(-100, -50)
         );
-        orb.body.setCollideWorldBounds(true);
-        orb.body.setBounce(0.5, 0.5);
+        (orb.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
+        (orb.body as Phaser.Physics.Arcade.Body).setBounce(0.5, 0.5);
         orb.xpValue = xpValue;
         
         // Disable gravity for orbs in underwater scenes
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
                             gameState.currentSceneKey === 'UnderwaterMicroScene';
         if (isUnderwater) {
-            orb.body.setAllowGravity(false);
+            (orb.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
             // Give orbs a gentle floating motion
-            orb.body.setVelocity(
+            (orb.body as Phaser.Physics.Arcade.Body).setVelocity(
                 Phaser.Math.Between(-30, 30),
                 Phaser.Math.Between(-30, 30)
             );
         }
         
-        gameState.xpOrbs.add(orb);
-        scene.physics.add.collider(orb, gameState.platforms);
-        scene.physics.add.overlap(gameState.player, orb, (p, o) => {
-            gainXP(o.xpValue || 25);
-            o.destroy();
+        gameState.xpOrbs!.add(orb);
+        scene.physics.add.collider(orb, gameState.platforms!);
+        scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
+            const xpOrb = o as XPOrb;
+            gainXP(xpOrb.xpValue || 25);
+            xpOrb.destroy();
         });
     }
     

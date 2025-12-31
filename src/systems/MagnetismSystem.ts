@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
+import type { XPOrb } from '../types/game';
 
 const MAGNETISM_RANGE = 150; // Distance to start pulling orbs
 const MAGNETISM_SPEED = 250; // Speed to pull orbs
@@ -15,10 +16,11 @@ export class MagnetismSystem {
     update(): void {
         if (!gameState.player || !gameState.xpOrbs) return;
         
-        gameState.xpOrbs.children.entries.forEach(orb => {
+        gameState.xpOrbs.children.entries.forEach(obj => {
+            const orb = obj as XPOrb;
             const distance = Phaser.Math.Distance.Between(
-                gameState.player.x, 
-                gameState.player.y, 
+                gameState.player!.x, 
+                gameState.player!.y, 
                 orb.x, 
                 orb.y
             );
@@ -27,11 +29,11 @@ export class MagnetismSystem {
                 const angle = Phaser.Math.Angle.Between(
                     orb.x, 
                     orb.y, 
-                    gameState.player.x, 
-                    gameState.player.y
+                    gameState.player!.x, 
+                    gameState.player!.y
                 );
                 
-                orb.body.setVelocity(
+                (orb.body as Phaser.Physics.Arcade.Body).setVelocity(
                     Math.cos(angle) * MAGNETISM_SPEED,
                     Math.sin(angle) * MAGNETISM_SPEED
                 );

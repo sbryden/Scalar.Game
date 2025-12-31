@@ -1,6 +1,6 @@
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config';
 import gameState from './utils/gameState';
-import type { PlayerSize } from './types/game';
+import type { PlayerSize, Enemy } from './types/game';
 
 export function getPlayerSize(): PlayerSize { return gameState.playerSize; }
 export function getSizeChangeTimer(): number { return gameState.sizeChangeTimer; }
@@ -88,13 +88,13 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     const baseDisplayScale = 0.25;
     
     // Apply new scale
-    gameState.player.setScale(baseDisplayScale * config.scale);
-    gameState.player.body.updateFromGameObject();
+    gameState.player!.setScale(baseDisplayScale * config.scale);
+    (gameState.player!.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
     
     // Small jump to account for size change
     const sizeDifference = Math.abs(newScale - oldScale);
     const jumpPower = 50 + (sizeDifference * 150);
-    gameState.player.body.setVelocityY(-jumpPower);
+    (gameState.player!.body as Phaser.Physics.Arcade.Body).setVelocityY(-jumpPower);
     
     // Scale enemies inversely
     const enemyScale = 1 / newScale;
@@ -103,10 +103,11 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     const enemyNewHeight = enemyBaseHeight * enemyScale;
     const enemyHeightDifference = enemyNewHeight - enemyOldHeight;
     
-    gameState.enemies.children.entries.forEach(enemy => {
-        enemy.setScale(enemyScale);
-        enemy.y -= enemyHeightDifference / 2;
-        enemy.body.updateFromGameObject();
+    gameState.enemies!.children.entries.forEach(enemy => {
+        const enemySprite = enemy as Enemy;
+        enemySprite.setScale(enemyScale);
+        enemySprite.y -= enemyHeightDifference / 2;
+        (enemySprite.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
     });
     
     // Reset cooldown timer
