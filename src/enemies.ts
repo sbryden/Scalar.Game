@@ -1,4 +1,4 @@
-import { ENEMY_CONFIG, PROJECTILE_CONFIG } from "./config";
+import { ENEMY_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
@@ -18,10 +18,13 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     let texture = "enemy";
     if (enemyType === "micro") {
         texture = "bacteria";
-    } else if (enemyType === "fish" || enemyType === "plankton") {
-        texture = "bacteria"; // Use bacteria as placeholder for swimming enemies
+    } else if (enemyType === "fish") {
+        // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
+        texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+    } else if (enemyType === "plankton") {
+        texture = "bacteria"; // Use bacteria as placeholder for plankton
     } else if (enemyType === "crab") {
-        texture = "enemy"; // Use enemy as placeholder for crabs
+        texture = "water_enemy_crab_1";
     }
     
     const enemy = scene.add.sprite(x, y, texture);
@@ -95,7 +98,10 @@ export function updateEnemyAI(enemy: Enemy): void {
             gameState.player.x, gameState.player.y
         );
         
-        if (distanceToPlayer <= enemy.aggroRange) {
+        const now = Date.now();
+        const playerIsImmune = gameState.player.immuneUntil && now < gameState.player.immuneUntil;
+        
+        if (distanceToPlayer <= enemy.aggroRange && !playerIsImmune) {
             enemy.isAggroed = true;
             enemy.aggroTarget = gameState.player;
         }

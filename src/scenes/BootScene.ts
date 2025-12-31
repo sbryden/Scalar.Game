@@ -28,12 +28,20 @@ export default class BootScene extends Phaser.Scene {
         // Load bacteria enemy image for micro scene
         this.load.image('bacteria', '/Scalar.Game/bacteria.png');
         
+        // Load water enemy images
+        this.load.image('water_enemy_crab_1', '/Scalar.Game/water_enemy_crab_1.png');
+        this.load.image('water_enemy_fish_1', '/Scalar.Game/water_enemy_fish_1.png');
+        this.load.image('water_enemy_needle_fish_1', '/Scalar.Game/water_enemy_needle_fish_1.png');
+        
         // Load projectile images
         this.load.image('torpedo', '/Scalar.Game/torpedo.png');
         this.load.image('beam', '/Scalar.Game/beam.png');
         
         // Load menu assets
         this.load.image('secure_robot', '/Scalar.Game/secure_robot.png');
+        
+        // Load game over image
+        this.load.image('gameover_1', '/Scalar.Game/gameover_1.png');
         
         // Optional: Add loading progress bar
         this.createLoadingBar();

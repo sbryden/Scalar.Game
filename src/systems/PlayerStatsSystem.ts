@@ -95,6 +95,11 @@ export class PlayerStatsSystem {
      * Apply damage to player
      */
     takeDamage(amount: number): number {
+        // Don't apply damage if already dead
+        if (this.stats.health <= 0) {
+            return 0;
+        }
+        
         this.stats.health = Math.max(0, this.stats.health - amount);
         
         if (this.stats.health <= 0) {
