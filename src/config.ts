@@ -16,12 +16,6 @@ export const SIZE_CONFIG = {
         speedMultiplier: 1.0,
         jumpMultiplier: 1.0,
         color: 0x00FF00 // Green
-    },
-    large: {
-        scale: 1.5,
-        speedMultiplier: 0.7,
-        jumpMultiplier: 0.8,
-        color: 0xFF8C00 // Orange
     }
 };
 
