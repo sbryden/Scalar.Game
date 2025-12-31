@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import gameState from '../utils/gameState';
 
 // Mock Phaser before importing anything that uses it
 vi.mock('phaser', () => ({
@@ -15,13 +16,40 @@ vi.mock('phaser', () => ({
 }));
 
 describe('GameState Module', () => {
-  let gameState: any;
-
-  beforeEach(async () => {
-    // Clear the module cache and re-import
-    vi.resetModules();
-    const module = await import('../utils/gameState');
-    gameState = module.default;
+  beforeEach(() => {
+    // Reset gameState to initial values
+    gameState.player = null;
+    gameState.enemies = null;
+    gameState.projectiles = null;
+    gameState.xpOrbs = null;
+    gameState.platforms = null;
+    gameState.scene = null;
+    gameState.cursors = null;
+    gameState.wasdKeys = null;
+    gameState.levelText = null;
+    gameState.sizeChangeTimer = 0;
+    gameState.playerSize = 'normal';
+    gameState.currentSceneKey = 'MainGameScene';
+    gameState.difficultyInitialized = false;
+    gameState.spawnEnemyFunc = null;
+    // Reset saved positions
+    gameState.savedPositions = {
+      BootScene: { x: 100, y: 650 },
+      MenuScene: { x: 100, y: 650 },
+      MainGameScene: { x: 100, y: 650 },
+      MicroScene: { x: 100, y: 650 },
+      UnderwaterScene: { x: 100, y: 650 },
+      UnderwaterMicroScene: { x: 100, y: 650 }
+    };
+    // Reset saved enemies
+    gameState.savedEnemies = {
+      BootScene: [],
+      MenuScene: [],
+      MainGameScene: [],
+      MicroScene: [],
+      UnderwaterScene: [],
+      UnderwaterMicroScene: []
+    };
   });
 
   describe('Initialization', () => {
@@ -168,25 +196,25 @@ describe('GameState Module', () => {
     });
 
     it('should return false when only player is set', () => {
-      gameState.player = { x: 0, y: 0 };
+      gameState.player = { x: 0, y: 0 } as any;
       expect(gameState.isInitialized()).toBe(false);
     });
 
     it('should return false when only scene is set', () => {
-      gameState.scene = { key: 'test' };
+      gameState.scene = { key: 'test' } as any;
       expect(gameState.isInitialized()).toBe(false);
     });
 
     it('should return true when both player and scene are set', () => {
-      gameState.player = { x: 0, y: 0 };
-      gameState.scene = { key: 'test' };
+      gameState.player = { x: 0, y: 0 } as any;
+      gameState.scene = { key: 'test' } as any;
       expect(gameState.isInitialized()).toBe(true);
     });
   });
 
   describe('State Mutability', () => {
     it('should allow updating player size', () => {
-      const sizes = ['small', 'normal', 'large'];
+      const sizes = ['small', 'normal', 'large'] as const;
       sizes.forEach(size => {
         gameState.playerSize = size;
         expect(gameState.playerSize).toBe(size);
