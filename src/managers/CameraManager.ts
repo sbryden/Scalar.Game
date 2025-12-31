@@ -6,10 +6,10 @@ import gameState from '../utils/gameState';
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
 
 export class CameraManager {
-    scene: any;
-    camera: any;
+    scene: Phaser.Scene;
+    camera: Phaser.Cameras.Scene2D.Camera;
 
-    constructor(scene) {
+    constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.camera = scene.cameras.main;
     }

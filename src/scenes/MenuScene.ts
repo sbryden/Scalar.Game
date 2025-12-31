@@ -5,14 +5,14 @@
 import Phaser from 'phaser';
 
 export default class MenuScene extends Phaser.Scene {
-    selectedDifficulty: any;
-    dropdownOpen: any;
-    dropdownContainer: any;
-    dropdownBox: any;
-    selectedText: any;
-    dropdownArrow: any;
-    optionsContainer: any;
-    optionElements: any;
+    selectedDifficulty!: string;
+    dropdownOpen!: boolean;
+    dropdownContainer!: Phaser.GameObjects.Container;
+    dropdownBox!: Phaser.GameObjects.Rectangle;
+    selectedText!: Phaser.GameObjects.Text;
+    dropdownArrow!: Phaser.GameObjects.Text;
+    optionsContainer!: Phaser.GameObjects.Container;
+    optionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
 
     constructor() {
         super({ key: 'MenuScene' });

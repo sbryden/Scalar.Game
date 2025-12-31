@@ -17,16 +17,16 @@ import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 
 export default class MicroScene extends Phaser.Scene {
-    player: any;
-    platforms: any;
-    enemies: any;
-    projectiles: any;
-    xpOrbs: any;
-    hud: any;
-    debugDisplay: any;
-    inputManager: any;
-    collisionManager: any;
-    cameraManager: any;
+    player!: Phaser.Physics.Arcade.Sprite;
+    platforms!: Phaser.Physics.Arcade.StaticGroup;
+    enemies!: Phaser.Physics.Arcade.Group;
+    projectiles!: Phaser.Physics.Arcade.Group;
+    xpOrbs!: Phaser.Physics.Arcade.Group;
+    hud!: HUD;
+    debugDisplay!: DebugDisplay;
+    inputManager!: InputManager;
+    collisionManager!: CollisionManager;
+    cameraManager!: CameraManager;
 
     constructor() {
         super({ key: 'MicroScene' });
@@ -129,12 +129,11 @@ export default class MicroScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.MicroScene;
         
         // Create player (car)
-        this.player = this.add.sprite(savedPos.x, savedPos.y, 'car_1');
-        this.player.setScale(0.25);
-        this.physics.add.existing(this.player);
-        this.player.body.setBounce(0.2);
-        this.player.body.setCollideWorldBounds(true);
-        this.player.body.setDrag(0, 0);
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1');
+        this.player.setScale(0.15);
+        this.player.setBounce(0.2);
+        this.player.setCollideWorldBounds(true);
+        this.player.setDrag(0, 0);
         this.player.scene = this;
         
         this.physics.add.collider(this.player, this.platforms);
@@ -247,7 +246,7 @@ export default class MicroScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.MicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map(enemy => ({
+            .map((enemy: any) => ({
                 x: enemy.x,
                 y: enemy.y,
                 health: enemy.health,

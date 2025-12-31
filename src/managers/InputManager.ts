@@ -8,11 +8,11 @@ import { fireProjectile } from '../projectiles';
 import { SIZE_CONFIG } from '../config';
 
 export class InputManager {
-    scene: any;
-    cursors: any;
-    wasdKeys: any;
+    scene: Phaser.Scene;
+    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    wasdKeys!: any;
 
-    constructor(scene) {
+    constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.cursors = null;
         this.wasdKeys = null;

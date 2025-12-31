@@ -7,9 +7,9 @@ import { damageEnemy } from '../enemies';
 import combatSystem from '../systems/CombatSystem';
 
 export class CollisionManager {
-    scene: any;
+    scene: Phaser.Scene;
 
-    constructor(scene) {
+    constructor(scene: Phaser.Scene) {
         this.scene = scene;
     }
     
