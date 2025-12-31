@@ -7,6 +7,12 @@ import Phaser from 'phaser';
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty: any;
     dropdownOpen: any;
+    dropdownContainer: any;
+    dropdownBox: any;
+    selectedText: any;
+    dropdownArrow: any;
+    optionsContainer: any;
+    optionElements: any;
 
     constructor() {
         super({ key: 'MenuScene' });
@@ -36,10 +42,10 @@ export default class MenuScene extends Phaser.Scene {
         const subtitle = this.add.text(width / 2, 230, 'Size-Shifting Adventure', {
             fontSize: '24px',
             fontFamily: 'Arial, sans-serif',
-            color: '#ffffff',
-            alpha: 0.8
+            color: '#ffffff'
         });
         subtitle.setOrigin(0.5);
+        subtitle.setAlpha(0.8);
         
         // Difficulty label
         const difficultyLabel = this.add.text(width / 2, 320, 'SELECT DIFFICULTY', {
@@ -60,10 +66,10 @@ export default class MenuScene extends Phaser.Scene {
         const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            color: '#ffffff',
-            alpha: 0.6
+            color: '#ffffff'
         });
         instructions.setOrigin(0.5);
+        instructions.setAlpha(0.6);
     }
     
     createDifficultyDropdown(centerX, y) {
