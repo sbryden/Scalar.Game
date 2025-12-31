@@ -14,9 +14,12 @@ export class DebugDisplay {
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.debugText = null;
-        this.enabled = true;
+        // Only enable debug display in development mode
+        this.enabled = import.meta.env.DEV || false;
         
-        this.create();
+        if (this.enabled) {
+            this.create();
+        }
     }
     
     create(): void {
