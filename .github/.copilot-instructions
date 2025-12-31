@@ -52,15 +52,35 @@ When a feature is complete, the following checks MUST pass before committing:
    - Only proceed with `git commit` if user approves
 
 ### Git Commit Message Format
-Use conventional commits:
+ALWAYS use verbose multi-line commit messages with separate -m flags for each line:
+```bash
+git commit -m "Primary summary line (50 chars max)" \
+  -m "- First detailed point about changes" \
+  -m "- Second detailed point" \
+  -m "- Third point about implementation details" \
+  -m "- Additional context or future implications"
 ```
-type(scope): description
 
-- Detailed explanation of changes
-- Key features or fixes
+**Format Requirements:**
+- **First line**: Clear, concise summary (imperative mood: "Add feature" not "Added feature")
+- **Subsequent lines**: Bullet points with detailed explanations using separate -m flags
+- Include implementation details, affected systems, and future considerations
+- Mention visual feedback, performance impacts, or architectural decisions
+
+**Example:**
+```bash
+git commit -m "Add player-enemy collision system with bidirectional damage, knockback, and stun" \
+  -m "- Player and enemies now collide physically (cannot pass through each other)" \
+  -m "- Bidirectional damage: player deals 5 melee damage, enemy deals damage on contact" \
+  -m "- Knockback mechanics: both entities pushed apart on collision" \
+  -m "- 500ms stun after knockback prevents spam and creates hit-stop effect" \
+  -m "- Configurable knockback resistance per enemy type" \
+  -m "- Separate cooldowns for player->enemy (100ms) and enemy->player (500ms) damage" \
+  -m "- Visual feedback: red flash for player, white flash for enemy, camera shake" \
+  -m "- Future-ready for boss immunity and ability-based damage modifiers"
 ```
 
-Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf`
+Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf` (optional prefix)
 
 ## When Helping with Code
 - **New Features**: Ask clarifying questions about game mechanics and user experience
