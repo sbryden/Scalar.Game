@@ -207,8 +207,9 @@ export class CombatSystem {
         let finalDamage = baseDamage;
         
         // Future: Add damage modifiers here based on entity properties
-        // if ('hasCritical' in attacker && attacker.hasCritical) finalDamage *= 2;
-        // if ('hasArmor' in target && target.hasArmor) finalDamage *= 0.5;
+        // Example: Type guards can be used to check for properties on specific entity types
+        // if ('damage' in attacker && attacker.damage > 10) finalDamage *= 1.5; // Critical hit for high damage attackers
+        // if ('maxHealth' in target && target.maxHealth > 100) finalDamage *= 0.8; // Armored targets take less damage
         
         return finalDamage;
     }
