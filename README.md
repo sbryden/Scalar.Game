@@ -97,6 +97,10 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
 - `npm run preview` - Preview the production build
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Run tests with coverage report
 
 ## Deployment
 
@@ -113,6 +117,28 @@ npm run build
 npm run preview
 ```
 Visit `http://localhost:4173/Scalar.Game/` to preview.
+
+## Testing
+
+This project includes a comprehensive unit test suite built with Vitest.
+
+**Running Tests:**
+```bash
+npm test              # Run tests in watch mode
+npm run test:run      # Run tests once
+npm run test:ui       # Run tests with interactive UI
+npm run test:coverage # Generate coverage report
+```
+
+**CI/CD:**
+- Tests run automatically on every push and pull request via GitHub Actions
+- See `.github/workflows/ci.yml` for the CI configuration
+- All tests must pass before code can be merged
+
+**Writing Tests:**
+- Test files are located in `src/test/`
+- Use the `.test.ts` extension for test files
+- Follow existing test patterns for consistency
 
 ## Technologies
 
