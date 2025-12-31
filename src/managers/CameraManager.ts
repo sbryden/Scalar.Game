@@ -17,7 +17,7 @@ export class CameraManager {
     /**
      * Setup camera bounds and following
      */
-    setupCamera() {
+    setupCamera(): void {
         if (!gameState.player) {
             console.error('CameraManager: Player not initialized');
             return;
@@ -31,7 +31,7 @@ export class CameraManager {
     /**
      * Update camera position (called from game loop)
      */
-    update() {
+    update(): void {
         if (!gameState.player) return;
         
         const targetPlayerScreenX = CAMERA_PADDING;

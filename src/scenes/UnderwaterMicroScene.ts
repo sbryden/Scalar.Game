@@ -15,6 +15,7 @@ import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
+import type { Enemy } from '../types/game';
 
 export default class UnderwaterMicroScene extends Phaser.Scene {
     player!: Phaser.Physics.Arcade.Sprite;
@@ -30,20 +31,6 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
 
     constructor() {
         super({ key: 'UnderwaterMicroScene' });
-        
-        // Scene variables
-        this.player = null;
-        this.platforms = null;
-        this.enemies = null;
-        this.projectiles = null;
-        this.xpOrbs = null;
-        this.hud = null;
-        this.debugDisplay = null;
-        
-        // Managers
-        this.inputManager = null;
-        this.collisionManager = null;
-        this.cameraManager = null;
     }
     
     create() {
@@ -274,7 +261,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.UnderwaterMicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map((enemy: any) => ({
+            .map((enemy: Enemy) => ({
                 x: enemy.x,
                 y: enemy.y,
                 health: enemy.health,

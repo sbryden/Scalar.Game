@@ -2,32 +2,34 @@
  * Input Manager
  * Handles all keyboard input setup and player movement controls
  */
+import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
 import { SIZE_CONFIG } from '../config';
+import type { WASDKeys } from '../types/game';
 
 export class InputManager {
     scene: Phaser.Scene;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-    wasdKeys!: any;
+    wasdKeys!: WASDKeys;
     spaceKey!: Phaser.Input.Keyboard.Key;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        this.cursors = null;
-        this.wasdKeys = null;
-        this.spaceKey = null;
+        this.cursors = null as any;
+        this.wasdKeys = null as any;
+        this.spaceKey = null as any;
     }
     
     /**
      * Setup all input handlers
      */
-    setupInput() {
+    setupInput(): void {
         // Create cursor keys and WASD
-        this.cursors = this.scene.input.keyboard.createCursorKeys();
-        this.wasdKeys = this.scene.input.keyboard.addKeys('W,A,S,D');
-        this.spaceKey = this.scene.input.keyboard.addKey('SPACE');
+        this.cursors = this.scene.input.keyboard!.createCursorKeys();
+        this.wasdKeys = this.scene.input.keyboard!.addKeys('W,A,S,D') as WASDKeys;
+        this.spaceKey = this.scene.input.keyboard!.addKey('SPACE');
         
         // Store in gameState for other modules
         gameState.cursors = this.cursors;
@@ -40,7 +42,7 @@ export class InputManager {
     /**
      * Setup action key handlers (jump, size change, attack)
      */
-    setupActionKeys() {
+    setupActionKeys(): void {
         // Check if we're underwater for different control scheme
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
                             gameState.currentSceneKey === 'UnderwaterMicroScene';
@@ -67,7 +69,7 @@ export class InputManager {
     /**
      * Handle jump action
      */
-    handleJump() {
+    handleJump(): void {
         if (!gameState.player || !gameState.player.body.touching.down) {
             return;
         }
@@ -81,7 +83,7 @@ export class InputManager {
     /**
      * Handle player movement (called from update loop)
      */
-    handleMovement() {
+    handleMovement(): void {
         if (!gameState.player) return;
         
         // Check if player is stunned
@@ -105,7 +107,7 @@ export class InputManager {
     /**
      * Handle land-based movement (original behavior)
      */
-    handleLandMovement() {
+    handleLandMovement(): void {
         const baseSpeed = 160;
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
         
@@ -123,7 +125,7 @@ export class InputManager {
     /**
      * Handle underwater submarine movement with thrust controls
      */
-    handleUnderwaterMovement() {
+    handleUnderwaterMovement(): void {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
@@ -154,7 +156,7 @@ export class InputManager {
     /**
      * Cleanup input handlers
      */
-    destroy() {
+    destroy(): void {
         this.scene.input.keyboard.removeAllListeners();
     }
 }
