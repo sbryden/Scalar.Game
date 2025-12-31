@@ -1,5 +1,5 @@
 // World configuration
-export const WORLD_WIDTH = 16384;
+export const WORLD_WIDTH = 8192;
 export const WORLD_HEIGHT = 768;
 export const CAMERA_PADDING = 256;
 
