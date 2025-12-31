@@ -103,7 +103,12 @@ export const PLAYER_COMBAT_CONFIG = {
     enemyToPlayerCooldown: 500,   // Milliseconds between enemy damaging player
     playerToEnemyCooldown: 100,   // Milliseconds between player damaging enemy
     invulnerabilityDuration: 150, // How long player flashes after taking damage (ms)
-    stunDuration: 500             // How long entities are stunned after knockback (ms)
+    stunDuration: 500,            // How long entities are stunned after knockback (ms)
+    // Melee attack mode configuration
+    meleeModePlayerDamage: 15,        // Damage dealt to enemy in melee mode (3x base)
+    passiveModePlayerDamage: 3,       // Damage dealt when moving toward enemy without melee mode
+    meleeModeDamageReduction: 0.25,   // Player takes 25% damage in melee mode
+    requiredApproachSpeed: 50         // Minimum velocity toward enemy for passive damage
 };
 
 // Projectile configuration
