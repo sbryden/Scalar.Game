@@ -4,6 +4,36 @@
  * Eliminates the need for setter functions across modules.
  */
 class GameState {
+    // Core game objects
+    player: any;
+    enemies: any;
+    projectiles: any;
+    xpOrbs: any;
+    platforms: any;
+    
+    // Scene and input references
+    scene: any;
+    cursors: any;
+    wasdKeys: any;
+    
+    // UI elements
+    levelText: any;
+    
+    // Timers and state
+    sizeChangeTimer: number;
+    playerSize: string;
+    
+    // Scene management
+    currentSceneKey: string;
+    savedPositions: any;
+    savedEnemies: any;
+    
+    // Difficulty
+    difficultyInitialized: boolean;
+    
+    // Function references
+    spawnEnemyFunc: any;
+
     constructor() {
         // Core game objects
         this.player = null;

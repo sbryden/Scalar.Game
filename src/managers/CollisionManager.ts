@@ -2,9 +2,9 @@
  * Collision Manager
  * Sets up and manages all physics collisions in the game
  */
-import gameState from '../utils/gameState.js';
-import { damageEnemy } from '../enemies.js';
-import combatSystem from '../systems/CombatSystem.js';
+import gameState from '../utils/gameState';
+import { damageEnemy } from '../enemies';
+import combatSystem from '../systems/CombatSystem';
 
 export class CollisionManager {
     constructor(scene) {

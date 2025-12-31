@@ -2,9 +2,13 @@
  * Debug Display
  * Shows debug information during development
  */
-import { WORLD_WIDTH } from '../config.js';
+import { WORLD_WIDTH } from '../config';
 
 export class DebugDisplay {
+    scene: any;
+    debugText: any;
+    enabled: boolean;
+
     constructor(scene) {
         this.scene = scene;
         this.debugText = null;

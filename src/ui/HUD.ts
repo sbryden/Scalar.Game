@@ -3,6 +3,13 @@
  * Manages health bar, XP bar, and level display
  */
 export class HUD {
+    scene: any;
+    healthBar: any;
+    healthBarBackground: any;
+    xpBar: any;
+    xpBarBackground: any;
+    levelText: any;
+
     constructor(scene) {
         this.scene = scene;
         this.healthBar = null;

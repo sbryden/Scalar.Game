@@ -2,6 +2,8 @@
  * Menu Scene
  * Main menu with title, difficulty selection, and start button
  */
+import Phaser from 'phaser';
+
 export default class MenuScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MenuScene' });
@@ -52,7 +54,7 @@ export default class MenuScene extends Phaser.Scene {
         this.createStartButton(width / 2, 520);
         
         // Instructions
-        const instructions = this.add.text(width / 2, 650, 'Q/E/R - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
+        const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             fill: '#ffffff',

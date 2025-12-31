@@ -2,10 +2,10 @@
  * Input Manager
  * Handles all keyboard input setup and player movement controls
  */
-import gameState from '../utils/gameState.js';
-import { changeSize, getPlayerSize } from '../player.js';
-import { fireProjectile } from '../projectiles.js';
-import { SIZE_CONFIG } from '../config.js';
+import gameState from '../utils/gameState';
+import { changeSize, getPlayerSize } from '../player';
+import { fireProjectile } from '../projectiles';
+import { SIZE_CONFIG } from '../config';
 
 export class InputManager {
     constructor(scene) {

@@ -1,8 +1,8 @@
-import { PROJECTILE_CONFIG, ENEMY_CONFIG } from './config.js';
-import gameState from './utils/gameState.js';
-import playerStatsSystem from './systems/PlayerStatsSystem.js';
-import spawnSystem from './systems/SpawnSystem.js';
-import magnetismSystem from './systems/MagnetismSystem.js';
+import { PROJECTILE_CONFIG, ENEMY_CONFIG } from './config';
+import gameState from './utils/gameState';
+import playerStatsSystem from './systems/PlayerStatsSystem';
+import spawnSystem from './systems/SpawnSystem';
+import magnetismSystem from './systems/MagnetismSystem';
 
 export function getPlayerStats() { return playerStatsSystem.getStats(); }
 export function updatePlayerStats(stats) { playerStatsSystem.setStats(stats); }

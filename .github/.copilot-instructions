@@ -5,38 +5,69 @@ This is a 2D side-scrolling game built with Phaser 3 and Vite. The game features
 
 ## Technology Stack
 - **Framework**: Phaser 3.55.2
+- **Language**: TypeScript
 - **Build Tool**: Vite 5.x
-- **Language**: JavaScript (ES6+)
 - **Physics**: Arcade Physics (built into Phaser)
+- **Architecture**: Modular with managers, systems, and scene-based organization
 
 ## Code Style Guidelines
+- Use TypeScript with proper type annotations
+- Add class property declarations for all instance variables
+- Import Phaser explicitly: `import Phaser from 'phaser'`
 - Use ES6+ syntax (arrow functions, const/let, destructuring)
 - Follow Phaser 3 conventions for game scenes and lifecycle methods
 - Keep functions concise and focused on single responsibilities
-- Use descriptive variable names (e.g., `player`, `platforms`, `cursors`)
+- Use descriptive variable names with types when beneficial
 - Comment complex logic and game mechanics
+- Prefer classes and modules over global functions
 
 ## Project Structure
 ```
-src/game.js          - Main game configuration and scene logic
-index.html           - HTML entry point with Phaser CDN
-style.css            - Game styling
-vite.config.js       - Build configuration
+src/
+  main.ts                 - Application entry point
+  config.ts               - Game configuration constants
+  scenes/                 - Phaser scene classes
+    BootScene.ts          - Asset loading
+    MenuScene.ts          - Main menu and difficulty selection
+    MainGameScene.ts      - Primary gameplay
+    MicroScene.ts         - Cellular-level gameplay
+  systems/                - Game logic systems
+    CombatSystem.ts       - Combat and damage calculations
+    PlayerStatsSystem.ts  - Player health, XP, leveling
+    SpawnSystem.ts        - Enemy and XP orb spawning
+    MagnetismSystem.ts    - XP orb attraction
+  managers/               - Scene-specific managers
+    InputManager.ts       - Keyboard input handling
+    CollisionManager.ts   - Physics collision setup
+    CameraManager.ts      - Camera following behavior
+  ui/                     - UI components
+    HUD.ts                - Health/XP bars, level display
+    DebugDisplay.ts       - Debug information overlay
+  utils/
+    gameState.ts          - Centralized game state
+index.html              - HTML entry point
+style.css               - Game styling
+vite.config.js          - Build configuration
+tsconfig.json           - TypeScript configuration
 ```
 
 ## Common Patterns in This Project
-- Scene lifecycle: `preload()`, `create()`, `update()`
-- Input handling via `this.input.keyboard.createCursorKeys()`
-- Physics bodies: `this.physics.add.existing()`, collision groups
-- Static vs dynamic game objects
-- Camera following with `this.cameras.main.startFollow()`
+- **TypeScript Classes**: All scenes extend `Phaser.Scene` with explicit Phaser import
+- **Scene Lifecycle**: `preload()`, `create()`, `update()` methods
+- **Modular Systems**: Separate systems for combat, stats, spawning, magnetism
+- **Manager Pattern**: InputManager, CollisionManager, CameraManager per scene
+- **Centralized State**: `gameState` singleton for shared state across scenes
+- **Type Safety**: Property declarations on all classes, typed parameters where beneficial
+- **Import Patterns**: No file extensions in imports (TypeScript standard)
 
 ## Development Workflow
 
 ### During Feature Development
-1. Make changes to `src/game.js` or related files
+1. Make changes to TypeScript files in `src/`
 2. Test in development mode with `npm run dev`
-3. Use hot module reloading during development
+3. Vite provides hot module reloading automatically
+4. TypeScript errors are shown in terminal and browser console
+5. Optional: Run `npx tsc --noEmit` to check types without building
 
 ### After Completing a Feature - QUALITY GATES
 When a feature is complete, the following checks MUST pass before committing:
@@ -85,8 +116,10 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf` (opti
 ## When Helping with Code
 - **New Features**: Ask clarifying questions about game mechanics and user experience
 - **Bug Fixes**: Identify whether issues are physics-related, input-related, or rendering-related
-- **Refactoring**: Suggest improvements while maintaining Phaser 3 best practices
+- **Refactoring**: Suggest improvements while maintaining Phaser 3 and TypeScript best practices
 - **Performance**: Consider rendering efficiency and physics calculations
+- **TypeScript**: Add type annotations to new functions, declare class properties, import Phaser where needed
+- **Architecture**: Use appropriate system/manager for new features (e.g., combat goes in CombatSystem)
 
 ## Key Game Mechanics to Understand
 - **Player Control**: Arrow keys for movement, spacebar for jumping
@@ -103,8 +136,9 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf` (opti
 - Level progression
 
 ## Dependencies to Know
-- **phaser**: Game framework with built-in physics, input, graphics
-- **vite**: Development server and build tool
+- **phaser**: Game framework with built-in physics, input, graphics (includes TypeScript definitions)
+- **typescript**: Type checking and compilation
+- **vite**: Development server and build tool with TypeScript support
 - **@vitejs/plugin-basic-ssl**: HTTPS support during development
 
 ## Testing & Validation

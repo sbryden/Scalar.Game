@@ -3,9 +3,14 @@
  * Manages player health, XP, and leveling progression
  * Extracted from xpOrbs.js for better separation of concerns
  */
-import gameState from '../utils/gameState.js';
+import gameState from '../utils/gameState';
 
 export class PlayerStatsSystem {
+    stats: any;
+    difficulty: string;
+    onLevelUp: any;
+    onGameOver: any;
+
     constructor() {
         this.stats = {
             level: 1,

@@ -2,6 +2,8 @@
  * Boot Scene
  * Handles asset preloading before the main game starts
  */
+import Phaser from 'phaser';
+
 export default class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BootScene' });

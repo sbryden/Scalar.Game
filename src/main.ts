@@ -2,10 +2,10 @@
  * Main Entry Point
  * Initializes Phaser game with scene configuration
  */
-import BootScene from './scenes/BootScene.js';
-import MenuScene from './scenes/MenuScene.js';
-import MainGameScene from './scenes/MainGameScene.js';
-import MicroScene from './scenes/MicroScene.js';
+import BootScene from './scenes/BootScene';
+import MenuScene from './scenes/MenuScene';
+import MainGameScene from './scenes/MainGameScene';
+import MicroScene from './scenes/MicroScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -15,7 +15,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { x: 0, y: 300 },
             debug: false
         }
     },

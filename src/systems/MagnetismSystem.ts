@@ -2,7 +2,8 @@
  * Magnetism System
  * Handles XP orb attraction to the player
  */
-import gameState from '../utils/gameState.js';
+import Phaser from 'phaser';
+import gameState from '../utils/gameState';
 
 const MAGNETISM_RANGE = 150; // Distance to start pulling orbs
 const MAGNETISM_SPEED = 250; // Speed to pull orbs

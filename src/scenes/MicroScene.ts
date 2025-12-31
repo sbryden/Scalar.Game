@@ -2,18 +2,19 @@
  * Micro Scene
  * Cellular-level gameplay scene with bacteria enemies
  */
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config.js';
-import { spawnEnemy, updateEnemyAI } from '../enemies.js';
-import { updateProjectiles } from '../projectiles.js';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
-import gameState from '../utils/gameState.js';
-import combatSystem from '../systems/CombatSystem.js';
-import { InputManager } from '../managers/InputManager.js';
-import { CollisionManager } from '../managers/CollisionManager.js';
-import { CameraManager } from '../managers/CameraManager.js';
-import { HUD } from '../ui/HUD.js';
-import { DebugDisplay } from '../ui/DebugDisplay.js';
+import Phaser from 'phaser';
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { spawnEnemy, updateEnemyAI } from '../enemies';
+import { updateProjectiles } from '../projectiles';
+import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
+import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
+import gameState from '../utils/gameState';
+import combatSystem from '../systems/CombatSystem';
+import { InputManager } from '../managers/InputManager';
+import { CollisionManager } from '../managers/CollisionManager';
+import { CameraManager } from '../managers/CameraManager';
+import { HUD } from '../ui/HUD';
+import { DebugDisplay } from '../ui/DebugDisplay';
 
 export default class MicroScene extends Phaser.Scene {
     constructor() {

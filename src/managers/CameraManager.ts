@@ -2,8 +2,8 @@
  * Camera Manager
  * Handles camera setup and following behavior
  */
-import gameState from '../utils/gameState.js';
-import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config.js';
+import gameState from '../utils/gameState';
+import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
 
 export class CameraManager {
     constructor(scene) {

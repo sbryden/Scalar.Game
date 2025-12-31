@@ -1,6 +1,6 @@
-import { ENEMY_CONFIG, PROJECTILE_CONFIG } from "./config.js";
-import gameState from "./utils/gameState.js";
-import combatSystem from "./systems/CombatSystem.js";
+import { ENEMY_CONFIG, PROJECTILE_CONFIG } from "./config";
+import gameState from "./utils/gameState";
+import combatSystem from "./systems/CombatSystem";
 
 export function spawnEnemy(scene, x, y, enemyType = "generic") {
     const config = ENEMY_CONFIG[enemyType];
