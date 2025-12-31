@@ -16,7 +16,7 @@ export class CollisionManager {
     /**
      * Setup all collision handlers
      */
-    setupCollisions() {
+    setupCollisions(): void {
         const { player, enemies, projectiles, xpOrbs, platforms } = gameState;
         
         if (!player || !enemies || !projectiles || !platforms) {

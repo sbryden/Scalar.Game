@@ -4,12 +4,16 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/gameState';
+import type { PlayerStats, Difficulty } from '../types/game';
+
+type LevelUpCallback = (level: number) => void;
+type GameOverCallback = () => void;
 
 export class PlayerStatsSystem {
-    stats: any;
-    difficulty: string;
-    onLevelUp: any;
-    onGameOver: any;
+    stats: PlayerStats;
+    difficulty: Difficulty;
+    onLevelUp: LevelUpCallback | null;
+    onGameOver: GameOverCallback | null;
 
     constructor() {
         this.stats = {
@@ -20,12 +24,14 @@ export class PlayerStatsSystem {
             xpToLevel: 100
         };
         this.difficulty = 'normal';
+        this.onLevelUp = null;
+        this.onGameOver = null;
     }
     
     /**
      * Initialize stats based on difficulty
      */
-    initializeDifficulty(difficulty) {
+    initializeDifficulty(difficulty: Difficulty): void {
         this.difficulty = difficulty;
         
         if (difficulty === 'godMode') {
@@ -40,21 +46,21 @@ export class PlayerStatsSystem {
     /**
      * Get current player stats
      */
-    getStats() {
+    getStats(): PlayerStats {
         return this.stats;
     }
     
     /**
      * Update stats (for save/load functionality)
      */
-    setStats(newStats) {
+    setStats(newStats: Partial<PlayerStats>): void {
         this.stats = { ...this.stats, ...newStats };
     }
     
     /**
      * Add XP to player and check for level up
      */
-    gainXP(amount) {
+    gainXP(amount: number): void {
         this.stats.xp += amount;
         this.checkLevelUp();
     }
@@ -63,7 +69,7 @@ export class PlayerStatsSystem {
      * Check if player has enough XP to level up
      * Can level up multiple times if enough XP
      */
-    checkLevelUp() {
+    checkLevelUp(): void {
         while (this.stats.xp >= this.stats.xpToLevel) {
             this.stats.xp -= this.stats.xpToLevel;
             this.stats.level += 1;
@@ -88,7 +94,7 @@ export class PlayerStatsSystem {
     /**
      * Apply damage to player
      */
-    takeDamage(amount) {
+    takeDamage(amount: number): number {
         this.stats.health = Math.max(0, this.stats.health - amount);
         
         if (this.stats.health <= 0) {
@@ -106,7 +112,7 @@ export class PlayerStatsSystem {
     /**
      * Heal player
      */
-    heal(amount) {
+    heal(amount: number): number {
         this.stats.health = Math.min(this.stats.maxHealth, this.stats.health + amount);
         return this.stats.health;
     }
@@ -114,7 +120,7 @@ export class PlayerStatsSystem {
     /**
      * Reset stats to initial state
      */
-    reset() {
+    reset(): void {
         this.stats = {
             level: 1,
             maxHealth: 100,
@@ -127,14 +133,14 @@ export class PlayerStatsSystem {
     /**
      * Set callback for level up events
      */
-    setLevelUpCallback(callback) {
+    setLevelUpCallback(callback: LevelUpCallback): void {
         this.onLevelUp = callback;
     }
     
     /**
      * Set callback for game over events
      */
-    setGameOverCallback(callback) {
+    setGameOverCallback(callback: GameOverCallback): void {
         this.onGameOver = callback;
     }
 }
