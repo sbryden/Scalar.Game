@@ -154,9 +154,11 @@ function updateAggroAI(enemy: Enemy): void {
         const verticalDistance = enemy.y - enemy.aggroTarget.y;
         const horizontalDistance = Math.abs(enemy.x - enemy.aggroTarget.x);
         
-        if (enemy.body.touching.down && verticalDistance > 50 && horizontalDistance < 200) {
+        if (enemy.body.touching.down && 
+            verticalDistance > config.jumpVerticalThreshold && 
+            horizontalDistance < config.jumpHorizontalThreshold) {
             // Jump towards player
-            enemy.body.setVelocityY(-250);
+            enemy.body.setVelocityY(config.jumpVelocity);
         }
         
         // Keep enemy above ground

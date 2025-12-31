@@ -40,7 +40,10 @@ export const ENEMY_CONFIG = {
         patrolDistance: 300,
         knockbackResistance: 1.0,  // 1.0 = normal knockback, 0 = immune, >1 = takes more knockback
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        aggroSpeedMultiplier: 1.5, // Speed when aggroed = base speed * this multiplier
+        jumpVerticalThreshold: 50,   // Minimum vertical distance to trigger jump
+        jumpHorizontalThreshold: 200, // Maximum horizontal distance to allow jump
+        jumpVelocity: -250           // Velocity applied when jumping (negative = upward)
     },
     micro: {
         width: 30,
@@ -53,7 +56,10 @@ export const ENEMY_CONFIG = {
         patrolDistance: 200,
         knockbackResistance: 0.8,  // Lighter, knocked back less
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        aggroSpeedMultiplier: 1.5, // Speed when aggroed = base speed * this multiplier
+        jumpVerticalThreshold: 50,   // Minimum vertical distance to trigger jump (not used for swimming enemies)
+        jumpHorizontalThreshold: 200, // Maximum horizontal distance to allow jump (not used for swimming enemies)
+        jumpVelocity: -250           // Velocity applied when jumping (not used for swimming enemies)
     },
     fish: {
         width: 30,
@@ -66,7 +72,10 @@ export const ENEMY_CONFIG = {
         patrolDistance: 400,
         knockbackResistance: 0.7,  // Swims smoothly, less affected by knockback
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        aggroSpeedMultiplier: 1.5, // Speed when aggroed = base speed * this multiplier
+        jumpVerticalThreshold: 50,   // Minimum vertical distance to trigger jump (not used for swimming enemies)
+        jumpHorizontalThreshold: 200, // Maximum horizontal distance to allow jump (not used for swimming enemies)
+        jumpVelocity: -250           // Velocity applied when jumping (not used for swimming enemies)
     },
     crab: {
         width: 30,
@@ -79,7 +88,10 @@ export const ENEMY_CONFIG = {
         patrolDistance: 250,
         knockbackResistance: 1.2,  // Heavier, more resistant to knockback
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        aggroSpeedMultiplier: 1.5, // Speed when aggroed = base speed * this multiplier
+        jumpVerticalThreshold: 50,   // Minimum vertical distance to trigger jump
+        jumpHorizontalThreshold: 200, // Maximum horizontal distance to allow jump
+        jumpVelocity: -250           // Velocity applied when jumping (negative = upward)
     },
     plankton: {
         width: 20,
@@ -92,7 +104,10 @@ export const ENEMY_CONFIG = {
         patrolDistance: 180,
         knockbackResistance: 0.5,  // Very light, easily knocked back
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        aggroSpeedMultiplier: 1.5, // Speed when aggroed = base speed * this multiplier
+        jumpVerticalThreshold: 50,   // Minimum vertical distance to trigger jump (not used for swimming enemies)
+        jumpHorizontalThreshold: 200, // Maximum horizontal distance to allow jump (not used for swimming enemies)
+        jumpVelocity: -250           // Velocity applied when jumping (not used for swimming enemies)
     }
 };
 
