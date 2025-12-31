@@ -26,7 +26,7 @@ export default class MenuScene extends Phaser.Scene {
             fontSize: '72px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
-            fill: '#00ff88',
+            color: '#00ff88',
             stroke: '#ffffff',
             strokeThickness: 4
         });
@@ -36,7 +36,7 @@ export default class MenuScene extends Phaser.Scene {
         const subtitle = this.add.text(width / 2, 230, 'Size-Shifting Adventure', {
             fontSize: '24px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
+            color: '#ffffff',
             alpha: 0.8
         });
         subtitle.setOrigin(0.5);
@@ -45,7 +45,7 @@ export default class MenuScene extends Phaser.Scene {
         const difficultyLabel = this.add.text(width / 2, 320, 'SELECT DIFFICULTY', {
             fontSize: '24px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
+            color: '#ffffff',
             fontStyle: 'bold'
         });
         difficultyLabel.setOrigin(0.5);
@@ -60,7 +60,7 @@ export default class MenuScene extends Phaser.Scene {
         const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
+            color: '#ffffff',
             alpha: 0.6
         });
         instructions.setOrigin(0.5);
@@ -82,7 +82,7 @@ export default class MenuScene extends Phaser.Scene {
         this.selectedText = this.add.text(-dropdownWidth / 2 + 15, 0, 'Normal', {
             fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         this.selectedText.setOrigin(0, 0.5);
         
@@ -90,7 +90,7 @@ export default class MenuScene extends Phaser.Scene {
         this.dropdownArrow = this.add.text(dropdownWidth / 2 - 15, 0, '▼', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         this.dropdownArrow.setOrigin(1, 0.5);
         
@@ -116,7 +116,7 @@ export default class MenuScene extends Phaser.Scene {
             const optionText = this.add.text(-dropdownWidth / 2 + 15, optionY + optionHeight / 2, option.label, {
                 fontSize: '18px',
                 fontFamily: 'Arial, sans-serif',
-                fill: '#ffffff'
+                color: '#ffffff'
             });
             optionText.setOrigin(0, 0.5);
             
@@ -176,7 +176,7 @@ export default class MenuScene extends Phaser.Scene {
             fontSize: '28px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         startText.setOrigin(0.5);
         

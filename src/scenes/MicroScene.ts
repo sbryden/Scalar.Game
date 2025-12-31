@@ -63,7 +63,7 @@ export default class MicroScene extends Phaser.Scene {
     
     createBackground() {
         // Create cellular-themed background (purple/pink tones)
-        const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
         
         // Base cellular fluid color
         bgGraphics.fillStyle(0x2D1B3D, 1);
@@ -98,7 +98,7 @@ export default class MicroScene extends Phaser.Scene {
     
     createGround() {
         // Create cellular membrane-like ground
-        const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
         
         // Base membrane color
         groundGraphics.fillStyle(0x4A2D5A, 1);

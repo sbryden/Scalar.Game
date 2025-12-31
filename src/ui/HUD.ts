@@ -44,7 +44,7 @@ export class HUD {
         // Level text
         this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
             fontSize: '24px',
-            fill: '#FFFFFF',
+            color: '#FFFFFF',
             fontStyle: 'bold'
         });
         this.levelText.setDepth(1000);

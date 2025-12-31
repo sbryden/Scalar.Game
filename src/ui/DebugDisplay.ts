@@ -20,7 +20,7 @@ export class DebugDisplay {
     create() {
         this.debugText = this.scene.add.text(10, 10, '', {
             fontSize: '16px',
-            fill: '#ffffff',
+            color: '#ffffff',
             backgroundColor: '#000000',
             padding: { x: 5, y: 5 }
         });

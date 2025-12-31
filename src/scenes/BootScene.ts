@@ -37,7 +37,7 @@ export default class BootScene extends Phaser.Scene {
         // Create loading text
         const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
             fontSize: '32px',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         loadingText.setOrigin(0.5);
         

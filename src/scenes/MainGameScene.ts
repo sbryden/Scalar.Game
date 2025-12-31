@@ -68,7 +68,7 @@ export default class MainGameScene extends Phaser.Scene {
     
     createBackground() {
         // Create background
-        const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
         bgGraphics.fillStyle(0x87CEEB, 1);
         bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         bgGraphics.lineStyle(1, 0x4DA6D6, 0.3);
@@ -88,7 +88,7 @@ export default class MainGameScene extends Phaser.Scene {
     
     createGround() {
         // Create ground texture
-        const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
         groundGraphics.fillStyle(0x8B7355, 1);
         groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
         groundGraphics.fillStyle(0x6B5345, 1);
