@@ -80,6 +80,12 @@ export class CombatSystem {
     handlePlayerEnemyCollision(player: Player, enemy: Enemy): void {
         const now = Date.now();
         
+        // Check if player is immune (after respawn)
+        if (player.immuneUntil && now < player.immuneUntil) {
+            // Player is immune, no collision effects
+            return;
+        }
+        
         // Trigger aggro on collision if not already aggroed
         if (!enemy.isAggroed) {
             enemy.isAggroed = true;

@@ -11,6 +11,7 @@ export interface Player extends Phaser.Physics.Arcade.Sprite {
     stunnedUntil?: number;
     stunVelocity?: { x: number; y: number };
     isMeleeMode?: boolean;
+    immuneUntil?: number; // For post-respawn immunity
 }
 
 /**

@@ -8,9 +8,11 @@ import combatSystem from '../systems/CombatSystem';
 
 export class CollisionManager {
     scene: Phaser.Scene;
+    playerEnemyCollider: Phaser.Physics.Arcade.Collider | null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
+        this.playerEnemyCollider = null;
     }
     
     /**
@@ -37,7 +39,21 @@ export class CollisionManager {
         }, null, this.scene);
         
         // Player-Enemy collision (bidirectional damage and knockback)
-        this.scene.physics.add.collider(player, enemies, (p, enemy) => {
+        this.setupPlayerEnemyCollision();
+    }
+    
+    /**
+     * Setup or re-setup player-enemy collision
+     */
+    setupPlayerEnemyCollision(): void {
+        const { player, enemies } = gameState;
+        
+        if (!player || !enemies) {
+            console.error('CollisionManager: Player or enemies not initialized');
+            return;
+        }
+        
+        this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (p, enemy) => {
             combatSystem.handlePlayerEnemyCollision(p, enemy);
         }, null, this.scene);
     }
