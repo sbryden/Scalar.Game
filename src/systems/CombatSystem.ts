@@ -8,6 +8,12 @@ import spawnSystem from './SpawnSystem';
 import gameState from '../utils/gameState';
 import type { Player, Enemy, Projectile } from '../types/game';
 
+/**
+ * Union type for entities that can deal or receive damage
+ * This maintains type safety while allowing flexibility for damage calculations
+ */
+type DamageEntity = Player | Enemy | Projectile;
+
 export class CombatSystem {
     /**
      * Apply damage to an enemy from a projectile
@@ -205,14 +211,18 @@ export class CombatSystem {
     
     /**
      * Calculate damage with potential modifiers
-     * (Can be extended for critical hits, damage boosts, etc.)
+     * @param baseDamage - Base damage value before modifiers
+     * @param attacker - Entity dealing damage (Player, Enemy, or Projectile)
+     * @param target - Entity receiving damage (Player, Enemy, or Projectile)
+     * @returns Final calculated damage with modifiers applied
      */
-    calculateDamage(baseDamage: number, attacker: any, target: any): number {
+    calculateDamage(baseDamage: number, attacker: DamageEntity, target: DamageEntity): number {
         let finalDamage = baseDamage;
         
-        // Future: Add damage modifiers here
-        // if (attacker.hasCritical) finalDamage *= 2;
-        // if (target.hasArmor) finalDamage *= 0.5;
+        // Future: Add damage modifiers here based on entity properties
+        // Example: Type guards can be used to check for properties on specific entity types
+        // if ('damage' in attacker && attacker.damage > 10) finalDamage *= 1.5; // Critical hit for high damage attackers
+        // if ('maxHealth' in target && target.maxHealth > 100) finalDamage *= 0.8; // Armored targets take less damage
         
         return finalDamage;
     }
