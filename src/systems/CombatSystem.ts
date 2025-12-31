@@ -5,6 +5,7 @@
 import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
 import spawnSystem from './SpawnSystem';
+import gameState from '../utils/gameState';
 import type { Player, Enemy, Projectile } from '../types/game';
 
 export class CombatSystem {
@@ -16,6 +17,12 @@ export class CombatSystem {
         
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
         enemy.health -= damage;
+        
+        // Trigger aggro when hit by projectile
+        if (!enemy.isAggroed && gameState.player) {
+            enemy.isAggroed = true;
+            enemy.aggroTarget = gameState.player;
+        }
         
         // Visual feedback: flash enemy red
         enemy.setTint(0xff0000);
@@ -38,6 +45,12 @@ export class CombatSystem {
      */
     handlePlayerEnemyCollision(player: Player, enemy: Enemy): void {
         const now = Date.now();
+        
+        // Trigger aggro on collision if not already aggroed
+        if (!enemy.isAggroed) {
+            enemy.isAggroed = true;
+            enemy.aggroTarget = player;
+        }
         
         // Check if entities are stunned (prevent knockback spam)
         const playerStunned = player.stunnedUntil && now < player.stunnedUntil;
