@@ -4,15 +4,25 @@ import combatSystem from "./systems/CombatSystem";
 
 export function spawnEnemy(scene, x, y, enemyType = "generic") {
     const config = ENEMY_CONFIG[enemyType];
-    const texture = enemyType === "micro" ? "bacteria" : "enemy";
+    
+    // Select appropriate texture based on enemy type
+    let texture = "enemy";
+    if (enemyType === "micro") {
+        texture = "bacteria";
+    } else if (enemyType === "fish" || enemyType === "plankton") {
+        texture = "bacteria"; // Use bacteria as placeholder for swimming enemies
+    } else if (enemyType === "crab") {
+        texture = "enemy"; // Use enemy as placeholder for crabs
+    }
+    
     const enemy = scene.add.sprite(x, y, texture);
     enemy.setScale(0.2);
     scene.physics.add.existing(enemy);
     enemy.body.setBounce(0.2);
     enemy.body.setCollideWorldBounds(true);
 
-    // Bacteria can float anywhere, ground enemies stay on ground
-    if (enemyType === "micro") {
+    // Swimming enemies don't have gravity
+    if (enemyType === "micro" || enemyType === "fish" || enemyType === "plankton") {
         enemy.body.setAllowGravity(false);
     }
 
@@ -64,9 +74,9 @@ export function updateEnemyAI(enemy) {
         return;
     }
     
-    // Different behavior for bacteria (floating) vs ground enemies
-    if (enemy.enemyType === "micro") {
-        // Bacteria float around their zone in a circular/wavy pattern
+    // Different behavior for swimming enemies (fish, plankton, micro) vs ground enemies
+    if (enemy.enemyType === "micro" || enemy.enemyType === "fish" || enemy.enemyType === "plankton") {
+        // Swimming enemies float around their zone in a circular/wavy pattern
         const maxDistance = enemy.patrolDistance / 2;
         const distFromStart = Math.abs(enemy.x - enemy.startX);
 
@@ -82,13 +92,13 @@ export function updateEnemyAI(enemy) {
 
         // Float with sinusoidal vertical movement - allow full screen height
         enemy.floatAngle += 0.02;
-        const floatSpeed = enemy.speed * 0.5;
-        const verticalAmplitude = 50; // Larger vertical movement range
+        const floatSpeed = enemy.speed * (enemy.enemyType === "plankton" ? 0.3 : 0.5);
+        const verticalAmplitude = enemy.enemyType === "plankton" ? 30 : 50;
 
         enemy.body.setVelocityX(floatSpeed * enemy.direction);
         enemy.body.setVelocityY(Math.cos(enemy.floatAngle) * verticalAmplitude);
 
-        // Keep bacteria within screen bounds (but allow them to reach top)
+        // Keep enemies within screen bounds (but allow them to reach top)
         if (enemy.y < 50) {
             enemy.y = 50;
             enemy.body.setVelocityY(Math.abs(enemy.body.velocity.y));
@@ -96,8 +106,37 @@ export function updateEnemyAI(enemy) {
             enemy.y = 750;
             enemy.body.setVelocityY(-Math.abs(enemy.body.velocity.y));
         }
+    } else if (enemy.enemyType === "crab") {
+        // Crabs walk on ground but can jump occasionally
+        const maxDistance = enemy.patrolDistance / 2;
+        const distFromStart = Math.abs(enemy.x - enemy.startX);
+
+        if (distFromStart > maxDistance) {
+            if (!enemy.hasHitBoundary) {
+                enemy.direction *= -1;
+                enemy.hasHitBoundary = true;
+                enemy.setFlipX(enemy.direction === -1);
+            }
+        } else {
+            enemy.hasHitBoundary = false;
+        }
+
+        enemy.body.setVelocityX(enemy.speed * enemy.direction);
+
+        // Occasional small jump (10% chance per frame when on ground)
+        if (enemy.body.touching.down && Math.random() < 0.01) {
+            enemy.body.setVelocityY(-150); // Small jump
+        }
+
+        // Keep enemy above ground
+        const groundY = 750;
+        const enemyHalfHeight = enemy.displayHeight / 2;
+        const minY = groundY - enemyHalfHeight;
+        if (enemy.y > minY) {
+            enemy.y = minY;
+        }
     } else {
-        // Ground enemies - original behavior
+        // Ground enemies - original behavior (generic, etc.)
         const maxDistance = enemy.patrolDistance / 2;
         const distFromStart = Math.abs(enemy.x - enemy.startX);
 

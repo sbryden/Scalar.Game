@@ -17,14 +17,20 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('car_4', './assets/car_4.png');
         this.load.image('car_5', './assets/car_5.png');
         
+        // Load submarine images for underwater levels
+        this.load.image('sub_1', './assets/sub_1.png');
+        this.load.image('sub_2', './assets/sub_2.png');
+        this.load.image('sub_3', './assets/sub_3.png');
+        
         // Load rockgiant enemy image
         this.load.image('enemy', './assets/rockgiant.png');
         
         // Load bacteria enemy image for micro scene
         this.load.image('bacteria', './assets/bacteria.png');
         
-        // Load projectile image
+        // Load projectile images
         this.load.image('beam', './assets/beam.png');
+        this.load.image('torpedo', './assets/torpedo.png');
         
         // Optional: Add loading progress bar
         this.createLoadingBar();
