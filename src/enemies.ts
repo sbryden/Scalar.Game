@@ -41,6 +41,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.hasHitBoundary = false;
     enemy.floatAngle = Math.random() * Math.PI * 2; // Random starting angle for floating
     enemy.setFlipX(false); // Start facing right
+    
+    // Initialize aggro system properties
+    enemy.isAggroed = false;
+    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier;
+    enemy.aggroTarget = undefined;
 
     const barWidth = 30;
     const barHeight = 4;
@@ -75,6 +80,96 @@ export function updateEnemyAI(enemy: Enemy): void {
         return;
     }
     
+    // Check for proximity-based aggro if not already aggroed
+    if (!enemy.isAggroed && gameState.player) {
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            enemy.x, enemy.y,
+            gameState.player.x, gameState.player.y
+        );
+        
+        if (distanceToPlayer <= enemy.aggroRange) {
+            enemy.isAggroed = true;
+            enemy.aggroTarget = gameState.player;
+        }
+    }
+    
+    // If aggroed, use aggro AI instead of patrol AI
+    if (enemy.isAggroed && enemy.aggroTarget && enemy.aggroTarget.active) {
+        updateAggroAI(enemy);
+        // Update health bar after aggro AI
+        updateEnemyHealthBar(enemy);
+        return;
+    }
+    
+    // Reset aggro if target is no longer valid
+    if (enemy.isAggroed && (!enemy.aggroTarget || !enemy.aggroTarget.active)) {
+        enemy.isAggroed = false;
+        enemy.aggroTarget = undefined;
+    }
+    
+    // Default patrol behavior
+    updatePatrolAI(enemy);
+    updateEnemyHealthBar(enemy);
+}
+
+function updateAggroAI(enemy: Enemy): void {
+    if (!enemy.aggroTarget) return;
+    
+    const config = ENEMY_CONFIG[enemy.enemyType];
+    const aggroSpeed = enemy.speed * config.aggroSpeedMultiplier;
+    
+    // Calculate direction to player
+    const angleToPlayer = Math.atan2(
+        enemy.aggroTarget.y - enemy.y,
+        enemy.aggroTarget.x - enemy.x
+    );
+    
+    // Different behavior for swimming vs ground enemies
+    if (enemy.enemyType === "micro" || enemy.enemyType === "fish" || enemy.enemyType === "plankton") {
+        // Swimming enemies can move freely in all directions
+        const velocityX = Math.cos(angleToPlayer) * aggroSpeed;
+        const velocityY = Math.sin(angleToPlayer) * aggroSpeed;
+        
+        enemy.body.setVelocityX(velocityX);
+        enemy.body.setVelocityY(velocityY);
+        
+        // Update sprite direction
+        enemy.setFlipX(velocityX < 0);
+        
+        // Keep enemies within screen bounds
+        if (enemy.y < 50) {
+            enemy.y = 50;
+            enemy.body.setVelocityY(Math.abs(enemy.body.velocity.y));
+        } else if (enemy.y > 750) {
+            enemy.y = 750;
+            enemy.body.setVelocityY(-Math.abs(enemy.body.velocity.y));
+        }
+    } else {
+        // Ground enemies (crab, generic) - respect gravity and jump
+        const horizontalDirection = Math.sign(enemy.aggroTarget.x - enemy.x);
+        enemy.body.setVelocityX(aggroSpeed * horizontalDirection);
+        enemy.setFlipX(horizontalDirection === -1);
+        
+        // Jump if player is above and enemy is on ground
+        const verticalDistance = enemy.y - enemy.aggroTarget.y;
+        const horizontalDistance = Math.abs(enemy.x - enemy.aggroTarget.x);
+        
+        if (enemy.body.touching.down && verticalDistance > 50 && horizontalDistance < 200) {
+            // Jump towards player
+            enemy.body.setVelocityY(-250);
+        }
+        
+        // Keep enemy above ground
+        const groundY = 750;
+        const enemyHalfHeight = enemy.displayHeight / 2;
+        const minY = groundY - enemyHalfHeight;
+        if (enemy.y > minY) {
+            enemy.y = minY;
+        }
+    }
+}
+
+function updatePatrolAI(enemy: Enemy): void {
     // Different behavior for swimming enemies (fish, plankton, micro) vs ground enemies
     if (enemy.enemyType === "micro" || enemy.enemyType === "fish" || enemy.enemyType === "plankton") {
         // Swimming enemies float around their zone in a circular/wavy pattern
@@ -161,7 +256,9 @@ export function updateEnemyAI(enemy: Enemy): void {
             enemy.y = minY;
         }
     }
+}
 
+function updateEnemyHealthBar(enemy: Enemy): void {
     // Update health bar for all enemies
     if (enemy.healthBar && enemy.healthBarBg) {
         const barWidth = 30;
