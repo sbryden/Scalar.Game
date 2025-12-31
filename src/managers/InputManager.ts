@@ -14,12 +14,14 @@ export class InputManager {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     wasdKeys!: WASDKeys;
     spaceKey!: Phaser.Input.Keyboard.Key;
+    shiftKey!: Phaser.Input.Keyboard.Key;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.cursors = null as any;
         this.wasdKeys = null as any;
         this.spaceKey = null as any;
+        this.shiftKey = null as any;
     }
     
     /**
@@ -30,6 +32,7 @@ export class InputManager {
         this.cursors = this.scene.input.keyboard!.createCursorKeys();
         this.wasdKeys = this.scene.input.keyboard!.addKeys('W,A,S,D') as WASDKeys;
         this.spaceKey = this.scene.input.keyboard!.addKey('SPACE');
+        this.shiftKey = this.scene.input.keyboard!.addKey('SHIFT');
         
         // Store in gameState for other modules
         gameState.cursors = this.cursors;
@@ -85,6 +88,19 @@ export class InputManager {
      */
     handleMovement(): void {
         if (!gameState.player) return;
+        
+        // Update melee mode state based on Shift key
+        const wasMeleeMode = gameState.player.isMeleeMode || false;
+        gameState.player.isMeleeMode = this.shiftKey.isDown;
+        
+        // Visual feedback when entering/exiting melee mode
+        if (gameState.player.isMeleeMode && !wasMeleeMode) {
+            // Entering melee mode - add blue tint
+            gameState.player.setTint(0x88ccff);
+        } else if (!gameState.player.isMeleeMode && wasMeleeMode) {
+            // Exiting melee mode - clear tint
+            gameState.player.clearTint();
+        }
         
         // Check if player is stunned
         const now = Date.now();
