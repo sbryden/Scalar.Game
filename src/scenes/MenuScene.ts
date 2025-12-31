@@ -37,6 +37,11 @@ export default class MenuScene extends Phaser.Scene {
         // Background
         this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
         
+        // Add secure robot image on the right side
+        const robot = this.add.image(width * 0.8, height / 2, 'secure_robot');
+        robot.setScale(0.75); // Adjust scale as needed
+        robot.setAlpha(0.8); // Make it semi-transparent for background effect
+        
         // Title
         const title = this.add.text(width / 2, 150, 'SCALAR', {
             fontSize: '72px',

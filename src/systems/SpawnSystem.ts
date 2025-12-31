@@ -1,6 +1,6 @@
 /**
  * Spawn System
- * Handles spawning of XP orbs and enemy spawning on level up
+ * Handles spawning of XP orbs
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
@@ -78,54 +78,10 @@ export class SpawnSystem {
     }
     
     /**
-     * Handle player level up - upgrade car and spawn enemies
+     * Handle player level up - upgrade car only
      */
     onPlayerLevelUp(level: number): void {
         this.upgradePlayerCar();
-        this.spawnEnemiesOnLevelUp();
-    }
-    
-    /**
-     * Spawn additional enemies when player levels up
-     */
-    spawnEnemiesOnLevelUp(): void {
-        if (!gameState.spawnEnemyFunc || !gameState.scene || !gameState.player) {
-            return;
-        }
-        
-        const stats = playerStatsSystem.getStats();
-        const enemiesToSpawn = Math.min(stats.level - 1, 3); // Spawn 0-3 additional enemies
-        const spawnOffsets = [300, 800, 1600];
-        
-        // Determine enemy type based on current scene
-        let enemyType = 'generic';
-        if (gameState.currentSceneKey === 'MicroScene') {
-            enemyType = 'micro';
-        } else if (gameState.currentSceneKey === 'UnderwaterScene') {
-            // 80% fish, 20% crabs
-            enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
-        } else if (gameState.currentSceneKey === 'UnderwaterMicroScene') {
-            enemyType = 'plankton';
-        }
-        
-        for (let i = 0; i < enemiesToSpawn; i++) {
-            const xOffset = spawnOffsets[i];
-            const spawnX = gameState.player.x + xOffset;
-            
-            // For underwater, spawn fish at various heights, crabs on ground
-            let spawnY = 680;
-            if (gameState.currentSceneKey === 'UnderwaterScene') {
-                if (enemyType === 'fish') {
-                    spawnY = 300 + Math.random() * 300; // Random depth
-                }
-                // Re-roll enemy type for each spawn (80/20 split)
-                enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
-            } else if (gameState.currentSceneKey === 'UnderwaterMicroScene') {
-                spawnY = 300 + Math.random() * 200; // Plankton at various depths
-            }
-            
-            gameState.spawnEnemyFunc(gameState.scene, spawnX, spawnY, enemyType);
-        }
     }
 }
 
