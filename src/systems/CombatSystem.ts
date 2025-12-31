@@ -7,6 +7,12 @@ import playerStatsSystem from './PlayerStatsSystem';
 import spawnSystem from './SpawnSystem';
 import type { Player, Enemy, Projectile } from '../types/game';
 
+/**
+ * Union type for entities that can deal or receive damage
+ * This maintains type safety while allowing flexibility for damage calculations
+ */
+type DamageEntity = Player | Enemy | Projectile;
+
 export class CombatSystem {
     /**
      * Apply damage to an enemy from a projectile
@@ -192,14 +198,17 @@ export class CombatSystem {
     
     /**
      * Calculate damage with potential modifiers
-     * (Can be extended for critical hits, damage boosts, etc.)
+     * @param baseDamage - Base damage value before modifiers
+     * @param attacker - Entity dealing damage (Player, Enemy, or Projectile)
+     * @param target - Entity receiving damage (Player, Enemy, or Projectile)
+     * @returns Final calculated damage with modifiers applied
      */
-    calculateDamage(baseDamage: number, attacker: any, target: any): number {
+    calculateDamage(baseDamage: number, attacker: DamageEntity, target: DamageEntity): number {
         let finalDamage = baseDamage;
         
-        // Future: Add damage modifiers here
-        // if (attacker.hasCritical) finalDamage *= 2;
-        // if (target.hasArmor) finalDamage *= 0.5;
+        // Future: Add damage modifiers here based on entity properties
+        // if ('hasCritical' in attacker && attacker.hasCritical) finalDamage *= 2;
+        // if ('hasArmor' in target && target.hasArmor) finalDamage *= 0.5;
         
         return finalDamage;
     }
