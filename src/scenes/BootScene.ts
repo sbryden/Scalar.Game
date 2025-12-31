@@ -18,9 +18,9 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('car_5', '/Scalar.Game/car_5.png');
         
         // Load submarine images for underwater levels
-        this.load.image('sub_1', './assets/sub_1.png');
-        this.load.image('sub_2', './assets/sub_2.png');
-        this.load.image('sub_3', './assets/sub_3.png');
+        this.load.image('sub_1', '/Scalar.Game/sub_1.png');
+        this.load.image('sub_2', '/Scalar.Game/sub_2.png');
+        this.load.image('sub_3', '/Scalar.Game/sub_3.png');
         
         // Load rockgiant enemy image
         this.load.image('enemy', '/Scalar.Game/rockgiant.png');
