@@ -58,11 +58,15 @@ class GameState {
         this.currentSceneKey = 'MainGameScene';
         this.savedPositions = {
             MainGameScene: { x: 100, y: 650 },
-            MicroScene: { x: 100, y: 650 }
+            MicroScene: { x: 100, y: 650 },
+            UnderwaterScene: { x: 100, y: 650 },
+            UnderwaterMicroScene: { x: 100, y: 650 }
         };
         this.savedEnemies = {
             MainGameScene: [],
-            MicroScene: []
+            MicroScene: [],
+            UnderwaterScene: [],
+            UnderwaterMicroScene: []
         };
         
         // Difficulty
