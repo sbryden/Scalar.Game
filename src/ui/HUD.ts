@@ -3,6 +3,13 @@
  * Manages health bar, XP bar, and level display
  */
 export class HUD {
+    scene: any;
+    healthBar: any;
+    healthBarBackground: any;
+    xpBar: any;
+    xpBarBackground: any;
+    levelText: any;
+
     constructor(scene) {
         this.scene = scene;
         this.healthBar = null;
@@ -37,7 +44,7 @@ export class HUD {
         // Level text
         this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
             fontSize: '24px',
-            fill: '#FFFFFF',
+            color: '#FFFFFF',
             fontStyle: 'bold'
         });
         this.levelText.setDepth(1000);

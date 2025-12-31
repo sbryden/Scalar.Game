@@ -2,9 +2,9 @@
  * Combat System
  * Handles damage calculations and combat logic
  */
-import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG } from '../config.js';
-import playerStatsSystem from './PlayerStatsSystem.js';
-import spawnSystem from './SpawnSystem.js';
+import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG } from '../config';
+import playerStatsSystem from './PlayerStatsSystem';
+import spawnSystem from './SpawnSystem';
 
 export class CombatSystem {
     /**

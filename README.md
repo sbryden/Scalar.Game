@@ -16,9 +16,10 @@ This is a classic 2D side-scroller game where you control a vehicle navigating t
 
 ⚙️ **Technical Stack**
 - Phaser 3 game framework
+- TypeScript for type safety and better architecture
 - Vite build tool for fast development
-- ES6+ JavaScript
 - Arcade physics engine
+- Modular architecture with managers and systems
 
 ## Quick Start
 
@@ -59,7 +60,8 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 ## Technologies
 
 - **Phaser 3** - Powerful 2D game framework
-- **Vite** - Next-generation build tool
+- **TypeScript** - Type-safe development with improved tooling
+- **Vite** - Next-generation build tool with HMR
 - **Arcade Physics** - Built-in physics engine
 
 ## Future Roadmap

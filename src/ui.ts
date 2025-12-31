@@ -23,7 +23,7 @@ export function createUIElements(scene) {
     
     const levelText = scene.add.text(50, 20, `LEVEL 1`, {
         fontSize: '24px',
-        fill: '#FFFFFF',
+        color: '#FFFFFF',
         fontStyle: 'bold'
     });
     levelText.setDepth(1000);
