@@ -1,9 +1,19 @@
-let healthBar;
-let healthBarBackground;
-let xpBar;
-let xpBarBackground;
+import type { PlayerStats } from './types/game';
 
-export function createUIElements(scene) {
+let healthBar: Phaser.GameObjects.Rectangle;
+let healthBarBackground: Phaser.GameObjects.Rectangle;
+let xpBar: Phaser.GameObjects.Rectangle;
+let xpBarBackground: Phaser.GameObjects.Rectangle;
+
+interface UIElements {
+    healthBar: Phaser.GameObjects.Rectangle;
+    healthBarBackground: Phaser.GameObjects.Rectangle;
+    xpBar: Phaser.GameObjects.Rectangle;
+    xpBarBackground: Phaser.GameObjects.Rectangle;
+    levelText: Phaser.GameObjects.Text;
+}
+
+export function createUIElements(scene: Phaser.Scene): UIElements {
     const barWidth = 100;
     const barHeight = 8;
     
@@ -32,7 +42,7 @@ export function createUIElements(scene) {
     return { healthBar, healthBarBackground, xpBar, xpBarBackground, levelText };
 }
 
-export function updateUIBars(playerStats) {
+export function updateUIBars(playerStats: PlayerStats): void {
     const barWidth = 100;
     
     const healthPercent = playerStats.health / playerStats.maxHealth;

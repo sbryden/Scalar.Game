@@ -1,8 +1,9 @@
 import { ENEMY_CONFIG, PROJECTILE_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
+import type { Enemy, Projectile } from './types/game';
 
-export function spawnEnemy(scene, x, y, enemyType = "generic") {
+export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
     const config = ENEMY_CONFIG[enemyType];
     
     // Select appropriate texture based on enemy type
@@ -66,7 +67,7 @@ export function spawnEnemy(scene, x, y, enemyType = "generic") {
     return enemy;
 }
 
-export function updateEnemyAI(enemy) {
+export function updateEnemyAI(enemy: Enemy): void {
     // Check if enemy is stunned
     const now = Date.now();
     if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
@@ -175,6 +176,6 @@ export function updateEnemyAI(enemy) {
     }
 }
 
-export async function damageEnemy(projectile, enemy) {
+export async function damageEnemy(projectile: Projectile, enemy: Enemy): Promise<void> {
     combatSystem.damageEnemy(projectile, enemy);
 }

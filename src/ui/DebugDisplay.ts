@@ -2,14 +2,16 @@
  * Debug Display
  * Shows debug information during development
  */
+import Phaser from 'phaser';
 import { WORLD_WIDTH } from '../config';
+import type { PlayerStats } from '../types/game';
 
 export class DebugDisplay {
-    scene: any;
-    debugText: any;
+    scene: Phaser.Scene;
+    debugText: Phaser.GameObjects.Text | null;
     enabled: boolean;
 
-    constructor(scene) {
+    constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.debugText = null;
         this.enabled = true;
@@ -17,7 +19,7 @@ export class DebugDisplay {
         this.create();
     }
     
-    create() {
+    create(): void {
         this.debugText = this.scene.add.text(10, 10, '', {
             fontSize: '16px',
             color: '#ffffff',
@@ -31,7 +33,7 @@ export class DebugDisplay {
     /**
      * Update debug display with player stats and position
      */
-    update(playerX, playerStats) {
+    update(playerX: number, playerStats: PlayerStats): void {
         if (!this.enabled || !this.debugText) return;
         
         const text = 
@@ -46,7 +48,7 @@ export class DebugDisplay {
     /**
      * Toggle debug display visibility
      */
-    toggle() {
+    toggle(): void {
         this.enabled = !this.enabled;
         if (this.debugText) {
             this.debugText.setVisible(this.enabled);
@@ -56,7 +58,7 @@ export class DebugDisplay {
     /**
      * Show debug display
      */
-    show() {
+    show(): void {
         this.enabled = true;
         if (this.debugText) {
             this.debugText.setVisible(true);
@@ -66,7 +68,7 @@ export class DebugDisplay {
     /**
      * Hide debug display
      */
-    hide() {
+    hide(): void {
         this.enabled = false;
         if (this.debugText) {
             this.debugText.setVisible(false);
@@ -76,7 +78,7 @@ export class DebugDisplay {
     /**
      * Clean up debug display
      */
-    destroy() {
+    destroy(): void {
         if (this.debugText) {
             this.debugText.destroy();
         }

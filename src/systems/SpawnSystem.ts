@@ -18,7 +18,7 @@ export class SpawnSystem {
     /**
      * Spawn an XP orb at the given location
      */
-    spawnXPOrb(scene, x, y, xpValue) {
+    spawnXPOrb(scene: Phaser.Scene, x: number, y: number, xpValue: number): void {
         const orb = scene.add.circle(x, y, 6, 0xFFD700);
         scene.physics.add.existing(orb);
         orb.body.setVelocity(
@@ -52,7 +52,7 @@ export class SpawnSystem {
     /**
      * Upgrade player vehicle sprite based on level and environment
      */
-    upgradePlayerCar() {
+    upgradePlayerCar(): void {
         if (!gameState.player) return;
         
         const stats = playerStatsSystem.getStats();
@@ -80,7 +80,7 @@ export class SpawnSystem {
     /**
      * Handle player level up - upgrade car and spawn enemies
      */
-    onPlayerLevelUp(level) {
+    onPlayerLevelUp(level: number): void {
         this.upgradePlayerCar();
         this.spawnEnemiesOnLevelUp();
     }
@@ -88,7 +88,7 @@ export class SpawnSystem {
     /**
      * Spawn additional enemies when player levels up
      */
-    spawnEnemiesOnLevelUp() {
+    spawnEnemiesOnLevelUp(): void {
         if (!gameState.spawnEnemyFunc || !gameState.scene || !gameState.player) {
             return;
         }

@@ -33,6 +33,8 @@
 
     // Recommended Options
     "strict": false,
+    "noImplicitAny": false,  // TODO: Enable after fixing all implicit any types
+    "strictNullChecks": false,
     "noImplicitThis": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
