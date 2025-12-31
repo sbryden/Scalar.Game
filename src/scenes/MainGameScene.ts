@@ -2,21 +2,33 @@
  * Main Game Scene
  * Primary gameplay scene
  */
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config.js';
-import { spawnEnemy, updateEnemyAI } from '../enemies.js';
-import { updateProjectiles } from '../projectiles.js';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
-import gameState from '../utils/gameState.js';
-import playerStatsSystem from '../systems/PlayerStatsSystem.js';
-import combatSystem from '../systems/CombatSystem.js';
-import { InputManager } from '../managers/InputManager.js';
-import { CollisionManager } from '../managers/CollisionManager.js';
-import { CameraManager } from '../managers/CameraManager.js';
-import { HUD } from '../ui/HUD.js';
-import { DebugDisplay } from '../ui/DebugDisplay.js';
+import Phaser from 'phaser';
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { spawnEnemy, updateEnemyAI } from '../enemies';
+import { updateProjectiles } from '../projectiles';
+import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
+import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
+import gameState from '../utils/gameState';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
+import combatSystem from '../systems/CombatSystem';
+import { InputManager } from '../managers/InputManager';
+import { CollisionManager } from '../managers/CollisionManager';
+import { CameraManager } from '../managers/CameraManager';
+import { HUD } from '../ui/HUD';
+import { DebugDisplay } from '../ui/DebugDisplay';
 
 export default class MainGameScene extends Phaser.Scene {
+    player!: Phaser.Physics.Arcade.Sprite;
+    platforms!: Phaser.Physics.Arcade.StaticGroup;
+    enemies!: Phaser.Physics.Arcade.Group;
+    projectiles!: Phaser.Physics.Arcade.Group;
+    xpOrbs!: Phaser.Physics.Arcade.Group;
+    hud!: HUD;
+    debugDisplay!: DebugDisplay;
+    inputManager!: InputManager;
+    collisionManager!: CollisionManager;
+    cameraManager!: CameraManager;
+
     constructor() {
         super({ key: 'MainGameScene' });
         
@@ -56,7 +68,7 @@ export default class MainGameScene extends Phaser.Scene {
     
     createBackground() {
         // Create background
-        const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
         bgGraphics.fillStyle(0x87CEEB, 1);
         bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         bgGraphics.lineStyle(1, 0x4DA6D6, 0.3);
@@ -76,7 +88,7 @@ export default class MainGameScene extends Phaser.Scene {
     
     createGround() {
         // Create ground texture
-        const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
         groundGraphics.fillStyle(0x8B7355, 1);
         groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
         groundGraphics.fillStyle(0x6B5345, 1);
@@ -102,12 +114,11 @@ export default class MainGameScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.MainGameScene;
         
         // Create player (car)
-        this.player = this.add.sprite(savedPos.x, savedPos.y, 'car_1');
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1');
         this.player.setScale(0.25);
-        this.physics.add.existing(this.player);
-        this.player.body.setBounce(0.2);
-        this.player.body.setCollideWorldBounds(true);
-        this.player.body.setDrag(0, 0);
+        this.player.setBounce(0.2);
+        this.player.setCollideWorldBounds(true);
+        this.player.setDrag(0, 0);
         this.player.scene = this;
         
         this.physics.add.collider(this.player, this.platforms);
@@ -219,7 +230,7 @@ export default class MainGameScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.MainGameScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map(enemy => ({
+            .map((enemy: any) => ({
                 x: enemy.x,
                 y: enemy.y,
                 health: enemy.health,

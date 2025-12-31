@@ -1,5 +1,5 @@
-import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config.js';
-import gameState from './utils/gameState.js';
+import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
+import gameState from './utils/gameState';
 
 let lastProjectileTime = 0;
 

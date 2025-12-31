@@ -1,5 +1,5 @@
-import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config.js';
-import gameState from './utils/gameState.js';
+import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config';
+import gameState from './utils/gameState';
 
 export function getPlayerSize() { return gameState.playerSize; }
 export function getSizeChangeTimer() { return gameState.sizeChangeTimer; }

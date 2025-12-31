@@ -2,20 +2,32 @@
  * Micro Scene
  * Cellular-level gameplay scene with bacteria enemies
  */
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config.js';
-import { spawnEnemy, updateEnemyAI } from '../enemies.js';
-import { updateProjectiles } from '../projectiles.js';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs.js';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player.js';
-import gameState from '../utils/gameState.js';
-import combatSystem from '../systems/CombatSystem.js';
-import { InputManager } from '../managers/InputManager.js';
-import { CollisionManager } from '../managers/CollisionManager.js';
-import { CameraManager } from '../managers/CameraManager.js';
-import { HUD } from '../ui/HUD.js';
-import { DebugDisplay } from '../ui/DebugDisplay.js';
+import Phaser from 'phaser';
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { spawnEnemy, updateEnemyAI } from '../enemies';
+import { updateProjectiles } from '../projectiles';
+import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
+import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
+import gameState from '../utils/gameState';
+import combatSystem from '../systems/CombatSystem';
+import { InputManager } from '../managers/InputManager';
+import { CollisionManager } from '../managers/CollisionManager';
+import { CameraManager } from '../managers/CameraManager';
+import { HUD } from '../ui/HUD';
+import { DebugDisplay } from '../ui/DebugDisplay';
 
 export default class MicroScene extends Phaser.Scene {
+    player!: Phaser.Physics.Arcade.Sprite;
+    platforms!: Phaser.Physics.Arcade.StaticGroup;
+    enemies!: Phaser.Physics.Arcade.Group;
+    projectiles!: Phaser.Physics.Arcade.Group;
+    xpOrbs!: Phaser.Physics.Arcade.Group;
+    hud!: HUD;
+    debugDisplay!: DebugDisplay;
+    inputManager!: InputManager;
+    collisionManager!: CollisionManager;
+    cameraManager!: CameraManager;
+
     constructor() {
         super({ key: 'MicroScene' });
         
@@ -51,7 +63,7 @@ export default class MicroScene extends Phaser.Scene {
     
     createBackground() {
         // Create cellular-themed background (purple/pink tones)
-        const bgGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
         
         // Base cellular fluid color
         bgGraphics.fillStyle(0x2D1B3D, 1);
@@ -86,7 +98,7 @@ export default class MicroScene extends Phaser.Scene {
     
     createGround() {
         // Create cellular membrane-like ground
-        const groundGraphics = this.make.graphics({ x: 0, y: 0, add: false });
+        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
         
         // Base membrane color
         groundGraphics.fillStyle(0x4A2D5A, 1);
@@ -117,12 +129,11 @@ export default class MicroScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.MicroScene;
         
         // Create player (car)
-        this.player = this.add.sprite(savedPos.x, savedPos.y, 'car_1');
-        this.player.setScale(0.25);
-        this.physics.add.existing(this.player);
-        this.player.body.setBounce(0.2);
-        this.player.body.setCollideWorldBounds(true);
-        this.player.body.setDrag(0, 0);
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1');
+        this.player.setScale(0.15);
+        this.player.setBounce(0.2);
+        this.player.setCollideWorldBounds(true);
+        this.player.setDrag(0, 0);
         this.player.scene = this;
         
         this.physics.add.collider(this.player, this.platforms);
@@ -235,7 +246,7 @@ export default class MicroScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.MicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map(enemy => ({
+            .map((enemy: any) => ({
                 x: enemy.x,
                 y: enemy.y,
                 health: enemy.health,

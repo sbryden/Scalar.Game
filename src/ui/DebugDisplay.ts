@@ -2,9 +2,13 @@
  * Debug Display
  * Shows debug information during development
  */
-import { WORLD_WIDTH } from '../config.js';
+import { WORLD_WIDTH } from '../config';
 
 export class DebugDisplay {
+    scene: any;
+    debugText: any;
+    enabled: boolean;
+
     constructor(scene) {
         this.scene = scene;
         this.debugText = null;
@@ -16,7 +20,7 @@ export class DebugDisplay {
     create() {
         this.debugText = this.scene.add.text(10, 10, '', {
             fontSize: '16px',
-            fill: '#ffffff',
+            color: '#ffffff',
             backgroundColor: '#000000',
             padding: { x: 5, y: 5 }
         });

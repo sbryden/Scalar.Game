@@ -2,9 +2,10 @@
  * Spawn System
  * Handles spawning of XP orbs and enemy spawning on level up
  */
-import gameState from '../utils/gameState.js';
-import playerStatsSystem from './PlayerStatsSystem.js';
-import { gainXP } from '../xpOrbs.js';
+import Phaser from 'phaser';
+import gameState from '../utils/gameState';
+import playerStatsSystem from './PlayerStatsSystem';
+import { gainXP } from '../xpOrbs';
 
 export class SpawnSystem {
     constructor() {

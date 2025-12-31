@@ -2,7 +2,18 @@
  * Menu Scene
  * Main menu with title, difficulty selection, and start button
  */
+import Phaser from 'phaser';
+
 export default class MenuScene extends Phaser.Scene {
+    selectedDifficulty!: string;
+    dropdownOpen!: boolean;
+    dropdownContainer!: Phaser.GameObjects.Container;
+    dropdownBox!: Phaser.GameObjects.Rectangle;
+    selectedText!: Phaser.GameObjects.Text;
+    dropdownArrow!: Phaser.GameObjects.Text;
+    optionsContainer!: Phaser.GameObjects.Container;
+    optionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
+
     constructor() {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
@@ -21,7 +32,7 @@ export default class MenuScene extends Phaser.Scene {
             fontSize: '72px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
-            fill: '#00ff88',
+            color: '#00ff88',
             stroke: '#ffffff',
             strokeThickness: 4
         });
@@ -31,16 +42,16 @@ export default class MenuScene extends Phaser.Scene {
         const subtitle = this.add.text(width / 2, 230, 'Size-Shifting Adventure', {
             fontSize: '24px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
-            alpha: 0.8
+            color: '#ffffff'
         });
         subtitle.setOrigin(0.5);
+        subtitle.setAlpha(0.8);
         
         // Difficulty label
         const difficultyLabel = this.add.text(width / 2, 320, 'SELECT DIFFICULTY', {
             fontSize: '24px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
+            color: '#ffffff',
             fontStyle: 'bold'
         });
         difficultyLabel.setOrigin(0.5);
@@ -52,13 +63,13 @@ export default class MenuScene extends Phaser.Scene {
         this.createStartButton(width / 2, 520);
         
         // Instructions
-        const instructions = this.add.text(width / 2, 650, 'Q/E/R - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
+        const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff',
-            alpha: 0.6
+            color: '#ffffff'
         });
         instructions.setOrigin(0.5);
+        instructions.setAlpha(0.6);
     }
     
     createDifficultyDropdown(centerX, y) {
@@ -77,7 +88,7 @@ export default class MenuScene extends Phaser.Scene {
         this.selectedText = this.add.text(-dropdownWidth / 2 + 15, 0, 'Normal', {
             fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         this.selectedText.setOrigin(0, 0.5);
         
@@ -85,7 +96,7 @@ export default class MenuScene extends Phaser.Scene {
         this.dropdownArrow = this.add.text(dropdownWidth / 2 - 15, 0, '▼', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         this.dropdownArrow.setOrigin(1, 0.5);
         
@@ -111,7 +122,7 @@ export default class MenuScene extends Phaser.Scene {
             const optionText = this.add.text(-dropdownWidth / 2 + 15, optionY + optionHeight / 2, option.label, {
                 fontSize: '18px',
                 fontFamily: 'Arial, sans-serif',
-                fill: '#ffffff'
+                color: '#ffffff'
             });
             optionText.setOrigin(0, 0.5);
             
@@ -171,7 +182,7 @@ export default class MenuScene extends Phaser.Scene {
             fontSize: '28px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
-            fill: '#ffffff'
+            color: '#ffffff'
         });
         startText.setOrigin(0.5);
         
