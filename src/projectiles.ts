@@ -24,7 +24,12 @@ export function fireProjectile(scene) {
         direction = -1;
     }
     
-    const velocityX = config.speed * direction;
+    // Check if underwater for slower projectile speed
+    const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
+                        gameState.currentSceneKey === 'UnderwaterMicroScene';
+    const speedMultiplier = isUnderwater ? 0.5 : 1.0; // Half speed underwater
+    
+    const velocityX = config.speed * direction * speedMultiplier;
     
     // Offset projectile spawn behind the vehicle (opposite of direction)
     const spawnOffsetX = direction === 1 ? 40 : -40;
@@ -34,8 +39,9 @@ export function fireProjectile(scene) {
     const tankHeight = gameState.player.displayHeight;
     const projectileY = gameState.player.y - tankHeight / 2 + (1 / 6) * tankHeight;
     
-    // Create beam projectile
-    const projectile = scene.add.image(projectileX, projectileY, 'beam');
+    // Create projectile (torpedo underwater, beam on land)
+    const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
+    const projectile = scene.add.image(projectileX, projectileY, projectileTexture);
     projectile.setOrigin(0.5, 0.5);
     projectile.setDepth(0);
     

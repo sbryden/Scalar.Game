@@ -6,18 +6,28 @@ import Phaser from 'phaser';
 
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
+    selectedEnvironment!: string;
     dropdownOpen!: boolean;
+    environmentDropdownOpen!: boolean;
     dropdownContainer!: Phaser.GameObjects.Container;
     dropdownBox!: Phaser.GameObjects.Rectangle;
     selectedText!: Phaser.GameObjects.Text;
     dropdownArrow!: Phaser.GameObjects.Text;
     optionsContainer!: Phaser.GameObjects.Container;
     optionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
+    environmentDropdownContainer!: Phaser.GameObjects.Container;
+    environmentDropdownBox!: Phaser.GameObjects.Rectangle;
+    environmentSelectedText!: Phaser.GameObjects.Text;
+    environmentDropdownArrow!: Phaser.GameObjects.Text;
+    environmentOptionsContainer!: Phaser.GameObjects.Container;
+    environmentOptionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
 
     constructor() {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
+        this.selectedEnvironment = 'land';
         this.dropdownOpen = false;
+        this.environmentDropdownOpen = false;
     }
     
     create() {
@@ -48,8 +58,8 @@ export default class MenuScene extends Phaser.Scene {
         subtitle.setAlpha(0.8);
         
         // Difficulty label
-        const difficultyLabel = this.add.text(width / 2, 320, 'SELECT DIFFICULTY', {
-            fontSize: '24px',
+        const difficultyLabel = this.add.text(width / 2, 300, 'SELECT DIFFICULTY', {
+            fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff',
             fontStyle: 'bold'
@@ -57,10 +67,22 @@ export default class MenuScene extends Phaser.Scene {
         difficultyLabel.setOrigin(0.5);
         
         // Create difficulty dropdown
-        this.createDifficultyDropdown(width / 2, 380);
+        this.createDifficultyDropdown(width / 2, 345);
+        
+        // Environment label
+        const environmentLabel = this.add.text(width / 2, 420, 'SELECT ENVIRONMENT', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff',
+            fontStyle: 'bold'
+        });
+        environmentLabel.setOrigin(0.5);
+        
+        // Create environment dropdown
+        this.createEnvironmentDropdown(width / 2, 465);
         
         // Start button
-        this.createStartButton(width / 2, 520);
+        this.createStartButton(width / 2, 560);
         
         // Instructions
         const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
@@ -173,6 +195,116 @@ export default class MenuScene extends Phaser.Scene {
         this.toggleDropdown();
     }
     
+    createEnvironmentDropdown(centerX, y) {
+        const dropdownWidth = 250;
+        const dropdownHeight = 50;
+        const optionHeight = 45;
+        
+        // Container for dropdown
+        this.environmentDropdownContainer = this.add.container(centerX, y);
+        
+        // Main dropdown box
+        this.environmentDropdownBox = this.add.rectangle(0, 0, dropdownWidth, dropdownHeight, 0x2c3e50);
+        this.environmentDropdownBox.setStrokeStyle(2, 0x3498db);
+        
+        // Selected text
+        this.environmentSelectedText = this.add.text(-dropdownWidth / 2 + 15, 0, 'Land', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff'
+        });
+        this.environmentSelectedText.setOrigin(0, 0.5);
+        
+        // Arrow indicator
+        this.environmentDropdownArrow = this.add.text(dropdownWidth / 2 - 15, 0, '▼', {
+            fontSize: '16px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff'
+        });
+        this.environmentDropdownArrow.setOrigin(1, 0.5);
+        
+        // Options container (hidden by default)
+        this.environmentOptionsContainer = this.add.container(0, dropdownHeight / 2 + 5);
+        this.environmentOptionsContainer.setVisible(false);
+        
+        // Create options
+        const options = [
+            { value: 'land', label: 'Land' },
+            { value: 'water', label: 'Water' },
+            { value: 'air', label: 'Air (Coming Soon)', disabled: true }
+        ];
+        
+        this.environmentOptionElements = [];
+        options.forEach((option, index) => {
+            const optionY = index * optionHeight;
+            
+            // Option background
+            const optionBg = this.add.rectangle(0, optionY + optionHeight / 2, dropdownWidth, optionHeight, 0x34495e);
+            optionBg.setStrokeStyle(1, 0x2c3e50);
+            
+            // Option text
+            const optionText = this.add.text(-dropdownWidth / 2 + 15, optionY + optionHeight / 2, option.label, {
+                fontSize: '18px',
+                fontFamily: 'Arial, sans-serif',
+                color: option.disabled ? '#888888' : '#ffffff'
+            });
+            optionText.setOrigin(0, 0.5);
+            
+            if (!option.disabled) {
+                // Make interactive
+                optionBg.setInteractive({ useHandCursor: true });
+                optionBg.on('pointerover', () => {
+                    optionBg.setFillStyle(0x3498db);
+                });
+                optionBg.on('pointerout', () => {
+                    optionBg.setFillStyle(0x34495e);
+                });
+                optionBg.on('pointerdown', () => {
+                    this.selectEnvironmentOption(option.value, option.label);
+                });
+            }
+            
+            this.environmentOptionsContainer.add([optionBg, optionText]);
+            this.environmentOptionElements.push({ bg: optionBg, text: optionText });
+        });
+        
+        // Make main dropdown interactive
+        this.environmentDropdownBox.setInteractive({ useHandCursor: true });
+        this.environmentDropdownBox.on('pointerover', () => {
+            this.environmentDropdownBox.setStrokeStyle(2, 0x5dade2);
+        });
+        this.environmentDropdownBox.on('pointerout', () => {
+            this.environmentDropdownBox.setStrokeStyle(2, 0x3498db);
+        });
+        this.environmentDropdownBox.on('pointerdown', () => {
+            this.toggleEnvironmentDropdown();
+        });
+        
+        // Add elements to container
+        this.environmentDropdownContainer.add([
+            this.environmentDropdownBox,
+            this.environmentSelectedText,
+            this.environmentDropdownArrow,
+            this.environmentOptionsContainer
+        ]);
+        
+        // Set depth to ensure dropdown appears on top
+        this.environmentDropdownContainer.setDepth(100);
+    }
+    
+    toggleEnvironmentDropdown() {
+        this.environmentDropdownOpen = !this.environmentDropdownOpen;
+        this.environmentOptionsContainer.setVisible(this.environmentDropdownOpen);
+        this.environmentDropdownArrow.setText(this.environmentDropdownOpen ? '▲' : '▼');
+    }
+    
+    selectEnvironmentOption(value, label) {
+        this.selectedEnvironment = value;
+        this.environmentSelectedText.setText(label);
+        this.toggleEnvironmentDropdown();
+    }
+
+    
     createStartButton(centerX, y) {
         const buttonWidth = 200;
         const buttonHeight = 70;
@@ -198,11 +330,16 @@ export default class MenuScene extends Phaser.Scene {
             startText.setScale(1);
         });
         startButton.on('pointerdown', () => {
-            // Store difficulty in registry for access by other scenes
+            // Store difficulty and environment in registry for access by other scenes
             this.registry.set('difficulty', this.selectedDifficulty);
+            this.registry.set('gameEnvironment', this.selectedEnvironment);
             
-            // Start the game
-            this.scene.start('MainGameScene');
+            // Start the appropriate scene based on environment
+            if (this.selectedEnvironment === 'water') {
+                this.scene.start('UnderwaterScene');
+            } else {
+                this.scene.start('MainGameScene');
+            }
         });
     }
 }

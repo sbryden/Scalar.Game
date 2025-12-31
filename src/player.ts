@@ -12,7 +12,11 @@ export function changeSize(direction) {
     }
     
     const currentSize = gameState.playerSize;
-    const sizeOrder = ['small', 'normal', 'large'];
+    const currentScene = gameState.currentSceneKey;
+    
+    // Underwater scenes only allow small and normal sizes (no large)
+    const isUnderwater = currentScene === 'UnderwaterScene' || currentScene === 'UnderwaterMicroScene';
+    const sizeOrder = isUnderwater ? ['small', 'normal'] : ['small', 'normal', 'large'];
     const currentIndex = sizeOrder.indexOf(currentSize);
     
     let newSize;
@@ -21,7 +25,7 @@ export function changeSize(direction) {
         if (currentIndex <= 0) return;
         newSize = sizeOrder[currentIndex - 1];
     } else if (direction === 'larger') {
-        // Can't go larger than large
+        // Can't go larger than max for current environment
         if (currentIndex >= sizeOrder.length - 1) return;
         newSize = sizeOrder[currentIndex + 1];
     } else {
@@ -35,9 +39,9 @@ export function changeSize(direction) {
     }
     
     // Check for scene transitions
-    const currentScene = gameState.currentSceneKey;
     const oldSize = currentSize;
     
+    // Land environment transitions
     // Transition to MicroScene when going to small from MainGameScene
     if (newSize === 'small' && currentScene === 'MainGameScene') {
         gameState.playerSize = newSize;
@@ -51,6 +55,23 @@ export function changeSize(direction) {
         gameState.playerSize = newSize;
         gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
         gameState.scene.scene.start('MainGameScene');
+        return;
+    }
+    
+    // Underwater environment transitions
+    // Transition to UnderwaterMicroScene when going to small from UnderwaterScene
+    if (newSize === 'small' && currentScene === 'UnderwaterScene') {
+        gameState.playerSize = newSize;
+        gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+        gameState.scene.scene.start('UnderwaterMicroScene');
+        return;
+    }
+    
+    // Transition back to UnderwaterScene when going to normal from UnderwaterMicroScene
+    if (newSize === 'normal' && currentScene === 'UnderwaterMicroScene') {
+        gameState.playerSize = newSize;
+        gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+        gameState.scene.scene.start('UnderwaterScene');
         return;
     }
     

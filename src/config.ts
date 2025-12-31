@@ -50,6 +50,39 @@ export const ENEMY_CONFIG = {
         xpReward: 10,
         patrolDistance: 200,
         knockbackResistance: 0.8  // Lighter, knocked back less
+    },
+    fish: {
+        width: 30,
+        height: 30,
+        color: 0x00BFFF, // Deep sky blue
+        speed: 70,
+        health: 15,
+        damage: 8,
+        xpReward: 20,
+        patrolDistance: 400,
+        knockbackResistance: 0.7  // Swims smoothly, less affected by knockback
+    },
+    crab: {
+        width: 30,
+        height: 30,
+        color: 0xFF6347, // Tomato red (crab color)
+        speed: 60,
+        health: 25,
+        damage: 12,
+        xpReward: 30,
+        patrolDistance: 250,
+        knockbackResistance: 1.2  // Heavier, more resistant to knockback
+    },
+    plankton: {
+        width: 20,
+        height: 20,
+        color: 0x7FFFD4, // Aquamarine
+        speed: 50,
+        health: 3,
+        damage: 3,
+        xpReward: 8,
+        patrolDistance: 180,
+        knockbackResistance: 0.5  // Very light, easily knocked back
     }
 };
 
