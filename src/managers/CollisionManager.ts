@@ -7,6 +7,8 @@ import { damageEnemy } from '../enemies';
 import combatSystem from '../systems/CombatSystem';
 
 export class CollisionManager {
+    scene: any;
+
     constructor(scene) {
         this.scene = scene;
     }

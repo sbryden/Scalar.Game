@@ -6,6 +6,9 @@ import gameState from '../utils/gameState';
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
 
 export class CameraManager {
+    scene: any;
+    camera: any;
+
     constructor(scene) {
         this.scene = scene;
         this.camera = scene.cameras.main;

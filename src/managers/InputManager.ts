@@ -8,6 +8,10 @@ import { fireProjectile } from '../projectiles';
 import { SIZE_CONFIG } from '../config';
 
 export class InputManager {
+    scene: any;
+    cursors: any;
+    wasdKeys: any;
+
     constructor(scene) {
         this.scene = scene;
         this.cursors = null;
