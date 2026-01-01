@@ -61,10 +61,10 @@ export class CombatSystem {
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
         enemy.health -= damage;
         
-        // Trigger aggro when hit by projectile
-        if (!enemy.isAggroed && gameState.player) {
-            enemy.isAggroed = true;
-            enemy.aggroTarget = gameState.player;
+        // Trigger chase when hit by projectile
+        if (!enemy.isChasing && gameState.player) {
+            enemy.isChasing = true;
+            enemy.chaseTarget = gameState.player;
         }
         
         // Visual feedback: flash enemy red
@@ -95,10 +95,10 @@ export class CombatSystem {
             return;
         }
         
-        // Trigger aggro on collision if not already aggroed
-        if (!enemy.isAggroed) {
-            enemy.isAggroed = true;
-            enemy.aggroTarget = player;
+        // Trigger chase on collision if not already chasing
+        if (!enemy.isChasing) {
+            enemy.isChasing = true;
+            enemy.chaseTarget = player;
         }
         
         // Check if entities are stunned (prevent knockback spam)

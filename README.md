@@ -15,8 +15,8 @@ Scalar is a classic 2D side-scroller where you control a vehicle navigating thro
 - Static platforms for navigation
 - **Multiple environments**: Land and Underwater levels
 - **Environment-specific mechanics**: Submarine controls with vertical thrust in water
-- **Enemy AI with Aggro System**: Enemies patrol areas but will chase and attack when provoked
-- **Combat System**: Shoot projectiles to damage enemies and trigger aggro behavior
+- **Enemy AI with Chase System**: Enemies patrol areas but will chase and attack when player enters their line of sight
+- **Combat System**: Shoot projectiles to damage enemies and trigger chase behavior
 
 ⚙️ **Technical Stack**
 - Phaser 3 game framework
@@ -35,13 +35,17 @@ Scalar is a classic 2D side-scroller where you control a vehicle navigating thro
 - Microscopic plankton level when shrinking
 - Blue ocean background with kelp and coral decorations
 
-🤖 **Enemy AI & Aggro System**
+🤖 **Enemy AI & Chase System**
 - Enemies patrol their designated areas by default
-- **Aggro Triggers**: Enemies become aggressive when:
+- **Detection Triggers**: Enemies become aggressive when:
   - Hit by a projectile
-  - Player enters aggro range (5× enemy size)
+  - Player enters their line of sight (detection range)
   - Direct collision with player
-- **Intelligent Pathfinding**: Aggroed enemies chase the player at 1.5× speed
+- **Line of Sight Calculation**:
+  - Based on larger of enemy width and height
+  - Minimum detection distance for small enemies (100 pixels)
+  - Bosses have enhanced line of sight (60% of screen width)
+- **Intelligent Pathfinding**: Detected enemies chase the player at 1.5× speed
 - **Physics-Aware Movement**:
   - Swimming enemies (fish, micro, plankton) move freely in 2D space
   - Ground enemies (crab, generic) run horizontally and jump intelligently to reach player
@@ -89,8 +93,8 @@ Control your character to navigate platforms, defeat enemies, and progress throu
 
 **Combat:**
 - **F** - Shoot projectiles (slower underwater)
-- Hitting enemies with projectiles triggers aggro behavior
-- Enemies will chase and attack when aggroed
+- Hitting enemies with projectiles triggers chase behavior
+- Enemies will chase and attack when detected
 
 ## Scripts
 
@@ -124,7 +128,7 @@ Visit `http://localhost:4173/Scalar.Game/` to preview.
 ## Future Roadmap
 
 This project continues to evolve with planned features:
-- ✅ Enemy aggro system (completed)
+- ✅ Enemy chase system with line of sight detection (completed)
 - ✅ TypeScript typing improvements (completed)
 - Enhanced vehicle transformation mechanics
 - Minimap
