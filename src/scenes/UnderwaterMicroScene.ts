@@ -18,10 +18,10 @@ import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
-import type { Enemy } from '../types/game';
+import type { Enemy, Player } from '../types/game';
 
 export default class UnderwaterMicroScene extends Phaser.Scene {
-    player!: Phaser.Physics.Arcade.Sprite;
+    player!: Player;
     platforms!: Phaser.Physics.Arcade.StaticGroup;
     enemies!: Phaser.Physics.Arcade.Group;
     projectiles!: Phaser.Physics.Arcade.Group;
@@ -149,7 +149,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.UnderwaterMicroScene;
         
         // Create player (smaller submarine)
-        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'sub_1');
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'sub_1') as Player;
         this.player.setScale(0.15);
         this.player.setBounce(0.1);
         this.player.setCollideWorldBounds(true);
@@ -284,14 +284,15 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         this.inputManager.handleMovement();
         
         // Update enemies
-        this.enemies.children.entries.forEach(enemy => {
+        this.enemies.children.entries.forEach(obj => {
+            const enemy = obj as Enemy;
             if (enemy.active) {
                 updateEnemyAI(enemy);
             }
         });
         
         // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies.children.entries, this.player);
+        combatSystem.updateStunEffects(this.enemies, this.player);
         
         // Update projectiles
         updateProjectiles();
