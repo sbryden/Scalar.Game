@@ -13,6 +13,7 @@ import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
+import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
@@ -191,7 +192,11 @@ export default class MicroScene extends Phaser.Scene {
             this.handleLevelComplete();
         });
         
-        // Set up replay and exit callbacks
+        // Set up next level, replay and exit callbacks
+        this.levelCompleteScreen.setNextLevelCallback(() => {
+            this.handleNextLevel();
+        });
+        
         this.levelCompleteScreen.setReplayCallback(() => {
             this.handleReplay();
         });
@@ -398,11 +403,36 @@ export default class MicroScene extends Phaser.Scene {
         this.levelCompleteScreen.show();
     }
     
+    handleNextLevel() {
+        console.log('Advancing to next level');
+        
+        // Advance to next level
+        levelProgressionSystem.advanceToNextLevel();
+        
+        // Reset stats tracker for new level
+        levelStatsTracker.reset();
+        
+        // Reset player position to start
+        gameState.savedPositions.MicroScene = { x: 100, y: 650 };
+        
+        // Clear saved enemies to spawn fresh enemies for new level
+        gameState.savedEnemies.MicroScene = [];
+        
+        // Restart the scene with new level
+        this.scene.restart();
+    }
+    
     handleReplay() {
         console.log('Replaying level');
         
         // Reset stats tracker for new attempt
         levelStatsTracker.reset();
+        
+        // Reset player position to start
+        gameState.savedPositions.MicroScene = { x: 100, y: 650 };
+        
+        // Clear saved enemies to respawn for replay
+        gameState.savedEnemies.MicroScene = [];
         
         // Restart the current scene
         this.scene.restart();
@@ -413,6 +443,9 @@ export default class MicroScene extends Phaser.Scene {
         
         // Reset stats tracker when exiting
         levelStatsTracker.reset();
+        
+        // Reset level progression to level 1
+        levelProgressionSystem.resetToLevel1();
         
         // Go back to menu
         this.scene.start('MenuScene');

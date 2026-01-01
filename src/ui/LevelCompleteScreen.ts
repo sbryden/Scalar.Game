@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import levelStatsTracker from '../systems/LevelStatsTracker';
+import levelProgressionSystem from '../systems/LevelProgressionSystem';
 
 export class LevelCompleteScreen {
     scene: Phaser.Scene;
@@ -12,9 +13,11 @@ export class LevelCompleteScreen {
     titleText: Phaser.GameObjects.Text | null;
     statsText: Phaser.GameObjects.Text | null;
     messageText: Phaser.GameObjects.Text | null;
+    nKey: Phaser.Input.Keyboard.Key | null;
     rKey: Phaser.Input.Keyboard.Key | null;
     eKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
+    onNextLevel: (() => void) | null;
     onReplay: (() => void) | null;
     onExit: (() => void) | null;
 
@@ -25,9 +28,11 @@ export class LevelCompleteScreen {
         this.titleText = null;
         this.statsText = null;
         this.messageText = null;
+        this.nKey = null;
         this.rKey = null;
         this.eKey = null;
         this.isVisible = false;
+        this.onNextLevel = null;
         this.onReplay = null;
         this.onExit = null;
     }
@@ -50,10 +55,11 @@ export class LevelCompleteScreen {
         this.overlay.setVisible(false);
 
         // Create title text
+        const currentLevel = levelProgressionSystem.getCurrentLevel();
         this.titleText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             80,
-            'LEVEL COMPLETE!',
+            `MAP ${currentLevel} COMPLETE!`,
             {
                 fontSize: '64px',
                 color: '#FFD700',
@@ -92,7 +98,7 @@ export class LevelCompleteScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 80,
-            'Press R to Replay\nPress E to Exit to Main Menu',
+            'Press N for Next Level\nPress R to Replay\nPress E to Exit to Main Menu',
             {
                 fontSize: '32px',
                 color: '#FFFFFF',
@@ -107,11 +113,18 @@ export class LevelCompleteScreen {
         this.messageText.setScrollFactor(0);
         this.messageText.setVisible(false);
 
-        // Setup keyboard input for R and E
+        // Setup keyboard input for N, R and E
+        this.nKey = this.scene.input.keyboard!.addKey('N');
         this.rKey = this.scene.input.keyboard!.addKey('R');
         this.eKey = this.scene.input.keyboard!.addKey('E');
 
-        // Add listeners for R and E keys
+        // Add listeners for N, R and E keys
+        this.nKey.on('down', () => {
+            if (this.isVisible) {
+                this.handleNextLevel();
+            }
+        });
+
         this.rKey.on('down', () => {
             if (this.isVisible) {
                 this.handleReplay();
@@ -130,6 +143,10 @@ export class LevelCompleteScreen {
      */
     show(): void {
         if (this.overlay && this.titleText && this.statsText && this.messageText) {
+            // Update title with current level
+            const currentLevel = levelProgressionSystem.getCurrentLevel();
+            this.titleText.setText(`MAP ${currentLevel} COMPLETE!`);
+            
             // Get stats from tracker
             const stats = levelStatsTracker.getStats();
             const completionTime = levelStatsTracker.getFormattedCompletionTime();
@@ -174,6 +191,21 @@ export class LevelCompleteScreen {
     }
 
     /**
+     * Handle next level (N key)
+     */
+    handleNextLevel(): void {
+        this.hide();
+        
+        // Resume physics
+        this.scene.physics.resume();
+
+        // Call next level callback if set
+        if (this.onNextLevel) {
+            this.onNextLevel();
+        }
+    }
+
+    /**
      * Handle replay (R key)
      */
     handleReplay(): void {
@@ -201,6 +233,13 @@ export class LevelCompleteScreen {
     }
 
     /**
+     * Set the next level callback
+     */
+    setNextLevelCallback(callback: () => void): void {
+        this.onNextLevel = callback;
+    }
+
+    /**
      * Set the replay callback
      */
     setReplayCallback(callback: () => void): void {
@@ -218,6 +257,9 @@ export class LevelCompleteScreen {
      * Cleanup resources
      */
     destroy(): void {
+        if (this.nKey) {
+            this.nKey.removeAllListeners();
+        }
         if (this.rKey) {
             this.rKey.removeAllListeners();
         }

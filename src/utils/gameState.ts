@@ -34,6 +34,9 @@ class GameState {
     // Difficulty
     difficultyInitialized: boolean;
     
+    // Level progression
+    currentMapLevel: number;
+    
     // Function references
     spawnEnemyFunc: ((scene: Phaser.Scene, x: number, y: number, enemyType?: string) => Enemy) | null;
 
@@ -78,6 +81,9 @@ class GameState {
         
         // Difficulty
         this.difficultyInitialized = false;
+        
+        // Level progression
+        this.currentMapLevel = 1;
         
         // Function references
         this.spawnEnemyFunc = null;
