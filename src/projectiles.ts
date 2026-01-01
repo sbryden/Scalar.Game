@@ -22,7 +22,7 @@ export function fireProjectile(scene: Phaser.Scene): void {
     const config = PROJECTILE_CONFIG.basic;
     
     let direction = 1;
-    if (gameState.wasdKeys.A.isDown || gameState.cursors.left.isDown) {
+    if (gameState.wasdKeys?.A.isDown || gameState.cursors?.left.isDown) {
         direction = -1;
     }
     
@@ -33,22 +33,25 @@ export function fireProjectile(scene: Phaser.Scene): void {
     
     const velocityX = config.speed * direction * speedMultiplier;
     
+    const player = gameState.player;
+    if (!player) return;
+    
     // Offset projectile spawn behind the vehicle (opposite of direction)
     const spawnOffsetX = direction === 1 ? 40 : -40;
-    const projectileX = gameState.player.x + spawnOffsetX;
+    const projectileX = player.x + spawnOffsetX;
     
     // Projectile spawns at 1/6 height of tank (1/6 from top)
-    const tankHeight = gameState.player.displayHeight;
-    const projectileY = gameState.player.y - tankHeight / 2 + (1 / 6) * tankHeight;
+    const tankHeight = player.displayHeight;
+    const projectileY = player.y - tankHeight / 2 + (1 / 6) * tankHeight;
     
     // Create projectile (torpedo underwater, beam on land)
     const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
-    const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
+    const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as unknown as import('./types/game').Projectile;
     projectile.setOrigin(0.5, 0.5);
     projectile.setDepth(0);
     
     // Scale projectile based on player scale
-    const playerScale = gameState.player!.scaleX;
+    const playerScale = player.scaleX;
     projectile.setScale(playerScale);
     
     // Flip the image if firing left
@@ -56,12 +59,15 @@ export function fireProjectile(scene: Phaser.Scene): void {
         projectile.setFlipX(true);
     }
     
-    gameState.projectiles!.add(projectile);
+    gameState.projectiles?.add(projectile);
     scene.physics.add.existing(projectile);
-    projectile.body.setAllowGravity(false);
-    projectile.body.setBounce(0, 0);
-    projectile.body.setCollideWorldBounds(true);
-    projectile.body.setVelocity(velocityX, 0);
+    
+    // Type assertion since we know projectile.body is an Arcade Body after physics.add.existing
+    const body = projectile.body as Phaser.Physics.Arcade.Body;
+    body.setAllowGravity(false);
+    body.setBounce(0, 0);
+    body.setCollideWorldBounds(true);
+    body.setVelocity(velocityX, 0);
     
     // Set damage (1000 in god mode, normal otherwise)
     projectile.damage = playerStatsSystem.isGodMode() ? 1000 : config.damage;
@@ -72,8 +78,11 @@ export function fireProjectile(scene: Phaser.Scene): void {
 }
 
 export function updateProjectiles(): void {
-    gameState.projectiles!.children.entries.forEach(proj => {
-        const projectile = proj as Projectile;
+    const projectiles = gameState.projectiles;
+    if (!projectiles) return;
+    
+    projectiles.children.entries.forEach(proj => {
+        const projectile = proj as import('./types/game').Projectile;
         // Destroy projectile if it exceeds max range or goes off world
         const distanceTraveled = Math.abs(projectile.x - projectile.spawnX);
         if (distanceTraveled > projectile.maxRange || projectile.x < 0 || projectile.x > WORLD_WIDTH) {

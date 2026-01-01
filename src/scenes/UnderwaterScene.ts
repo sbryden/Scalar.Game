@@ -364,7 +364,10 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.startImmunityFlash(this.player);
         
         // Disable collisions with enemies temporarily
-        this.physics.world.removeCollider(this.collisionManager.playerEnemyCollider);
+        const collider = this.collisionManager.playerEnemyCollider;
+        if (collider) {
+            this.physics.world.removeCollider(collider);
+        }
         
         // Re-enable collisions after immunity ends
         this.time.delayedCall(2000, () => {
@@ -424,15 +427,18 @@ export default class UnderwaterScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.UnderwaterScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map((enemy: Enemy) => ({
-                x: enemy.x,
-                y: enemy.y,
-                health: enemy.health,
-                startX: enemy.startX,
-                startY: enemy.startY,
-                direction: enemy.direction,
-                enemyType: enemy.enemyType
-            }));
+            .map((enemy) => {
+                const e = enemy as Enemy;
+                return {
+                    x: e.x,
+                    y: e.y,
+                    health: e.health,
+                    startX: e.startX,
+                    startY: e.startY,
+                    direction: e.direction,
+                    enemyType: e.enemyType
+                };
+            });
         
         // Save player position
         if (this.player) {
