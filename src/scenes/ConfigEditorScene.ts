@@ -8,12 +8,20 @@ import * as config from '../config';
 
 interface ConfigValue {
     path: string;
-    key: string;
     value: any;
-    type: 'number' | 'string' | 'object' | 'color';
+    type: 'number' | 'color';
 }
 
 export default class ConfigEditorScene extends Phaser.Scene {
+    // Layout constants
+    private static readonly HEADER_HEIGHT = 120;
+    private static readonly FOOTER_HEIGHT = 150;
+    private static readonly LINE_HEIGHT = 50;
+    private static readonly START_Y = 20;
+    private static readonly LEFT_MARGIN = 50;
+    private static readonly INPUT_OFFSET_Y = 15;
+    private static readonly SCROLL_SPEED = 30;
+    
     private configValues: ConfigValue[] = [];
     private scrollContainer!: Phaser.GameObjects.Container;
     private inputElements: Map<string, HTMLInputElement> = new Map();
@@ -85,40 +93,35 @@ export default class ConfigEditorScene extends Phaser.Scene {
         const configEntries = Object.entries(config);
         
         for (const [key, value] of configEntries) {
-            this.parseValue(key, value, key);
+            this.parseValue(key, value);
         }
     }
     
-    parseValue(fullPath: string, value: any, key: string): void {
+    parseValue(fullPath: string, value: any): void {
         if (typeof value === 'number') {
-            // Check if it's a color (hex number >= 0xFF or path contains 'color')
-            const isColor = (value >= 0xFF && fullPath.toLowerCase().includes('color')) || 
-                          (value >= 0x1000 && /color/i.test(fullPath));
+            // Check if it's a color: numeric hex-like value with 'color' in the path
+            const isColor = value >= 0x1000 && /color/i.test(fullPath);
             this.configValues.push({
                 path: fullPath,
-                key: key,
                 value: value,
                 type: isColor ? 'color' : 'number'
             });
         } else if (typeof value === 'object' && value !== null) {
             // Recursively parse nested objects
             for (const [subKey, subValue] of Object.entries(value)) {
-                this.parseValue(`${fullPath}.${subKey}`, subValue, subKey);
+                this.parseValue(`${fullPath}.${subKey}`, subValue);
             }
         }
     }
     
     createInputFields(): void {
-        const startY = 20;
-        const lineHeight = 50;
-        const leftMargin = 50;
         const width = this.cameras.main.width;
         
         this.configValues.forEach((configValue, index) => {
-            const y = startY + index * lineHeight;
+            const y = ConfigEditorScene.START_Y + index * ConfigEditorScene.LINE_HEIGHT;
             
             // Label
-            const label = this.add.text(leftMargin, y, configValue.path, {
+            const label = this.add.text(ConfigEditorScene.LEFT_MARGIN, y, configValue.path, {
                 fontSize: '14px',
                 fontFamily: 'Arial, sans-serif',
                 color: '#ffffff'
@@ -134,7 +137,7 @@ export default class ConfigEditorScene extends Phaser.Scene {
             const input = document.createElement('input');
             input.style.position = 'absolute';
             input.style.left = `${width - 300}px`;
-            input.style.top = `${120 + y - 15}px`;
+            input.style.top = `${ConfigEditorScene.HEADER_HEIGHT + y - ConfigEditorScene.INPUT_OFFSET_Y}px`;
             input.style.width = '200px';
             input.style.height = '30px';
             input.style.fontSize = '14px';
@@ -147,13 +150,15 @@ export default class ConfigEditorScene extends Phaser.Scene {
             
             if (configValue.type === 'color') {
                 input.type = 'text';
+                // Normalize to a 6-digit RGB hex string (RRGGBB), zero-padded for values < 0x100000.
                 const hexValue = currentValue >= 0 ? currentValue.toString(16).toUpperCase().padStart(6, '0') : '000000';
                 input.value = '0x' + hexValue;
                 input.placeholder = '0xFFFFFF';
             } else {
                 input.type = 'number';
                 input.value = currentValue.toString();
-                input.step = configValue.value < 1 && configValue.value > 0 ? '0.1' : '1';
+                // Determine step based on decimal places in original value
+                input.step = this.getStepValue(configValue.value);
             }
             
             document.body.appendChild(input);
@@ -161,14 +166,31 @@ export default class ConfigEditorScene extends Phaser.Scene {
         });
         
         // Calculate max scroll
-        this.maxScrollY = Math.max(0, (this.configValues.length * lineHeight) - (this.cameras.main.height - 250));
+        this.maxScrollY = Math.max(0, (this.configValues.length * ConfigEditorScene.LINE_HEIGHT) - 
+            (this.cameras.main.height - ConfigEditorScene.HEADER_HEIGHT - ConfigEditorScene.FOOTER_HEIGHT));
+    }
+    
+    /**
+     * Determine appropriate step value for number inputs based on the original value
+     */
+    private getStepValue(value: number): string {
+        if (value === 0) return '0.1';
+        
+        const absValue = Math.abs(value);
+        if (absValue < 1) return '0.1';
+        if (absValue < 10) return '0.5';
+        return '1';
     }
     
     setupScrolling(): void {
-        this.input.on('wheel', (pointer: any, gameObjects: any, deltaX: number, deltaY: number) => {
-            const scrollSpeed = 30;
+        this.input.on('wheel', (pointer: any, gameObjects: any, deltaX: number, deltaY: number, deltaZ: number) => {
+            // Prevent default browser scrolling
+            if (pointer.event) {
+                pointer.event.preventDefault();
+            }
+            
             this.scrollY = Phaser.Math.Clamp(
-                this.scrollY + (deltaY > 0 ? scrollSpeed : -scrollSpeed),
+                this.scrollY + (deltaY > 0 ? ConfigEditorScene.SCROLL_SPEED : -ConfigEditorScene.SCROLL_SPEED),
                 0,
                 this.maxScrollY
             );
@@ -177,19 +199,21 @@ export default class ConfigEditorScene extends Phaser.Scene {
     }
     
     updateScrollPosition(): void {
-        this.scrollContainer.y = 120 - this.scrollY;
+        this.scrollContainer.y = ConfigEditorScene.HEADER_HEIGHT - this.scrollY;
         
         // Update HTML input positions
         this.inputElements.forEach((input, path) => {
             const configValueIndex = this.configValues.findIndex(cv => cv.path === path);
             if (configValueIndex >= 0) {
-                const lineHeight = 50;
-                const baseY = 120 + 20 + configValueIndex * lineHeight - 15;
+                const baseY = ConfigEditorScene.HEADER_HEIGHT + ConfigEditorScene.START_Y + 
+                             configValueIndex * ConfigEditorScene.LINE_HEIGHT - ConfigEditorScene.INPUT_OFFSET_Y;
                 input.style.top = `${baseY - this.scrollY}px`;
                 
-                // Hide inputs that are out of view
+                // Hide inputs that are out of view (above header or below footer)
                 const y = baseY - this.scrollY;
-                input.style.display = (y < 100 || y > this.cameras.main.height - 150) ? 'none' : 'block';
+                const isVisible = y >= ConfigEditorScene.HEADER_HEIGHT && 
+                                y <= this.cameras.main.height - ConfigEditorScene.FOOTER_HEIGHT;
+                input.style.display = isVisible ? 'block' : 'none';
             }
         });
     }
@@ -242,7 +266,7 @@ export default class ConfigEditorScene extends Phaser.Scene {
     }
     
     saveConfig(): void {
-        const configData: Record<string, any> = {};
+        const configData: Record<string, number> = {};
         
         this.inputElements.forEach((input, path) => {
             let value: number;
@@ -250,9 +274,22 @@ export default class ConfigEditorScene extends Phaser.Scene {
             if (input.type === 'number') {
                 value = parseFloat(input.value);
             } else {
-                // Parse hex color value
+                // Parse hex color value with validation
                 const hexStr = input.value.replace(/^0x/i, '');
+                
+                // Validate hex string format
+                if (!/^[0-9A-Fa-f]{1,6}$/.test(hexStr)) {
+                    console.warn(`Invalid hex color format for ${path}: ${input.value}`);
+                    return;
+                }
+                
                 value = parseInt(hexStr, 16);
+                
+                // Validate color range (0x000000 to 0xFFFFFF)
+                if (value < 0 || value > 0xFFFFFF) {
+                    console.warn(`Color value out of range for ${path}: 0x${hexStr}`);
+                    return;
+                }
             }
             
             // Only save valid numbers
@@ -265,21 +302,28 @@ export default class ConfigEditorScene extends Phaser.Scene {
         localStorage.setItem('gameConfig', JSON.stringify(configData));
         
         // Visual feedback
+        this.showFeedbackMessage('Configuration Saved!', '#00ff88', 1500);
+    }
+    
+    /**
+     * Show a temporary feedback message to the user
+     */
+    private showFeedbackMessage(message: string, color: string, duration: number): void {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
-        const savedText = this.add.text(width / 2, height / 2, 'Configuration Saved!', {
+        const feedbackText = this.add.text(width / 2, height / 2, message, {
             fontSize: '32px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
-            color: '#00ff88',
+            color: color,
             stroke: '#ffffff',
             strokeThickness: 3
         });
-        savedText.setOrigin(0.5);
-        savedText.setDepth(2000);
+        feedbackText.setOrigin(0.5);
+        feedbackText.setDepth(2000);
         
-        this.time.delayedCall(1500, () => {
-            savedText.destroy();
+        this.time.delayedCall(duration, () => {
+            feedbackText.destroy();
         });
     }
     
@@ -301,22 +345,7 @@ export default class ConfigEditorScene extends Phaser.Scene {
         });
         
         // Visual feedback
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
-        const resetText = this.add.text(width / 2, height / 2, 'Configuration Reset!', {
-            fontSize: '32px',
-            fontFamily: 'Arial, sans-serif',
-            fontStyle: 'bold',
-            color: '#ff8800',
-            stroke: '#ffffff',
-            strokeThickness: 3
-        });
-        resetText.setOrigin(0.5);
-        resetText.setDepth(2000);
-        
-        this.time.delayedCall(1500, () => {
-            resetText.destroy();
-        });
+        this.showFeedbackMessage('Configuration Reset!', '#ff8800', 1500);
     }
     
     getStoredValue(path: string): number | null {
@@ -342,5 +371,10 @@ export default class ConfigEditorScene extends Phaser.Scene {
     
     shutdown(): void {
         this.cleanup();
+    }
+    
+    destroy(): void {
+        this.cleanup();
+        super.destroy();
     }
 }

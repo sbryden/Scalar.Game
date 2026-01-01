@@ -25,6 +25,10 @@ export function getConfigValue<T>(path: string, defaultValue: T): T {
 /**
  * Apply stored configuration values to the config object
  * This should be called before the game starts
+ * 
+ * Note: This mutates the imported config object at runtime. 
+ * Code that caches config values before this is called may see stale values.
+ * Ensure this is called early in the boot sequence.
  */
 export function applyStoredConfig(): void {
     try {
@@ -33,11 +37,29 @@ export function applyStoredConfig(): void {
         
         const configData = JSON.parse(stored);
         
+        // Validate that configData is an object
+        if (typeof configData !== 'object' || configData === null || Array.isArray(configData)) {
+            console.error('Invalid config data format in localStorage');
+            return;
+        }
+        
         // Apply each stored value to the config object
         for (const [path, value] of Object.entries(configData)) {
-            if (typeof value === 'number' || typeof value === 'string') {
-                setConfigValue(path, value);
+            // Validate value type
+            if (typeof value !== 'number' && typeof value !== 'string') {
+                console.warn(`Skipping invalid value type for ${path}:`, typeof value);
+                continue;
             }
+            
+            // Validate number values are in reasonable range
+            if (typeof value === 'number') {
+                if (!Number.isFinite(value)) {
+                    console.warn(`Skipping non-finite number for ${path}:`, value);
+                    continue;
+                }
+            }
+            
+            setConfigValue(path, value);
         }
         
         console.log('Custom configuration applied');
@@ -51,15 +73,16 @@ export function applyStoredConfig(): void {
  */
 function setConfigValue(path: string, value: number | string): void {
     const parts = path.split('.');
-    let obj: any = config;
+    let obj: Record<string, any> = config as Record<string, any>;
     
     // Navigate to the parent object
     for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
         if (part && obj[part] !== undefined) {
-            obj = obj[part];
+            obj = obj[part] as Record<string, any>;
         } else {
-            return; // Path doesn't exist
+            console.warn(`Config path does not exist; skipping stored value for ${path} (missing part: ${part})`);
+            return;
         }
     }
     
@@ -67,6 +90,8 @@ function setConfigValue(path: string, value: number | string): void {
     const lastKey = parts[parts.length - 1];
     if (lastKey && obj[lastKey] !== undefined) {
         obj[lastKey] = value;
+    } else {
+        console.warn(`Config path does not exist; skipping stored value for ${path} (missing key: ${lastKey})`);
     }
 }
 
