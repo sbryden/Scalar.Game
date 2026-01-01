@@ -9,7 +9,6 @@ import { fireProjectile } from '../projectiles';
 
 export class TouchControlsManager {
     scene: Phaser.Scene;
-    private controlsContainer: Phaser.GameObjects.Container | null = null;
     private buttons: Map<string, TouchButton> = new Map();
     private dpad: VirtualDPad | null = null;
     private isUnderwater: boolean = false;
