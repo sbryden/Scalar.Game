@@ -3,12 +3,14 @@
  * Displays when player defeats the boss with replay or exit options
  */
 import Phaser from 'phaser';
+import levelStatsTracker from '../systems/LevelStatsTracker';
 
 export class LevelCompleteScreen {
     scene: Phaser.Scene;
     container: Phaser.GameObjects.Container | null;
     overlay: Phaser.GameObjects.Rectangle | null;
     titleText: Phaser.GameObjects.Text | null;
+    statsText: Phaser.GameObjects.Text | null;
     messageText: Phaser.GameObjects.Text | null;
     rKey: Phaser.Input.Keyboard.Key | null;
     eKey: Phaser.Input.Keyboard.Key | null;
@@ -21,6 +23,7 @@ export class LevelCompleteScreen {
         this.container = null;
         this.overlay = null;
         this.titleText = null;
+        this.statsText = null;
         this.messageText = null;
         this.rKey = null;
         this.eKey = null;
@@ -49,7 +52,7 @@ export class LevelCompleteScreen {
         // Create title text
         this.titleText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
-            this.scene.cameras.main.height / 2 - 80,
+            80,
             'LEVEL COMPLETE!',
             {
                 fontSize: '64px',
@@ -65,11 +68,31 @@ export class LevelCompleteScreen {
         this.titleText.setScrollFactor(0);
         this.titleText.setVisible(false);
 
+        // Create stats text (will be updated when shown)
+        this.statsText = this.scene.add.text(
+            this.scene.cameras.main.width / 2,
+            200,
+            '',
+            {
+                fontSize: '28px',
+                color: '#FFFFFF',
+                fontStyle: 'bold',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 4,
+                lineSpacing: 8
+            }
+        );
+        this.statsText.setOrigin(0.5, 0);
+        this.statsText.setDepth(2001);
+        this.statsText.setScrollFactor(0);
+        this.statsText.setVisible(false);
+
         // Create message text
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
-            this.scene.cameras.main.height / 2 + 40,
-            'Boss Defeated!\n\nPress R to Replay\nPress E to Exit to Main Menu',
+            this.scene.cameras.main.height - 80,
+            'Press R to Replay\nPress E to Exit to Main Menu',
             {
                 fontSize: '32px',
                 color: '#FFFFFF',
@@ -106,9 +129,29 @@ export class LevelCompleteScreen {
      * Show the level complete screen
      */
     show(): void {
-        if (this.overlay && this.titleText && this.messageText) {
+        if (this.overlay && this.titleText && this.statsText && this.messageText) {
+            // Get stats from tracker
+            const stats = levelStatsTracker.getStats();
+            const completionTime = levelStatsTracker.getFormattedCompletionTime();
+            
+            // Build stats display text
+            const statsDisplay = [
+                'Level Statistics',
+                '',
+                `Time to Completion: ${completionTime}`,
+                `Projectiles Fired: ${stats.projectilesFired}`,
+                `Deaths: ${stats.deaths}`,
+                `Enemies Destroyed: ${stats.enemiesDestroyed}`,
+                `Bosses Destroyed: ${stats.bossesDestroyed}`,
+                `Damage Dealt: ${Math.round(stats.damageDealt)}`,
+                `Damage Taken: ${Math.round(stats.damageTaken)}`
+            ].join('\n');
+            
+            this.statsText.setText(statsDisplay);
+            
             this.overlay.setVisible(true);
             this.titleText.setVisible(true);
+            this.statsText.setVisible(true);
             this.messageText.setVisible(true);
             this.isVisible = true;
 
@@ -121,9 +164,10 @@ export class LevelCompleteScreen {
      * Hide the level complete screen
      */
     hide(): void {
-        if (this.overlay && this.titleText && this.messageText) {
+        if (this.overlay && this.titleText && this.statsText && this.messageText) {
             this.overlay.setVisible(false);
             this.titleText.setVisible(false);
+            this.statsText.setVisible(false);
             this.messageText.setVisible(false);
             this.isVisible = false;
         }
@@ -185,6 +229,9 @@ export class LevelCompleteScreen {
         }
         if (this.titleText) {
             this.titleText.destroy();
+        }
+        if (this.statsText) {
+            this.statsText.destroy();
         }
         if (this.messageText) {
             this.messageText.destroy();

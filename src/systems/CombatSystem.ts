@@ -4,6 +4,7 @@
  */
 import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
+import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/gameState';
 import type { Player, Enemy, Projectile } from '../types/game';
@@ -66,6 +67,9 @@ export class CombatSystem {
         
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
         enemy.health -= damage;
+        
+        // Track damage dealt
+        levelStatsTracker.recordDamageDealt(damage);
         
         // Trigger chase when hit by projectile
         if (!enemy.isChasing && gameState.player) {
@@ -182,6 +186,9 @@ export class CombatSystem {
                 enemy.health -= playerDamage;
                 enemy.lastPlayerDamageTime = gameTime;
                 
+                // Track damage dealt
+                levelStatsTracker.recordDamageDealt(playerDamage);
+                
                 // Visual feedback: flash enemy white (different from projectile red)
                 enemy.setTint(0xffffff);
                 enemy.scene.time.delayedCall(COMBAT_CONFIG.visual.enemyFlashDuration, () => {
@@ -273,6 +280,9 @@ export class CombatSystem {
         // Check if this is a boss enemy
         const isBoss = enemy.enemyType?.startsWith('boss_');
         
+        // Track enemy destruction
+        levelStatsTracker.recordEnemyDestroyed(isBoss);
+        
         // Mark enemy as dead to prevent further AI/damage processing
         enemy.health = 0;
         enemy.isDead = true;
@@ -338,6 +348,9 @@ export class CombatSystem {
      * Apply damage to player
      */
     damagePlayer(damage: number): void {
+        // Track damage taken
+        levelStatsTracker.recordDamageTaken(damage);
+        
         playerStatsSystem.takeDamage(damage);
     }
     

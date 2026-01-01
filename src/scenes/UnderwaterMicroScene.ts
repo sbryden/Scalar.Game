@@ -12,6 +12,7 @@ import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
+import levelStatsTracker from '../systems/LevelStatsTracker';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
@@ -41,6 +42,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     }
     
     create() {
+        // Start tracking level stats
+        levelStatsTracker.startLevel(this.time.now);
+        
         // Set very light gravity for micro underwater (half of underwater)
         this.physics.world.gravity.y = 50;
         
@@ -415,11 +419,18 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     
     handleLevelComplete() {
         console.log('Level Complete - Boss Defeated!');
+        
+        // End level tracking
+        levelStatsTracker.endLevel(this.time.now);
+        
         this.levelCompleteScreen.show();
     }
     
     handleReplay() {
         console.log('Replaying level');
+        
+        // Reset stats tracker for new attempt
+        levelStatsTracker.reset();
         
         // Restart the current scene
         this.scene.restart();
@@ -427,6 +438,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     
     handleExitToMenu() {
         console.log('Exiting to main menu');
+        
+        // Reset stats tracker when exiting
+        levelStatsTracker.reset();
         
         // Go back to menu
         this.scene.start('MenuScene');
