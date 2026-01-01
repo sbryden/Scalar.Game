@@ -4,7 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
-import { generateDynamicSpawnPoints } from '../utils/spawnHelpers';
+import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -238,7 +238,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         } else {
             // Generate dynamic spawn points with density gradients
             // Plankton are floating enemies, so allow Y variance
-            const spawnPoints = generateDynamicSpawnPoints(
+            const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
                 SPAWN_CONFIG.defaults.baseInterval,
                 SPAWN_CONFIG.defaults.microWaterY,
                 true
