@@ -1,6 +1,6 @@
 /**
  * HUD (Heads-Up Display)
- * Manages health bar, XP bar, and level display
+ * Manages health bar, XP bar, stamina bar, and level display
  */
 import Phaser from 'phaser';
 import type { PlayerStats } from '../types/game';
@@ -11,6 +11,8 @@ export class HUD {
     healthBarBackground: Phaser.GameObjects.Rectangle | null;
     xpBar: Phaser.GameObjects.Rectangle | null;
     xpBarBackground: Phaser.GameObjects.Rectangle | null;
+    staminaBar: Phaser.GameObjects.Rectangle | null;
+    staminaBarBackground: Phaser.GameObjects.Rectangle | null;
     levelText: Phaser.GameObjects.Text | null;
 
     constructor(scene: Phaser.Scene) {
@@ -19,6 +21,8 @@ export class HUD {
         this.healthBarBackground = null;
         this.xpBar = null;
         this.xpBarBackground = null;
+        this.staminaBar = null;
+        this.staminaBarBackground = null;
         this.levelText = null;
         
         this.create();
@@ -44,6 +48,14 @@ export class HUD {
         this.xpBarBackground.setScrollFactor(0);
         this.xpBar.setScrollFactor(0);
         
+        // Stamina bar
+        this.staminaBarBackground = this.scene.add.rectangle(512, 70, barWidth, barHeight, 0x333333);
+        this.staminaBar = this.scene.add.rectangle(512, 70, barWidth, barHeight, 0x00BFFF);
+        this.staminaBarBackground.setDepth(1000);
+        this.staminaBar.setDepth(1000);
+        this.staminaBarBackground.setScrollFactor(0);
+        this.staminaBar.setScrollFactor(0);
+        
         // Level text
         this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
             fontSize: '24px',
@@ -55,7 +67,7 @@ export class HUD {
     }
     
     /**
-     * Update health and XP bars based on player stats
+     * Update health, XP, and stamina bars based on player stats
      */
     update(playerStats: PlayerStats): void {
         const barWidth = 100;
@@ -69,6 +81,23 @@ export class HUD {
         const xpPercent = playerStats.xp / playerStats.xpToLevel;
         this.xpBar?.setDisplayOrigin(barWidth / 2, 4);
         this.xpBar?.setScale(xpPercent, 1);
+        
+        // Update stamina bar
+        const staminaPercent = playerStats.stamina / playerStats.maxStamina;
+        this.staminaBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.staminaBar?.setScale(staminaPercent, 1);
+        
+        // Color code stamina bar based on percentage
+        if (staminaPercent <= 0) {
+            // Depleted - red
+            this.staminaBar?.setFillStyle(0xFF0000);
+        } else if (staminaPercent <= 0.2) {
+            // Exhaustion threshold - orange
+            this.staminaBar?.setFillStyle(0xFF8800);
+        } else {
+            // Normal - blue
+            this.staminaBar?.setFillStyle(0x00BFFF);
+        }
     }
     
     /**
@@ -79,6 +108,8 @@ export class HUD {
         if (this.healthBarBackground) this.healthBarBackground.destroy();
         if (this.xpBar) this.xpBar.destroy();
         if (this.xpBarBackground) this.xpBarBackground.destroy();
+        if (this.staminaBar) this.staminaBar.destroy();
+        if (this.staminaBarBackground) this.staminaBarBackground.destroy();
         if (this.levelText) this.levelText.destroy();
     }
 }

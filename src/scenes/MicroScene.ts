@@ -12,6 +12,7 @@ import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
+import { getStaminaSystem } from '../systems/StaminaSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
@@ -248,6 +249,11 @@ export default class MicroScene extends Phaser.Scene {
     
     async update() {
         const playerStats = getPlayerStats();
+        
+        // Update stamina system
+        const staminaSystem = getStaminaSystem();
+        const isMeleeActive = this.player?.isMeleeMode || false;
+        staminaSystem.update(isMeleeActive);
         
         // Update debug display (only if enabled)
         if (this.debugDisplay?.enabled) {

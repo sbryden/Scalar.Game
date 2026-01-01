@@ -367,3 +367,14 @@ export const HARD_MODE_CONFIG = {
 export const GOD_MODE_CONFIG = {
     playerSpeedMultiplier: 4.0       // Player moves 4x faster in god mode
 };
+
+// Stamina configuration
+export const STAMINA_CONFIG = {
+    startingMaxStamina: 100,         // Starting maximum stamina
+    startingStamina: 100,            // Starting current stamina (full)
+    rechargeRate: 20,                // Stamina recharged per second
+    consumptionRate: 25,             // Stamina consumed per second in melee mode
+    exhaustionThreshold: 0.2,        // 20% - cannot activate melee below this
+    xpOrbRestoration: 15,            // Stamina restored per XP orb collected
+    staminaIncreasePerLevel: 10      // Max stamina increase per level up
+};

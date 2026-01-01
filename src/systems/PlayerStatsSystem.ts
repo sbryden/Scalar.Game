@@ -1,10 +1,11 @@
 /**
  * Player Stats System
- * Manages player health, XP, and leveling progression
+ * Manages player health, XP, stamina, and leveling progression
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/gameState';
-import { COMBAT_CONFIG, XP_CONFIG } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG } from '../config';
+import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import type { PlayerStats, Difficulty } from '../types/game';
 
 type LevelUpCallback = (level: number) => void;
@@ -17,12 +18,17 @@ export class PlayerStatsSystem {
     onGameOver: GameOverCallback | null;
 
     constructor() {
+        // Initialize stamina system
+        initializeStaminaSystem(STAMINA_CONFIG);
+        
         this.stats = {
             level: XP_CONFIG.progression.startingLevel,
             maxHealth: XP_CONFIG.progression.startingMaxHealth,
             health: XP_CONFIG.progression.startingHealth,
             xp: XP_CONFIG.progression.startingXP,
-            xpToLevel: XP_CONFIG.progression.startingXPToLevel
+            xpToLevel: XP_CONFIG.progression.startingXPToLevel,
+            stamina: STAMINA_CONFIG.startingStamina,
+            maxStamina: STAMINA_CONFIG.startingMaxStamina
         };
         this.difficulty = 'normal';
         this.onLevelUp = null;
@@ -48,6 +54,11 @@ export class PlayerStatsSystem {
      * Get current player stats
      */
     getStats(): PlayerStats {
+        // Sync stamina values from stamina system
+        const staminaSystem = getStaminaSystem();
+        const staminaState = staminaSystem.getState();
+        this.stats.stamina = staminaState.current;
+        this.stats.maxStamina = staminaState.max;
         return this.stats;
     }
     
@@ -77,6 +88,10 @@ export class PlayerStatsSystem {
             this.stats.maxHealth += XP_CONFIG.progression.healthIncreasePerLevel;
             this.stats.health = this.stats.maxHealth;
             this.stats.xpToLevel = Math.floor(this.stats.xpToLevel * XP_CONFIG.progression.xpScalingFactor);
+            
+            // Increase max stamina on level up
+            const staminaSystem = getStaminaSystem();
+            staminaSystem.increaseMaxStamina(staminaSystem.getStaminaIncreasePerLevel());
             
             // Update level text UI
             if (gameState.levelText) {
@@ -132,8 +147,14 @@ export class PlayerStatsSystem {
             maxHealth: XP_CONFIG.progression.startingMaxHealth,
             health: XP_CONFIG.progression.startingHealth,
             xp: XP_CONFIG.progression.startingXP,
-            xpToLevel: XP_CONFIG.progression.startingXPToLevel
+            xpToLevel: XP_CONFIG.progression.startingXPToLevel,
+            stamina: STAMINA_CONFIG.startingStamina,
+            maxStamina: STAMINA_CONFIG.startingMaxStamina
         };
+        
+        // Reset stamina system
+        const staminaSystem = getStaminaSystem();
+        staminaSystem.reset();
     }
     
     /**

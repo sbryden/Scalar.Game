@@ -6,7 +6,8 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import playerStatsSystem from './PlayerStatsSystem';
 import { gainXP } from '../xpOrbs';
-import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG } from '../config';
+import { getStaminaSystem } from './StaminaSystem';
+import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG } from '../config';
 import type { XPOrb } from '../types/game';
 
 /**
@@ -57,6 +58,11 @@ export class SpawnSystem {
         scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
             const xpOrb = o as XPOrb;
             gainXP(xpOrb.xpValue || XP_CONFIG.orb.defaultValue);
+            
+            // Restore stamina when collecting XP orb
+            const staminaSystem = getStaminaSystem();
+            staminaSystem.restoreStamina(STAMINA_CONFIG.xpOrbRestoration);
+            
             xpOrb.destroy();
         });
     }
