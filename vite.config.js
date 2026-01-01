@@ -11,7 +11,7 @@ function getBuildNumber() {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   base: '/Scalar.Game/',
   server: {
     port: 3000,
@@ -25,6 +25,6 @@ export default defineConfig({
   },
   publicDir: 'assets', // Copy assets folder to dist root
   define: {
-    '__BUILD_NUMBER__': JSON.stringify(process.env.NODE_ENV === 'production' ? getBuildNumber() : 'dev')
+    '__BUILD_NUMBER__': JSON.stringify(command === 'build' ? getBuildNumber() : 'dev')
   }
-})
+}))
