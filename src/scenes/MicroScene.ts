@@ -221,7 +221,7 @@ export default class MicroScene extends Phaser.Scene {
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
                     // Spawn boss enemy
-                    spawnEnemy(this, point.x, point.y, 'boss_micro');
+                    spawnEnemy(this, point.x, point.y, 'boss_land_micro');
                 } else {
                     // Spawn regular micro enemy
                     spawnEnemy(this, point.x, point.y, 'micro');

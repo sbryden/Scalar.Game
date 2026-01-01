@@ -9,9 +9,9 @@ import playerStatsSystem from './systems/PlayerStatsSystem';
  * Swimming enemies can move freely in all directions and don't have gravity
  */
 function isSwimmingEnemy(enemyType: string): boolean {
-    return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton" ||
-           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton" ||
-           enemyType === "boss_shark";
+    return enemyType === "micro" || enemyType === "fish" || enemyType === "water_swimming_micro" ||
+           enemyType === "boss_land_micro" || enemyType === "boss_water_swimming" || 
+           enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark";
 }
 
 /**
@@ -41,8 +41,8 @@ function selectEnemyTexture(enemyType: string): string {
     } else if (enemyType === "fish") {
         // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
         return Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
-    } else if (enemyType === "plankton") {
-        return "bacteria"; // Use bacteria as placeholder for plankton
+    } else if (enemyType === "water_swimming_micro") {
+        return "bacteria"; // Use bacteria for water_swimming_micro
     } else if (enemyType === "crab") {
         return "water_enemy_crab_1";
     } else {
@@ -258,7 +258,7 @@ function updateChaseAI(enemy: Enemy): void {
 }
 
 function updatePatrolAI(enemy: Enemy): void {
-    // Different behavior for swimming enemies (fish, plankton, micro) vs ground enemies
+    // Different behavior for swimming enemies (fish, water_swimming_micro, micro) vs ground enemies
     if (isSwimmingEnemy(enemy.enemyType)) {
         // Swimming enemies float around their zone in a circular/wavy pattern
         const maxDistance = enemy.patrolDistance / 2;
@@ -276,10 +276,10 @@ function updatePatrolAI(enemy: Enemy): void {
 
         // Float with sinusoidal vertical movement - allow full screen height
         enemy.floatAngle += PHYSICS_CONFIG.enemy.patrol.floatAngleIncrement;
-        const floatSpeed = enemy.speed * (enemy.enemyType === "plankton" ? 
+        const floatSpeed = enemy.speed * (enemy.enemyType === "water_swimming_micro" ? 
             PHYSICS_CONFIG.enemy.patrol.floatSpeedPlankton : 
             PHYSICS_CONFIG.enemy.patrol.floatSpeedOther);
-        const verticalAmplitude = enemy.enemyType === "plankton" ? 
+        const verticalAmplitude = enemy.enemyType === "water_swimming_micro" ? 
             PHYSICS_CONFIG.enemy.patrol.verticalAmplitudePlankton : 
             PHYSICS_CONFIG.enemy.patrol.verticalAmplitudeOther;
 

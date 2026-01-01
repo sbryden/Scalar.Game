@@ -1,6 +1,6 @@
 /**
  * Underwater Micro Scene
- * Microscopic underwater scene with plankton and microorganisms
+ * Microscopic underwater scene with swimming micro organisms
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
@@ -230,7 +230,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         if (savedEnemies && savedEnemies.length > 0) {
             // Restore saved enemies
             savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'plankton');
+                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'water_swimming_micro');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
                 enemy.startY = enemyData.startY || enemyData.y;
@@ -238,21 +238,21 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
             });
         } else {
             // Generate dynamic spawn points with random density distribution
-            // Plankton are floating enemies, so allow Y variance
+            // Water swimming micro enemies are floating enemies, so allow Y variance
             const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
                 SPAWN_CONFIG.defaults.baseInterval,
                 SPAWN_CONFIG.defaults.microWaterY,
                 true
             );
             
-            // Spawn plankton enemies at generated points
+            // Spawn water swimming micro enemies at generated points
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
-                    // Spawn boss plankton
-                    spawnEnemy(this, point.x, point.y, 'boss_plankton');
+                    // Spawn boss water swimming micro
+                    spawnEnemy(this, point.x, point.y, 'boss_water_swimming_micro');
                 } else {
-                    // Spawn regular plankton
-                    spawnEnemy(this, point.x, point.y, 'plankton');
+                    // Spawn regular water swimming micro
+                    spawnEnemy(this, point.x, point.y, 'water_swimming_micro');
                 }
             });
         }
@@ -393,7 +393,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         
         // Spawn new enemies
         for (let x = 300; x < WORLD_WIDTH; x += 400) {
-            spawnEnemy(this, x, 680, 'plankton');
+            spawnEnemy(this, x, 680, 'water_swimming_micro');
         }
         
         // Update HUD

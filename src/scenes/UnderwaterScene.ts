@@ -253,7 +253,7 @@ export default class UnderwaterScene extends Phaser.Scene {
             // Spawn fish enemies
             fishSpawns.forEach(point => {
                 if (point.isBoss) {
-                    spawnEnemy(this, point.x, point.y, 'boss_shark');
+                    spawnEnemy(this, point.x, point.y, 'boss_water_shark');
                 } else {
                     spawnEnemy(this, point.x, point.y, 'fish');
                 }
@@ -262,7 +262,7 @@ export default class UnderwaterScene extends Phaser.Scene {
             // Spawn crab enemies
             crabSpawns.forEach(point => {
                 if (point.isBoss) {
-                    spawnEnemy(this, point.x, point.y, 'boss_crab');
+                    spawnEnemy(this, point.x, point.y, 'boss_water_crab');
                 } else {
                     spawnEnemy(this, point.x, point.y, 'crab');
                 }
