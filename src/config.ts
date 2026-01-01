@@ -238,7 +238,8 @@ export const VISUAL_CONFIG = {
         height: 4, // Height of enemy health bars
         offsetY: 10, // Offset above enemy for health bar placement
         depth: 50, // Z-depth for health bar rendering
-        yDivisor: 2 // Divisor for calculating health bar Y offset
+        yDivisor: 2, // Divisor for calculating health bar Y offset
+        displayOriginY: 2 // Y origin point for health bar display
     },
     fishSpawn: {
         fishTextureThreshold: 0.25 // Probability threshold for water_enemy_fish_1 vs needle fish
