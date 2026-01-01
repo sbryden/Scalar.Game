@@ -38,11 +38,11 @@ export function fireProjectile(scene: Phaser.Scene): void {
     
     // Offset projectile spawn behind the vehicle (opposite of direction)
     const spawnOffsetX = direction === 1 ? PHYSICS_CONFIG.projectile.spawnOffsetX : -PHYSICS_CONFIG.projectile.spawnOffsetX;
-    const projectileX = gameState.player.x + spawnOffsetX;
+    const projectileX = player.x + spawnOffsetX;
     
     // Projectile spawns at configured height ratio from top of tank
-    const tankHeight = gameState.player.displayHeight;
-    const projectileY = gameState.player.y - tankHeight / 2 + PHYSICS_CONFIG.projectile.heightRatio * tankHeight;
+    const tankHeight = player.displayHeight;
+    const projectileY = player.y - tankHeight / 2 + PHYSICS_CONFIG.projectile.heightRatio * tankHeight;
     
     // Create projectile (torpedo underwater, beam on land)
     const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
