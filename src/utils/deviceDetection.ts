@@ -29,8 +29,15 @@ export function isTouchDevice(): boolean {
 /**
  * Check if touch controls should be enabled
  * Returns true for iPad and other touch devices
+ * Can be forced with ?touchControls=true URL parameter for testing
  */
 export function shouldEnableTouchControls(): boolean {
+    // Check for URL parameter to force enable touch controls for testing
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('touchControls') === 'true') {
+        return true;
+    }
+    
     return isIPad() || isTouchDevice();
 }
 
