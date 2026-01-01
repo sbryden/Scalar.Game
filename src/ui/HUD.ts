@@ -3,6 +3,7 @@
  * Manages health bar, XP bar, stamina bar, and level display
  */
 import Phaser from 'phaser';
+import { STAMINA_UI_CONFIG } from '../config';
 import type { PlayerStats } from '../types/game';
 
 export class HUD {
@@ -31,26 +32,30 @@ export class HUD {
     create(): void {
         const barWidth = 100;
         const barHeight = 8;
+        const barCenterX = 512;
+        const healthBarY = 30;
+        const xpBarY = 50;
+        const staminaBarY = 70;
         
         // Health bar
-        this.healthBarBackground = this.scene.add.rectangle(512, 30, barWidth, barHeight, 0x333333);
-        this.healthBar = this.scene.add.rectangle(512, 30, barWidth, barHeight, 0xFF0000);
+        this.healthBarBackground = this.scene.add.rectangle(barCenterX, healthBarY, barWidth, barHeight, 0x333333);
+        this.healthBar = this.scene.add.rectangle(barCenterX, healthBarY, barWidth, barHeight, 0xFF0000);
         this.healthBarBackground.setDepth(1000);
         this.healthBar.setDepth(1000);
         this.healthBarBackground.setScrollFactor(0);
         this.healthBar.setScrollFactor(0);
         
         // XP bar
-        this.xpBarBackground = this.scene.add.rectangle(512, 50, barWidth, barHeight, 0x333333);
-        this.xpBar = this.scene.add.rectangle(512, 50, barWidth, barHeight, 0x00FF00);
+        this.xpBarBackground = this.scene.add.rectangle(barCenterX, xpBarY, barWidth, barHeight, 0x333333);
+        this.xpBar = this.scene.add.rectangle(barCenterX, xpBarY, barWidth, barHeight, 0x00FF00);
         this.xpBarBackground.setDepth(1000);
         this.xpBar.setDepth(1000);
         this.xpBarBackground.setScrollFactor(0);
         this.xpBar.setScrollFactor(0);
         
         // Stamina bar
-        this.staminaBarBackground = this.scene.add.rectangle(512, 70, barWidth, barHeight, 0x333333);
-        this.staminaBar = this.scene.add.rectangle(512, 70, barWidth, barHeight, 0x00BFFF);
+        this.staminaBarBackground = this.scene.add.rectangle(barCenterX, staminaBarY, barWidth, barHeight, 0x333333);
+        this.staminaBar = this.scene.add.rectangle(barCenterX, staminaBarY, barWidth, barHeight, STAMINA_UI_CONFIG.colors.normal);
         this.staminaBarBackground.setDepth(1000);
         this.staminaBar.setDepth(1000);
         this.staminaBarBackground.setScrollFactor(0);
@@ -90,13 +95,13 @@ export class HUD {
         // Color code stamina bar based on percentage
         if (staminaPercent <= 0) {
             // Depleted - red
-            this.staminaBar?.setFillStyle(0xFF0000);
+            this.staminaBar?.setFillStyle(STAMINA_UI_CONFIG.colors.depleted);
         } else if (staminaPercent <= 0.2) {
             // Exhaustion threshold - orange
-            this.staminaBar?.setFillStyle(0xFF8800);
+            this.staminaBar?.setFillStyle(STAMINA_UI_CONFIG.colors.exhaustion);
         } else {
             // Normal - blue
-            this.staminaBar?.setFillStyle(0x00BFFF);
+            this.staminaBar?.setFillStyle(STAMINA_UI_CONFIG.colors.normal);
         }
     }
     

@@ -378,3 +378,13 @@ export const STAMINA_CONFIG = {
     xpOrbRestoration: 15,            // Stamina restored per XP orb collected
     staminaIncreasePerLevel: 10      // Max stamina increase per level up
 };
+
+// UI configuration for stamina display
+export const STAMINA_UI_CONFIG = {
+    exhaustionFlashDuration: 300,    // Duration of exhaustion flash effect (ms)
+    colors: {
+        normal: 0x00BFFF,            // Deep sky blue for normal stamina (>20%)
+        exhaustion: 0xFF8800,        // Orange for exhaustion warning (≤20%)
+        depleted: 0xFF0000           // Red for depleted (0%)
+    }
+};

@@ -1,12 +1,8 @@
-/**
- * Input Manager
- * Handles all keyboard input setup and player movement controls
- */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
-import { SIZE_CONFIG, GOD_MODE_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
@@ -130,9 +126,9 @@ export class InputManager {
             const staminaState = staminaSystem.getState();
             if (staminaState.isExhausted) {
                 // Add orange/red tint to indicate exhaustion
-                gameState.player.setTint(0xff8844);
-                // Clear tint after a short delay
-                this.scene.time.delayedCall(300, () => {
+                gameState.player.setTint(STAMINA_UI_CONFIG.colors.exhaustion);
+                // Clear tint after configured delay
+                this.scene.time.delayedCall(STAMINA_UI_CONFIG.exhaustionFlashDuration, () => {
                     if (gameState.player && !gameState.player.isMeleeMode) {
                         gameState.player.clearTint();
                     }

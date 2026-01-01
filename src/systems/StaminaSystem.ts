@@ -169,7 +169,7 @@ export class StaminaSystem {
      */
     increaseMaxStamina(amount: number): void {
         this.state.max += amount;
-        // Optionally restore to max on level up
+        // Restore to max on level up
         this.state.current = this.state.max;
     }
 
