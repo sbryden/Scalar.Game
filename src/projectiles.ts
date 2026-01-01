@@ -1,6 +1,7 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG } from './config';
 import gameState from './utils/gameState';
 import playerStatsSystem from './systems/PlayerStatsSystem';
+import levelStatsTracker from './systems/LevelStatsTracker';
 import type { WASDKeys, Projectile } from './types/game';
 
 let lastProjectileTime = 0;
@@ -75,6 +76,9 @@ export function fireProjectile(scene: Phaser.Scene): void {
     // Track projectile spawn position and max range (based on viewport width, not world width)
     projectile.spawnX = projectileX;
     projectile.maxRange = VISUAL_CONFIG.viewportWidth * PHYSICS_CONFIG.projectile.maxRangeMultiplier;
+    
+    // Track projectile fired for stats
+    levelStatsTracker.recordProjectileFired();
 }
 
 export function updateProjectiles(): void {
