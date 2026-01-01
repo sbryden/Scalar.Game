@@ -183,7 +183,7 @@ export default class ConfigEditorScene extends Phaser.Scene {
     }
     
     setupScrolling(): void {
-        this.input.on('wheel', (pointer: any, gameObjects: any, deltaX: number, deltaY: number, deltaZ: number) => {
+        this.input.on('wheel', (pointer: any, gameObjects: any, deltaX: number, deltaY: number) => {
             // Prevent default browser scrolling
             if (pointer.event) {
                 pointer.event.preventDefault();
