@@ -1,4 +1,4 @@
-import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG, PHYSICS_CONFIG } from './config';
+import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, PHYSICS_CONFIG } from './config';
 import gameState from './utils/gameState';
 import type { PlayerSize, Enemy } from './types/game';
 
