@@ -447,21 +447,17 @@ export default class MenuScene extends Phaser.Scene {
         yPos += 35;
         const controlsList = [
             'WASD / Arrow Keys - Move',
-            'SPACE - Jump (Land)',
-            'SPACE - Up Thrust (Water)',
-            'Q / E - Change Size',
-            'F - Fire Projectile',
-            'SHIFT - Melee Mode',
-            '',
-            'Y / N - Continue / Quit',
-            'R / E - Replay / Exit'
+            'SPACE - Jump / Thrust',
+            'Q / E - Shrink / Grow',
+            'F - Fire',
+            'SHIFT - Shield / Melee'
         ];
         
         const controlsText = this.add.text(leftX, yPos, controlsList.join('\n'), {
-            fontSize: '14px',
+            fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff',
-            lineSpacing: 4
+            lineSpacing: 6
         });
         controlsText.setOrigin(0.5, 0);
         
@@ -479,20 +475,16 @@ export default class MenuScene extends Phaser.Scene {
         const landList = [
             '• Drive a tank',
             '• Fire beam projectiles',
-            '• Jump to avoid obstacles',
-            '• Side-scrolling movement',
-            '• Gravity affects movement',
-            '',
-            'Size Changes:',
-            '• Normal: Standard tank',
-            '• Small: Enter micro world'
+            '• Jump and dodge',
+            '• Change size to explore',
+            '  different scales'
         ];
         
         const landText = this.add.text(centerX, yPos, landList.join('\n'), {
-            fontSize: '14px',
+            fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff',
-            lineSpacing: 4
+            lineSpacing: 6
         });
         landText.setOrigin(0.5, 0);
         
@@ -510,26 +502,22 @@ export default class MenuScene extends Phaser.Scene {
         const waterList = [
             '• Pilot a submarine',
             '• Fire torpedoes',
-            '• Full directional control',
-            '• W/S for up/down thrust',
-            '• Slower projectiles (50%)',
-            '',
-            'Size Changes:',
-            '• Normal: Standard sub',
-            '• Small: Enter micro world'
+            '• Thrust in all directions',
+            '• Explore underwater',
+            '  environments'
         ];
         
         const waterText = this.add.text(rightX, yPos, waterList.join('\n'), {
-            fontSize: '14px',
+            fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff',
-            lineSpacing: 4
+            lineSpacing: 6
         });
         waterText.setOrigin(0.5, 0);
         
         // Combat section (Full width at bottom)
-        yPos = 400;
-        const combatTitle = this.add.text(width / 2, yPos, '⚔️ COMBAT MECHANICS', {
+        yPos = 320;
+        const combatTitle = this.add.text(width / 2, yPos, '⚔️ COMBAT', {
             fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
             fontStyle: 'bold',
@@ -539,27 +527,20 @@ export default class MenuScene extends Phaser.Scene {
         
         yPos += 35;
         const combatList = [
-            'Projectile Attacks:  Press F to fire. Deals 10 damage per hit.',
+            'Fire projectiles to damage enemies',
             '',
-            'Melee Combat:  Hold SHIFT to activate melee mode (blue tint).',
-            '  • Collision damage: 15 damage to enemies',
-            '  • Damage reduction: Take 75% less damage from enemies',
-            '  • Knockback: Enemies pushed away and stunned',
-            '',
-            'Passive Collisions:  Ramming enemies without melee mode.',
-            '  • Moving toward enemy: 3 damage',
-            '  • Moving away: No damage',
-            '  • Both take damage and get knocked back',
-            '',
-            'God Mode:  Projectiles and melee attacks deal 1000 damage. You take no damage.'
+            'Hold SHIFT for shield/melee mode:',
+            '  • Ram enemies for extra damage',
+            '  • Take less damage from collisions',
+            '  • Enemies are knocked back'
         ];
         
         const combatText = this.add.text(width / 2, yPos, combatList.join('\n'), {
-            fontSize: '13px',
+            fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff',
             align: 'center',
-            lineSpacing: 2
+            lineSpacing: 6
         });
         combatText.setOrigin(0.5, 0);
         
