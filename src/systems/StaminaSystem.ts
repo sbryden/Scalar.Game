@@ -17,6 +17,7 @@ export interface StaminaState {
     rechargeRate: number;       // Stamina recharged per second
     consumptionRate: number;    // Stamina consumed per second in melee mode
     exhaustionThreshold: number; // Percentage (0.2 = 20%)
+    depletionPauseRemaining: number; // Time left in depletion pause (in ms)
 }
 
 export interface StaminaConfig {
@@ -27,6 +28,7 @@ export interface StaminaConfig {
     exhaustionThreshold: number;   // 0.2 = 20%
     xpOrbRestoration: number;      // Fixed amount per orb
     staminaIncreasePerLevel: number; // Max stamina increase per level
+    depletionPauseDuration: number; // Time to pause before recharging when stamina hits 0 (in ms)
 }
 
 type StaminaDepletedCallback = () => void;
@@ -47,7 +49,8 @@ export class StaminaSystem {
             needsReset: false,
             rechargeRate: config.rechargeRate,
             consumptionRate: config.consumptionRate,
-            exhaustionThreshold: config.exhaustionThreshold
+            exhaustionThreshold: config.exhaustionThreshold,
+            depletionPauseRemaining: 0
         };
         this.onStaminaDepleted = null;
         this.lastUpdateTime = Date.now();
@@ -87,14 +90,21 @@ export class StaminaSystem {
      */
     update(isMeleeActive: boolean): void {
         const now = Date.now();
-        const deltaSeconds = (now - this.lastUpdateTime) / 1000;
+        const deltaMs = now - this.lastUpdateTime;
+        const deltaSeconds = deltaMs / 1000;
         this.lastUpdateTime = now;
+
+        // Decrease depletion pause timer
+        if (this.state.depletionPauseRemaining > 0) {
+            this.state.depletionPauseRemaining -= deltaMs;
+            this.state.depletionPauseRemaining = Math.max(0, this.state.depletionPauseRemaining);
+        }
 
         if (isMeleeActive) {
             // Consume stamina while melee mode is active
             this.consumeStamina(this.state.consumptionRate * deltaSeconds);
-        } else if (!this.state.needsReset) {
-            // Recharge stamina when not in melee mode
+        } else if (this.state.depletionPauseRemaining <= 0) {
+            // Recharge stamina when not in melee mode and depletion pause has expired
             this.rechargeStamina(this.state.rechargeRate * deltaSeconds);
         }
 
@@ -113,6 +123,9 @@ export class StaminaSystem {
         if (previousStamina > 0 && this.state.current === 0) {
             this.state.isDepleted = true;
             this.state.needsReset = true;
+            
+            // Start depletion pause before recharge can resume
+            this.state.depletionPauseRemaining = this.config.depletionPauseDuration;
             
             // Trigger depletion callback
             if (this.onStaminaDepleted) {
@@ -189,6 +202,7 @@ export class StaminaSystem {
         this.state.isExhausted = false;
         this.state.isDepleted = false;
         this.state.needsReset = false;
+        this.state.depletionPauseRemaining = 0;
         this.lastUpdateTime = Date.now();
     }
 
