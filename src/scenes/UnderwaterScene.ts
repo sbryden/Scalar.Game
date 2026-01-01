@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -246,13 +247,19 @@ export default class UnderwaterScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial underwater enemies (80% fish, 20% crabs)
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            const spawnInterval = getEnemySpawnInterval();
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 const enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
                 spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
             }
             
             // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 400, 'boss_fish');
+            // Randomly choose between shark boss (swimming) or crab boss (ground)
+            const bossType = Math.random() < 0.5 ? 'boss_shark' : 'boss_crab';
+            // Boss shark swims at mid-depth, boss crab on ground (adjusted for 3x scale)
+            const bossY = bossType === 'boss_shark' ? 400 : 600;
+            spawnEnemy(this, 7500, bossY, bossType);
         }
     }
     
@@ -364,7 +371,10 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.startImmunityFlash(this.player);
         
         // Disable collisions with enemies temporarily
-        this.physics.world.removeCollider(this.collisionManager.playerEnemyCollider);
+        const collider = this.collisionManager.playerEnemyCollider;
+        if (collider) {
+            this.physics.world.removeCollider(collider);
+        }
         
         // Re-enable collisions after immunity ends
         this.time.delayedCall(2000, () => {
@@ -424,15 +434,18 @@ export default class UnderwaterScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.UnderwaterScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map((enemy: Enemy) => ({
-                x: enemy.x,
-                y: enemy.y,
-                health: enemy.health,
-                startX: enemy.startX,
-                startY: enemy.startY,
-                direction: enemy.direction,
-                enemyType: enemy.enemyType
-            }));
+            .map((enemy) => {
+                const e = enemy as Enemy;
+                return {
+                    x: e.x,
+                    y: e.y,
+                    health: e.health,
+                    startX: e.startX,
+                    startY: e.startY,
+                    direction: e.direction,
+                    enemyType: e.enemyType
+                };
+            });
         
         // Save player position
         if (this.player) {

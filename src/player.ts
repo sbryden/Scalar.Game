@@ -16,18 +16,18 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     const currentScene = gameState.currentSceneKey;
     
     // All scenes only allow small and normal sizes
-    const sizeOrder = ['small', 'normal'];
+    const sizeOrder: PlayerSize[] = ['small', 'normal'];
     const currentIndex = sizeOrder.indexOf(currentSize);
     
-    let newSize;
+    let newSize: string;
     if (direction === 'smaller') {
         // Can't go smaller than small
         if (currentIndex <= 0) return;
-        newSize = sizeOrder[currentIndex - 1];
+        newSize = sizeOrder[currentIndex - 1]!;
     } else if (direction === 'larger') {
         // Can't go larger than normal
         if (currentIndex >= sizeOrder.length - 1) return;
-        newSize = sizeOrder[currentIndex + 1];
+        newSize = sizeOrder[currentIndex + 1]!;
     } else {
         // Direct size specification (for backwards compatibility)
         newSize = direction;
@@ -46,7 +46,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     if (newSize === 'small' && currentScene === 'MainGameScene') {
         gameState.playerSize = newSize;
         gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-        gameState.scene.scene.start('MicroScene');
+        gameState.scene?.scene.start('MicroScene');
         return;
     }
     
@@ -54,7 +54,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     if (newSize === 'normal' && currentScene === 'MicroScene') {
         gameState.playerSize = newSize;
         gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-        gameState.scene.scene.start('MainGameScene');
+        gameState.scene?.scene.start('MainGameScene');
         return;
     }
     
@@ -63,7 +63,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     if (newSize === 'small' && currentScene === 'UnderwaterScene') {
         gameState.playerSize = newSize;
         gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-        gameState.scene.scene.start('UnderwaterMicroScene');
+        gameState.scene?.scene.start('UnderwaterMicroScene');
         return;
     }
     
@@ -71,20 +71,23 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     if (newSize === 'normal' && currentScene === 'UnderwaterMicroScene') {
         gameState.playerSize = newSize;
         gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-        gameState.scene.scene.start('UnderwaterScene');
+        gameState.scene?.scene.start('UnderwaterScene');
         return;
     }
     
     // Apply new size (simplified - no complex scaling needed)
-    gameState.playerSize = newSize;
+    gameState.playerSize = newSize as PlayerSize;
     const config = SIZE_CONFIG[newSize];
     
     // Base scale for the tank sprite
     const baseDisplayScale = PHYSICS_CONFIG.player.baseDisplayScale;
     
     // Apply new scale
-    gameState.player!.setScale(baseDisplayScale * config.scale);
-    gameState.player!.body.updateFromGameObject();
+    const player = gameState.player;
+    if (!player) return;
+    
+    player.setScale(baseDisplayScale * config.scale);
+    player.body.updateFromGameObject();
     
     // Small jump to account for size change
     gameState.player.body.setVelocityY(PHYSICS_CONFIG.player.sizeChangeJumpVelocity);

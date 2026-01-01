@@ -6,7 +6,8 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
-import { SIZE_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG } from '../config';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -52,17 +53,17 @@ export class InputManager {
         
         if (!isUnderwater) {
             // Jump (only for land environments)
-            this.scene.input.keyboard.on('keydown-SPACE', () => {
+            this.scene.input.keyboard?.on('keydown-SPACE', () => {
                 this.handleJump();
             });
         }
         
         // Size changes - Q for smaller, E for larger (one step at a time)
-        this.scene.input.keyboard.on('keydown-Q', () => changeSize('smaller'));
-        this.scene.input.keyboard.on('keydown-E', () => changeSize('larger'));
+        this.scene.input.keyboard?.on('keydown-Q', () => changeSize('smaller'));
+        this.scene.input.keyboard?.on('keydown-E', () => changeSize('larger'));
         
         // Attack
-        this.scene.input.keyboard.on('keydown-F', () => {
+        this.scene.input.keyboard?.on('keydown-F', () => {
             if (gameState.player) {
                 fireProjectile(gameState.player.scene);
             }
@@ -73,13 +74,17 @@ export class InputManager {
      * Handle jump action
      */
     handleJump(): void {
-        if (!gameState.player || !gameState.player.body.touching.down) {
+        const player = gameState.player;
+        if (!player || !player.body.touching.down) {
             return;
         }
         
-        const body = gameState.player.body;
+        const body = player.body;
         const currentVelocityX = body.velocity.x;
-        const jumpPower = 330 * SIZE_CONFIG[getPlayerSize()].jumpMultiplier;
+        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        if (!sizeConfig) return;
+        
+        const jumpPower = 330 * sizeConfig.jumpMultiplier;
         body.setVelocityY(-jumpPower);
         body.setVelocityX(currentVelocityX);
     }
@@ -126,7 +131,16 @@ export class InputManager {
      */
     handleLandMovement(): void {
         const baseSpeed = 160;
-        const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
+        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        if (!sizeConfig) return;
+        
+        let speedMultiplier = sizeConfig.speedMultiplier;
+        
+        // Apply god mode speed multiplier if active
+        if (playerStatsSystem.isGodMode()) {
+            speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
+        }
+        
         const body = gameState.player!.body;
         
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
@@ -146,7 +160,16 @@ export class InputManager {
     handleUnderwaterMovement(): void {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
-        const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
+        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        if (!sizeConfig) return;
+        
+        let speedMultiplier = sizeConfig.speedMultiplier;
+        
+        // Apply god mode speed multiplier if active
+        if (playerStatsSystem.isGodMode()) {
+            speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
+        }
+        
         const body = gameState.player!.body;
         
         // Horizontal movement
@@ -176,6 +199,6 @@ export class InputManager {
      * Cleanup input handlers
      */
     destroy(): void {
-        this.scene.input.keyboard.removeAllListeners();
+        this.scene.input.keyboard?.removeAllListeners();
     }
 }
