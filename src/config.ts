@@ -26,6 +26,34 @@ export const SIZE_CONFIG: Record<string, {
 
 export const SIZE_CHANGE_COOLDOWN = 500;
 
+// Dynamic spawn configuration
+export const SPAWN_CONFIG = {
+    // Segment-based spawning (world divided into 16 segments)
+    segmentCount: 16,
+    // Density range for random assignment (multipliers)
+    densityRange: {
+        min: 0.3,    // Minimum density multiplier
+        max: 1.8     // Maximum density multiplier
+    },
+    // Random variance in spawn positions
+    positionVariance: {
+        x: 50,         // +/- 25 pixels in X
+        y: 100         // +/- 50 pixels in Y (for swimming enemies)
+    },
+    // Default spawn parameters per scene type
+    defaults: {
+        baseInterval: 300,        // Base spawn interval in pixels
+        groundY: 680,             // Y position for ground enemies
+        midWaterY: 400,           // Y position for mid-water swimming enemies
+        microWaterY: 350,         // Y position for micro underwater enemies
+        bossGroundY: 550,         // Y position for ground bosses
+        bossCrabY: 600,           // Y position for crab bosses
+        minSpawnX: 300,           // Minimum X spawn boundary
+        minSpawnY: 100,           // Minimum Y spawn boundary
+        maxSpawnY: 700            // Maximum Y spawn boundary
+    }
+};
+
 // Enemy configuration
 export const ENEMY_CONFIG: Record<string, {
     width: number;

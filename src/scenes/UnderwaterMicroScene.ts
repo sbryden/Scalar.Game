@@ -3,8 +3,8 @@
  * Microscopic underwater scene with plankton and microorganisms
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
+import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -236,15 +236,24 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Spawn initial micro enemies (all floating plankton-like)
-            const spawnInterval = getEnemySpawnInterval();
+            // Generate dynamic spawn points with random density distribution
+            // Plankton are floating enemies, so allow Y variance
+            const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
+                SPAWN_CONFIG.defaults.baseInterval,
+                SPAWN_CONFIG.defaults.microWaterY,
+                true
+            );
             
-            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
-                spawnEnemy(this, x, 300 + Math.random() * 200, 'plankton');
-            }
-            
-            // Spawn boss enemy toward the end of the level (adjusted for 3x scale)
-            spawnEnemy(this, 7500, 500, 'boss_plankton');
+            // Spawn plankton enemies at generated points
+            spawnPoints.forEach(point => {
+                if (point.isBoss) {
+                    // Spawn boss plankton
+                    spawnEnemy(this, point.x, point.y, 'boss_plankton');
+                } else {
+                    // Spawn regular plankton
+                    spawnEnemy(this, point.x, point.y, 'plankton');
+                }
+            });
         }
     }
     
