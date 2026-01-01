@@ -9,6 +9,7 @@ import levelProgressionSystem from '../systems/LevelProgressionSystem';
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
     selectedEnvironment!: string;
+    bossMode!: boolean;
     dropdownOpen!: boolean;
     environmentDropdownOpen!: boolean;
     dropdownContainer!: Phaser.GameObjects.Container;
@@ -28,6 +29,7 @@ export default class MenuScene extends Phaser.Scene {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
         this.selectedEnvironment = 'land';
+        this.bossMode = false;
         this.dropdownOpen = false;
         this.environmentDropdownOpen = false;
     }
@@ -88,8 +90,11 @@ export default class MenuScene extends Phaser.Scene {
         // Create environment dropdown
         this.createEnvironmentDropdown(width / 2, 465);
         
+        // Boss Mode checkbox
+        this.createBossModeCheckbox(width / 2, 530);
+        
         // Start button
-        this.createStartButton(width / 2, 560);
+        this.createStartButton(width / 2, 590);
         
         // Instructions
         const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
@@ -314,6 +319,45 @@ export default class MenuScene extends Phaser.Scene {
         this.toggleEnvironmentDropdown();
     }
 
+    createBossModeCheckbox(centerX: number, y: number): void {
+        const checkboxSize = 24;
+        const spacing = 10;
+        
+        // Checkbox background
+        const checkbox = this.add.rectangle(centerX - 80, y, checkboxSize, checkboxSize, 0x2c3e50);
+        checkbox.setStrokeStyle(2, 0x3498db);
+        checkbox.setInteractive({ useHandCursor: true });
+        
+        // Checkmark (initially hidden)
+        const checkmark = this.add.text(centerX - 80, y, '✓', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#00ff88',
+            fontStyle: 'bold'
+        });
+        checkmark.setOrigin(0.5);
+        checkmark.setVisible(false);
+        
+        // Label
+        const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'Boss Mode (Testing)', {
+            fontSize: '18px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff'
+        });
+        label.setOrigin(0, 0.5);
+        
+        // Toggle functionality
+        checkbox.on('pointerover', () => {
+            checkbox.setStrokeStyle(2, 0x5dade2);
+        });
+        checkbox.on('pointerout', () => {
+            checkbox.setStrokeStyle(2, 0x3498db);
+        });
+        checkbox.on('pointerdown', () => {
+            this.bossMode = !this.bossMode;
+            checkmark.setVisible(this.bossMode);
+        });
+    }
     
     createStartButton(centerX: number, y: number): void {
         const buttonWidth = 200;
@@ -340,9 +384,10 @@ export default class MenuScene extends Phaser.Scene {
             startText.setScale(1);
         });
         startButton.on('pointerdown', () => {
-            // Store difficulty and environment in registry for access by other scenes
+            // Store difficulty, environment, and boss mode in registry for access by other scenes
             this.registry.set('difficulty', this.selectedDifficulty);
             this.registry.set('gameEnvironment', this.selectedEnvironment);
+            this.registry.set('bossMode', this.bossMode);
             
             // Reset to level 1 when starting a new game
             levelProgressionSystem.resetToLevel1();

@@ -3,7 +3,7 @@
  * Submarine gameplay scene with lighter gravity
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, BOSS_MODE_CONFIG } from '../config';
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -251,6 +251,9 @@ export default class UnderwaterScene extends Phaser.Scene {
     restoreOrSpawnEnemies() {
         // Check if we have saved enemies for this scene
         const savedEnemies = gameState.savedEnemies.UnderwaterScene;
+
+        // Check if boss mode is active
+        const bossMode = this.registry.get('bossMode') === true;
         
         if (savedEnemies && savedEnemies.length > 0) {
             // Restore saved enemies
@@ -262,26 +265,44 @@ export default class UnderwaterScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Generate dynamic mixed spawn points (80% fish, 20% crabs)
-            const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
-            
-            // Spawn fish enemies
-            fishSpawns.forEach(point => {
-                if (point.isBoss) {
+            if (bossMode) {
+                // Boss mode: spawn only bosses (shark + crab)
+                const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
+                
+                // Spawn boss fish
+                fishSpawns.forEach(point => {
                     spawnEnemy(this, point.x, point.y, 'boss_water_shark');
-                } else {
-                    spawnEnemy(this, point.x, point.y, 'fish');
-                }
-            });
-            
-            // Spawn crab enemies
-            crabSpawns.forEach(point => {
-                if (point.isBoss) {
+                });
+                
+                // Spawn boss crabs
+                crabSpawns.forEach(point => {
                     spawnEnemy(this, point.x, point.y, 'boss_water_crab');
-                } else {
-                    spawnEnemy(this, point.x, point.y, 'crab');
-                }
-            });
+                });
+                
+                // Set total bosses for tracking
+                combatSystem.setTotalBosses(fishSpawns.length + crabSpawns.length);
+            } else {
+                // Normal mode: Generate dynamic mixed spawn points (80% fish, 20% crabs)
+                const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
+                
+                // Spawn fish enemies
+                fishSpawns.forEach(point => {
+                    if (point.isBoss) {
+                        spawnEnemy(this, point.x, point.y, 'boss_water_shark');
+                    } else {
+                        spawnEnemy(this, point.x, point.y, 'fish');
+                    }
+                });
+                
+                // Spawn crab enemies
+                crabSpawns.forEach(point => {
+                    if (point.isBoss) {
+                        spawnEnemy(this, point.x, point.y, 'boss_water_crab');
+                    } else {
+                        spawnEnemy(this, point.x, point.y, 'crab');
+                    }
+                });
+            }
         }
     }
     
@@ -317,6 +338,15 @@ export default class UnderwaterScene extends Phaser.Scene {
         
         // Update HUD
         this.hud.update(playerStats);
+        
+        // Update boss count display if in boss mode
+        const bossMode = this.registry.get('bossMode') === true;
+        if (bossMode) {
+            const bossProgress = combatSystem.getBossProgress();
+            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
+        } else {
+            this.hud.hideBossCount();
+        }
         
         // Update size change cooldown
         let timer = getSizeChangeTimer();
