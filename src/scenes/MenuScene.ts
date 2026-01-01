@@ -22,6 +22,8 @@ export default class MenuScene extends Phaser.Scene {
     environmentDropdownArrow!: Phaser.GameObjects.Text;
     environmentOptionsContainer!: Phaser.GameObjects.Container;
     environmentOptionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
+    infoScreenVisible!: boolean;
+    infoScreenContainer!: Phaser.GameObjects.Container | null;
 
     constructor() {
         super({ key: 'MenuScene' });
@@ -29,6 +31,8 @@ export default class MenuScene extends Phaser.Scene {
         this.selectedEnvironment = 'land';
         this.dropdownOpen = false;
         this.environmentDropdownOpen = false;
+        this.infoScreenVisible = false;
+        this.infoScreenContainer = null;
     }
     
     create(): void {
@@ -88,16 +92,19 @@ export default class MenuScene extends Phaser.Scene {
         this.createEnvironmentDropdown(width / 2, 465);
         
         // Start button
-        this.createStartButton(width / 2, 560);
+        this.createStartButton(width / 2, 540);
         
-        // Instructions
-        const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
+        // Help text - click to view full controls and info
+        const helpText = this.add.text(width / 2, 620, 'Click "INFO" for controls and gameplay details', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
-            color: '#ffffff'
+            color: '#00ff88'
         });
-        instructions.setOrigin(0.5);
-        instructions.setAlpha(0.6);
+        helpText.setOrigin(0.5);
+        helpText.setAlpha(0.7);
+        
+        // Info button
+        this.createInfoButton(width / 2, 670);
     }
     
     createDifficultyDropdown(centerX: number, y: number): void {
@@ -359,5 +366,243 @@ export default class MenuScene extends Phaser.Scene {
                 this.scene.start('MainGameScene');
             }
         });
+    }
+    
+    createInfoButton(centerX: number, y: number): void {
+        const buttonWidth = 120;
+        const buttonHeight = 40;
+        
+        const infoButton = this.add.rectangle(centerX, y, buttonWidth, buttonHeight, 0x2c3e50);
+        infoButton.setStrokeStyle(2, 0x3498db);
+        const infoText = this.add.text(centerX, y, 'INFO', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        infoText.setOrigin(0.5);
+        
+        infoButton.setInteractive({ useHandCursor: true });
+        infoButton.on('pointerover', () => {
+            infoButton.setFillStyle(0x34495e);
+            infoButton.setScale(1.05);
+            infoText.setScale(1.05);
+        });
+        infoButton.on('pointerout', () => {
+            infoButton.setFillStyle(0x2c3e50);
+            infoButton.setScale(1);
+            infoText.setScale(1);
+        });
+        infoButton.on('pointerdown', () => {
+            this.showInfoScreen();
+        });
+    }
+    
+    showInfoScreen(): void {
+        if (this.infoScreenVisible) return;
+        
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        
+        this.infoScreenContainer = this.add.container(0, 0);
+        this.infoScreenContainer.setDepth(1000);
+        
+        // Semi-transparent overlay
+        const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.9);
+        overlay.setInteractive();
+        
+        // Background panel
+        const panelWidth = 900;
+        const panelHeight = 650;
+        const panel = this.add.rectangle(width / 2, height / 2, panelWidth, panelHeight, 0x1a1a2e);
+        panel.setStrokeStyle(3, 0x00ff88);
+        
+        // Title
+        const title = this.add.text(width / 2, 80, 'CONTROLS & GAMEPLAY', {
+            fontSize: '32px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#00ff88'
+        });
+        title.setOrigin(0.5);
+        
+        // Create three columns
+        const leftX = width / 2 - 280;
+        const centerX = width / 2;
+        const rightX = width / 2 + 280;
+        let yPos = 140;
+        
+        // Controls section (Left)
+        const controlsTitle = this.add.text(leftX, yPos, '⌨️ CONTROLS', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        controlsTitle.setOrigin(0.5);
+        
+        yPos += 35;
+        const controlsList = [
+            'WASD / Arrow Keys - Move',
+            'SPACE - Jump (Land)',
+            '         Up Thrust (Water)',
+            'Q / E - Change Size',
+            'F - Fire Projectile',
+            'SHIFT - Melee Mode',
+            '',
+            'Y / N - Continue / Quit',
+            'R / E - Replay / Exit'
+        ];
+        
+        const controlsText = this.add.text(leftX, yPos, controlsList.join('\n'), {
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff',
+            lineSpacing: 4
+        });
+        controlsText.setOrigin(0.5, 0);
+        
+        // Land Gameplay section (Center)
+        yPos = 140;
+        const landTitle = this.add.text(centerX, yPos, '🚜 LAND GAMEPLAY', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        landTitle.setOrigin(0.5);
+        
+        yPos += 35;
+        const landList = [
+            '• Drive a tank',
+            '• Fire beam projectiles',
+            '• Jump to avoid obstacles',
+            '• Side-scrolling movement',
+            '• Gravity affects movement',
+            '',
+            'Size Changes:',
+            '• Normal: Standard tank',
+            '• Small: Enter micro world'
+        ];
+        
+        const landText = this.add.text(centerX, yPos, landList.join('\n'), {
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff',
+            lineSpacing: 4
+        });
+        landText.setOrigin(0.5, 0);
+        
+        // Underwater Gameplay section (Right)
+        yPos = 140;
+        const waterTitle = this.add.text(rightX, yPos, '🌊 UNDERWATER', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        waterTitle.setOrigin(0.5);
+        
+        yPos += 35;
+        const waterList = [
+            '• Pilot a submarine',
+            '• Fire torpedoes',
+            '• Full directional control',
+            '• W/S for up/down thrust',
+            '• Slower projectiles (50%)',
+            '',
+            'Size Changes:',
+            '• Normal: Standard sub',
+            '• Small: Enter micro world'
+        ];
+        
+        const waterText = this.add.text(rightX, yPos, waterList.join('\n'), {
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff',
+            lineSpacing: 4
+        });
+        waterText.setOrigin(0.5, 0);
+        
+        // Combat section (Full width at bottom)
+        yPos = 400;
+        const combatTitle = this.add.text(width / 2, yPos, '⚔️ COMBAT MECHANICS', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        combatTitle.setOrigin(0.5);
+        
+        yPos += 35;
+        const combatList = [
+            'Projectile Attacks:  Press F to fire. Deals 10 damage per hit.',
+            '',
+            'Melee Combat:  Hold SHIFT to activate melee mode (blue tint).',
+            '  • Collision damage: 15 damage to enemies',
+            '  • Damage reduction: Take 75% less damage from enemies',
+            '  • Knockback: Enemies pushed away and stunned',
+            '',
+            'Passive Collisions:  Ramming enemies without melee mode.',
+            '  • Moving toward enemy: 3 damage',
+            '  • Moving away: No damage',
+            '  • Both take damage and get knocked back',
+            '',
+            'God Mode:  Projectiles and melee attacks deal 1000 damage. You take no damage.'
+        ];
+        
+        const combatText = this.add.text(width / 2, yPos, combatList.join('\n'), {
+            fontSize: '13px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff',
+            align: 'center',
+            lineSpacing: 2
+        });
+        combatText.setOrigin(0.5, 0);
+        
+        // Close button
+        const closeButton = this.add.rectangle(width / 2, height - 60, 150, 50, 0x2196F3);
+        const closeText = this.add.text(width / 2, height - 60, 'CLOSE', {
+            fontSize: '24px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        closeText.setOrigin(0.5);
+        
+        closeButton.setInteractive({ useHandCursor: true });
+        closeButton.on('pointerover', () => {
+            closeButton.setFillStyle(0x42A5F5);
+            closeButton.setScale(1.05);
+            closeText.setScale(1.05);
+        });
+        closeButton.on('pointerout', () => {
+            closeButton.setFillStyle(0x2196F3);
+            closeButton.setScale(1);
+            closeText.setScale(1);
+        });
+        closeButton.on('pointerdown', () => {
+            this.hideInfoScreen();
+        });
+        
+        // Add all elements to container
+        this.infoScreenContainer.add([
+            overlay, panel, title,
+            controlsTitle, controlsText,
+            landTitle, landText,
+            waterTitle, waterText,
+            combatTitle, combatText,
+            closeButton, closeText
+        ]);
+        
+        this.infoScreenVisible = true;
+    }
+    
+    hideInfoScreen(): void {
+        if (this.infoScreenContainer) {
+            this.infoScreenContainer.destroy();
+            this.infoScreenContainer = null;
+        }
+        this.infoScreenVisible = false;
     }
 }
