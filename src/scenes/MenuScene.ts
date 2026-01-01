@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
+import levelProgressionSystem from '../systems/LevelProgressionSystem';
 
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
@@ -342,6 +343,9 @@ export default class MenuScene extends Phaser.Scene {
             // Store difficulty and environment in registry for access by other scenes
             this.registry.set('difficulty', this.selectedDifficulty);
             this.registry.set('gameEnvironment', this.selectedEnvironment);
+            
+            // Reset to level 1 when starting a new game
+            levelProgressionSystem.resetToLevel1();
             
             // Clear saved enemies when starting a new game
             gameState.savedEnemies = {

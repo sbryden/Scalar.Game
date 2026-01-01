@@ -461,3 +461,17 @@ export const STAMINA_UI_CONFIG = {
         depleted: 0xFF0000           // Red for depleted (0%)
     }
 };
+
+// Progressive Level System configuration
+export const LEVEL_SYSTEM_CONFIG = {
+    startingLevel: 1,                // Starting level
+    enemyCountBase: 1.0,             // Base enemy count multiplier (level 1)
+    enemyCountIncreasePerLevel: 0.2, // +20% enemy count per level
+    enemyHealthBase: 1.0,            // Base enemy health multiplier (level 1)
+    enemyHealthIncreasePerLevel: 0.15, // +15% enemy health per level
+    enemyDamageBase: 1.0,            // Base enemy damage multiplier (level 1)
+    enemyDamageIncreasePerLevel: 0.10, // +10% enemy damage per level
+    enemySpeedBase: 1.0,             // Base enemy speed multiplier (level 1)
+    enemySpeedIncreasePerLevel: 0.05, // +5% enemy speed per level
+    maxLevel: 99                     // Maximum level (for UI display purposes)
+};
