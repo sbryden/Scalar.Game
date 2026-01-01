@@ -443,6 +443,6 @@ export const LEVEL_SYSTEM_CONFIG = {
     enemyDamageBase: 1.0,            // Base enemy damage multiplier (level 1)
     enemyDamageIncreasePerLevel: 0.10, // +10% enemy damage per level
     enemySpeedBase: 1.0,             // Base enemy speed multiplier (level 1)
-    enemySpeedIncreasePerLevel: 0.05, // +5% enemy speed per level (rare increases)
+    enemySpeedIncreasePerLevel: 0.05, // +5% enemy speed per level
     maxLevel: 99                     // Maximum level (for UI display purposes)
 };

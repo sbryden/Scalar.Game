@@ -24,8 +24,7 @@ class LevelProgressionSystem {
      * Advance to the next level
      */
     advanceToNextLevel(): void {
-        const nextLevel = gameState.currentMapLevel + 1;
-        this.setLevel(nextLevel);
+        this.setLevel(gameState.currentMapLevel + 1);
     }
 
     /**
