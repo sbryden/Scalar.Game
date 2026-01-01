@@ -53,7 +53,7 @@ export class StaminaSystem {
             depletionPauseRemaining: 0
         };
         this.onStaminaDepleted = null;
-        this.lastUpdateTime = Date.now();
+        this.lastUpdateTime = 0; // Will be set on first update call
     }
 
     /**
@@ -87,12 +87,18 @@ export class StaminaSystem {
      * Update stamina system (call every frame)
      * Handles automatic recharge and melee mode consumption
      * @param isMeleeActive - Whether melee mode is currently active
+     * @param gameTime - Current game time from Phaser scene (scene.time.now)
      */
-    update(isMeleeActive: boolean): void {
-        const now = Date.now();
-        const deltaMs = now - this.lastUpdateTime;
+    update(isMeleeActive: boolean, gameTime: number): void {
+        // Initialize lastUpdateTime on first call
+        if (this.lastUpdateTime === 0) {
+            this.lastUpdateTime = gameTime;
+            return; // Skip processing on first frame
+        }
+
+        const deltaMs = gameTime - this.lastUpdateTime;
         const deltaSeconds = deltaMs / 1000;
-        this.lastUpdateTime = now;
+        this.lastUpdateTime = gameTime;
 
         // Decrease depletion pause timer
         if (this.state.depletionPauseRemaining > 0) {
@@ -195,15 +201,16 @@ export class StaminaSystem {
 
     /**
      * Reset stamina to initial state
+     * @param gameTime - Optional current game time from Phaser scene
      */
-    reset(): void {
+    reset(gameTime?: number): void {
         this.state.current = this.config.startingStamina;
         this.state.max = this.config.startingMaxStamina;
         this.state.isExhausted = false;
         this.state.isDepleted = false;
         this.state.needsReset = false;
         this.state.depletionPauseRemaining = 0;
-        this.lastUpdateTime = Date.now();
+        this.lastUpdateTime = gameTime ?? 0;
     }
 
     /**

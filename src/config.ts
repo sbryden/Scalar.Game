@@ -220,6 +220,32 @@ export const ENEMY_CONFIG: Record<string, {
     }
 };
 
+// Boss texture configuration with weighted random selection
+// Each boss type can have multiple texture options with spawn weights
+export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight: number }>> = {
+    boss_generic: [
+        { texture: 'snake_boss', weight: 0.5 },
+        { texture: 'rockgiant', weight: 0.5 }
+    ],
+    boss_micro: [
+        { texture: 'zombie_blob', weight: 0.8 },
+        { texture: 'micromonkeyboss', weight: 0.2 }
+    ],
+    boss_fish: [
+        { texture: 'water_enemy_fish_1', weight: 0.25 },
+        { texture: 'water_enemy_needle_fish_1', weight: 0.75 }
+    ],
+    boss_shark: [
+        { texture: 'sharkboss', weight: 1.0 }
+    ],
+    boss_crab: [
+        { texture: 'crabboss', weight: 1.0 }
+    ],
+    boss_plankton: [
+        { texture: 'bacteria', weight: 1.0 }
+    ]
+};
+
 // Player combat configuration
 export const PLAYER_COMBAT_CONFIG = {
     baseMeleeDamage: 5,           // Base damage when colliding with enemies

@@ -85,12 +85,11 @@ export class CombatSystem {
     /**
      * Handle player-enemy collision
      * Both player and enemy take damage, enemy gets knocked back
+     * @param gameTime - Current game time from Phaser scene (scene.time.now)
      */
-    handlePlayerEnemyCollision(player: Player, enemy: Enemy): void {
-        const now = Date.now();
-        
+    handlePlayerEnemyCollision(player: Player, enemy: Enemy, gameTime: number): void {
         // Check if player is immune (after respawn)
-        if (player.immuneUntil && now < player.immuneUntil) {
+        if (player.immuneUntil && gameTime < player.immuneUntil) {
             // Player is immune, no collision effects
             return;
         }
@@ -102,8 +101,8 @@ export class CombatSystem {
         }
         
         // Check if entities are stunned (prevent knockback spam)
-        const playerStunned = player.stunnedUntil && now < player.stunnedUntil;
-        const enemyStunned = enemy.stunnedUntil && now < enemy.stunnedUntil;
+        const playerStunned = player.stunnedUntil && gameTime < player.stunnedUntil;
+        const enemyStunned = enemy.stunnedUntil && gameTime < enemy.stunnedUntil;
         
         // Apply knockback only if neither is stunned
         if (!playerStunned && !enemyStunned) {
@@ -111,8 +110,8 @@ export class CombatSystem {
             this.applyPlayerKnockback(player, enemy);
             
             // Stun both entities
-            player.stunnedUntil = now + PLAYER_COMBAT_CONFIG.stunDuration;
-            enemy.stunnedUntil = now + PLAYER_COMBAT_CONFIG.stunDuration;
+            player.stunnedUntil = gameTime + PLAYER_COMBAT_CONFIG.stunDuration;
+            enemy.stunnedUntil = gameTime + PLAYER_COMBAT_CONFIG.stunDuration;
             
             // Freeze movement during stun
             if (player.body) player.stunVelocity = { x: player.body.velocity.x, y: player.body.velocity.y };
@@ -120,7 +119,7 @@ export class CombatSystem {
         }
         
         // Check if enemy can damage player (cooldown per enemy)
-        if (!enemy.lastDamageTime || now - enemy.lastDamageTime >= PLAYER_COMBAT_CONFIG.enemyToPlayerCooldown) {
+        if (!enemy.lastDamageTime || gameTime - enemy.lastDamageTime >= PLAYER_COMBAT_CONFIG.enemyToPlayerCooldown) {
             // Determine damage based on melee mode
             const enemyDamage = enemy.damage || 10;
             let damageToPlayer: number;
@@ -134,7 +133,7 @@ export class CombatSystem {
             }
             
             this.damagePlayer(damageToPlayer);
-            enemy.lastDamageTime = now;
+            enemy.lastDamageTime = gameTime;
             
             // Visual feedback: flash player red and shake camera
             // Don't override melee mode tint if active
@@ -153,7 +152,7 @@ export class CombatSystem {
         }
         
         // Check if player can damage enemy (cooldown per enemy)
-        if (!enemy.lastPlayerDamageTime || now - enemy.lastPlayerDamageTime >= PLAYER_COMBAT_CONFIG.playerToEnemyCooldown) {
+        if (!enemy.lastPlayerDamageTime || gameTime - enemy.lastPlayerDamageTime >= PLAYER_COMBAT_CONFIG.playerToEnemyCooldown) {
             let playerDamage = 0;
             
             // God mode deals configured damage on collision
@@ -170,7 +169,7 @@ export class CombatSystem {
             
             if (playerDamage > 0) {
                 enemy.health -= playerDamage;
-                enemy.lastPlayerDamageTime = now;
+                enemy.lastPlayerDamageTime = gameTime;
                 
                 // Visual feedback: flash enemy white (different from projectile red)
                 enemy.setTint(0xffffff);
@@ -191,12 +190,11 @@ export class CombatSystem {
     /**
      * Update stun effects for entities
      * Call this every frame to handle stun state
+     * @param gameTime - Current game time from Phaser scene (scene.time.now)
      */
-    updateStunEffects(entities: Phaser.Physics.Arcade.Group, player: Player): void {
-        const now = Date.now();
-        
+    updateStunEffects(entities: Phaser.Physics.Arcade.Group, player: Player, gameTime: number): void {
         // Handle player stun
-        if (player.stunnedUntil && now < player.stunnedUntil) {
+        if (player.stunnedUntil && gameTime < player.stunnedUntil) {
             // Player is stunned, reduce movement
             if (player.body) {
                 player.body.setVelocityX(player.body.velocity.x * COMBAT_CONFIG.stun.velocityDecay);
@@ -206,7 +204,7 @@ export class CombatSystem {
         // Handle enemy stuns
         entities.children.entries.forEach(obj => {
             const enemy = obj as Enemy;
-            if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
+            if (enemy.stunnedUntil && gameTime < enemy.stunnedUntil) {
                 // Enemy is stunned, freeze AI movement
                 if (enemy.body) {
                     enemy.body.setVelocityX(enemy.body.velocity.x * COMBAT_CONFIG.stun.velocityDecay);
