@@ -37,10 +37,10 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     healthBarBg: Phaser.GameObjects.Rectangle;
     healthBar: Phaser.GameObjects.Rectangle;
     healthBarOffsetY: number;
-    // Aggro system properties
-    isAggroed: boolean;
-    aggroRange: number;
-    aggroTarget?: Phaser.Physics.Arcade.Sprite;
+    // Chase system properties
+    isChasing: boolean;
+    lineOfSight: number;
+    chaseTarget?: Phaser.Physics.Arcade.Sprite;
     lastDamageTime?: number;
     lastPlayerDamageTime?: number;
     stunVelocity?: { x: number; y: number };
