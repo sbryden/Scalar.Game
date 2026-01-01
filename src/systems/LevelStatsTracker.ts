@@ -12,6 +12,11 @@ export interface LevelStats {
     bossesDestroyed: number;
     damageDealt: number;
     damageTaken: number;
+    // Scoring breakdown
+    regularEnemiesDestroyed: number;
+    regularBossesDestroyed: number;
+    microEnemiesDestroyed: number;
+    microBossesDestroyed: number;
 }
 
 export class LevelStatsTracker {
@@ -35,7 +40,11 @@ export class LevelStatsTracker {
             enemiesDestroyed: 0,
             bossesDestroyed: 0,
             damageDealt: 0,
-            damageTaken: 0
+            damageTaken: 0,
+            regularEnemiesDestroyed: 0,
+            regularBossesDestroyed: 0,
+            microEnemiesDestroyed: 0,
+            microBossesDestroyed: 0
         };
     }
 
@@ -75,13 +84,43 @@ export class LevelStatsTracker {
     }
 
     /**
+     * Check if an enemy type is a micro-world enemy
+     */
+    private isMicroEnemy(enemyType: string): boolean {
+        return enemyType === 'micro' || 
+               enemyType === 'water_swimming_micro' ||
+               enemyType === 'boss_land_micro' ||
+               enemyType === 'boss_water_swimming_micro' ||
+               enemyType === 'boss_water_crab_micro';
+    }
+
+    /**
      * Track an enemy being destroyed
      */
-    recordEnemyDestroyed(isBoss: boolean = false): void {
+    recordEnemyDestroyed(isBoss: boolean = false, enemyType?: string): void {
         if (this.isLevelActive) {
             this.stats.enemiesDestroyed++;
             if (isBoss) {
                 this.stats.bossesDestroyed++;
+            }
+            
+            // Track by category for scoring
+            if (enemyType) {
+                const isMicro = this.isMicroEnemy(enemyType);
+                
+                if (isBoss) {
+                    if (isMicro) {
+                        this.stats.microBossesDestroyed++;
+                    } else {
+                        this.stats.regularBossesDestroyed++;
+                    }
+                } else {
+                    if (isMicro) {
+                        this.stats.microEnemiesDestroyed++;
+                    } else {
+                        this.stats.regularEnemiesDestroyed++;
+                    }
+                }
             }
         }
     }
@@ -144,6 +183,46 @@ export class LevelStatsTracker {
     reset(): void {
         this.stats = this.createEmptyStats();
         this.isLevelActive = false;
+    }
+
+    /**
+     * Calculate score based on enemy kills with level-based scaling
+     * Scoring:
+     * - Regular bosses: 20 points each (base)
+     * - Regular enemies: 5 points each (base)
+     * - Micro-world bosses: 10 points each (base)
+     * - Micro-world enemies: 2.5 points each (base)
+     * Points scale with map level
+     */
+    calculateScore(currentLevel: number): {
+        regularBossPoints: number;
+        regularEnemyPoints: number;
+        microBossPoints: number;
+        microEnemyPoints: number;
+        totalScore: number;
+    } {
+        // Base point values
+        const baseRegularBossPoints = 20;
+        const baseRegularEnemyPoints = 5;
+        const baseMicroBossPoints = 10;
+        const baseMicroEnemyPoints = 2.5;
+        
+        // Level scaling multiplier (increases linearly with level)
+        const levelMultiplier = currentLevel;
+        
+        // Calculate points for each category
+        const regularBossPoints = this.stats.regularBossesDestroyed * baseRegularBossPoints * levelMultiplier;
+        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * baseRegularEnemyPoints * levelMultiplier;
+        const microBossPoints = this.stats.microBossesDestroyed * baseMicroBossPoints * levelMultiplier;
+        const microEnemyPoints = this.stats.microEnemiesDestroyed * baseMicroEnemyPoints * levelMultiplier;
+        
+        return {
+            regularBossPoints,
+            regularEnemyPoints,
+            microBossPoints,
+            microEnemyPoints,
+            totalScore: regularBossPoints + regularEnemyPoints + microBossPoints + microEnemyPoints
+        };
     }
 }
 
