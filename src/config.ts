@@ -168,3 +168,113 @@ export const PROJECTILE_CONFIG = {
         cooldown: 500 // milliseconds between shots
     }
 };
+
+// Combat configuration
+export const COMBAT_CONFIG = {
+    godMode: {
+        damage: 1000, // Damage dealt in god mode (projectiles and collisions)
+        health: 10000000 // Health in god mode
+    },
+    visual: {
+        enemyFlashDuration: 100, // How long enemy flashes when hit (ms)
+        playerFlashDuration: 150, // Already in PLAYER_COMBAT_CONFIG but needed here for reference
+        cameraShakeDuration: 100, // Duration of camera shake on damage (ms)
+        cameraShakeIntensityMelee: 0.003, // Shake intensity in melee mode
+        cameraShakeIntensityNormal: 0.005 // Shake intensity in normal mode
+    },
+    stun: {
+        velocityDecay: 0.95 // Velocity decay multiplier during stun (per frame)
+    },
+    playerKnockback: {
+        force: 250, // Base force applied to player when hit
+        verticalMultiplier: 0.5 // Multiplier for vertical knockback
+    }
+};
+
+// Physics configuration
+export const PHYSICS_CONFIG = {
+    underwater: {
+        speedMultiplier: 0.5 // Projectiles move at half speed underwater
+    },
+    projectile: {
+        spawnOffsetX: 40, // Horizontal offset from player center for projectile spawn
+        heightRatio: 1/6, // Projectile spawns at 1/6 height from top of tank
+        maxRangeMultiplier: 1.5, // Max range = screen width * this value
+        depth: 0 // Z-depth for projectile rendering
+    },
+    player: {
+        baseDisplayScale: 0.25, // Base scale for the tank sprite
+        sizeChangeJumpVelocity: -200 // Y velocity applied when changing size
+    },
+    enemy: {
+        baseScale: 0.2, // Base scale for enemy sprites
+        bossScaleMultiplier: 3, // Boss enemies are 3x base scale
+        bounce: 0.2, // Bounce value for enemy physics
+        groundY: 750, // Y coordinate of ground level
+        screenTopBoundary: 50, // Y coordinate of top screen boundary
+        screenBottomBoundary: 750, // Y coordinate of bottom screen boundary
+        aggroJump: {
+            verticalThreshold: 50, // Jump if player is this many pixels above
+            horizontalThreshold: 200, // Only jump if player within this horizontal distance
+            velocity: -250 // Y velocity for aggro jump
+        },
+        patrol: {
+            floatAngleIncrement: 0.02, // How fast the float angle changes per frame
+            floatSpeedPlankton: 0.3, // Speed multiplier for plankton floating
+            floatSpeedOther: 0.5, // Speed multiplier for other swimming enemies
+            verticalAmplitudePlankton: 30, // Vertical amplitude for plankton floating
+            verticalAmplitudeOther: 50, // Vertical amplitude for other swimming enemies
+            crabJumpProbability: 0.01, // Probability per frame that crab will jump
+            crabJumpVelocity: -150 // Y velocity for crab jump
+        }
+    }
+};
+
+// Visual configuration
+export const VISUAL_CONFIG = {
+    screenWidth: 1024, // Reference screen width for calculations
+    healthBar: {
+        width: 30, // Width of enemy health bars
+        height: 4, // Height of enemy health bars
+        offsetY: 10, // Offset above enemy for health bar placement
+        depth: 50, // Z-depth for health bar rendering
+        yDivisor: 2 // Divisor for calculating health bar Y offset
+    },
+    fishSpawn: {
+        fishTextureThreshold: 0.25 // Probability threshold for water_enemy_fish_1 vs needle fish
+    }
+};
+
+// XP and progression configuration
+export const XP_CONFIG = {
+    orb: {
+        radius: 6, // Radius of XP orb circles
+        color: 0xFFD700, // Gold color for XP orbs
+        defaultValue: 25, // Default XP value if not specified
+        bounce: 0.5, // Bounce value for XP orb physics
+        spawnVelocity: {
+            xRange: 50, // Random X velocity range (-50 to 50)
+            yMin: -100, // Minimum Y velocity
+            yMax: -50, // Maximum Y velocity
+            underwaterRange: 30 // Velocity range for underwater orbs
+        }
+    },
+    magnetism: {
+        range: 150, // Distance at which orbs start being attracted to player
+        speed: 250 // Speed at which orbs move toward player
+    },
+    progression: {
+        startingLevel: 1,
+        startingHealth: 100,
+        startingMaxHealth: 100,
+        startingXP: 0,
+        startingXPToLevel: 100,
+        healthIncreasePerLevel: 20, // Health gained per level up
+        xpScalingFactor: 1.1 // XP requirement multiplier per level (10% increase)
+    },
+    vehicleUpgrade: {
+        submarineLevel2Threshold: 2, // Level required for submarine tier 2
+        submarineLevel3Threshold: 3, // Level required for submarine tier 3
+        maxCarLevel: 5 // Maximum car level (capped at 5)
+    }
+};

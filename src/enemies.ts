@@ -1,4 +1,4 @@
-import { ENEMY_CONFIG } from "./config";
+import { ENEMY_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
@@ -23,8 +23,8 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     if (enemyType === "micro" || enemyType === "boss_micro") {
         texture = "bacteria";
     } else if (enemyType === "fish" || enemyType === "boss_fish") {
-        // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
-        texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+        // Configurable chance for water_enemy_fish_1.png vs water_enemy_needle_fish_1.png
+        texture = Math.random() < VISUAL_CONFIG.fishSpawn.fishTextureThreshold ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
     } else if (enemyType === "plankton" || enemyType === "boss_plankton") {
         texture = "bacteria"; // Use bacteria as placeholder for plankton
     } else if (enemyType === "crab") {
@@ -32,11 +32,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     }
     
     const enemy = scene.add.sprite(x, y, texture);
-    // Boss enemies are 3x the size (0.2 * 3 = 0.6 for bosses)
-    const baseScale = 0.2;
-    enemy.setScale(isBoss ? baseScale * 3 : baseScale);
+    // Boss enemies are scaled according to config
+    const baseScale = PHYSICS_CONFIG.enemy.baseScale;
+    enemy.setScale(isBoss ? baseScale * PHYSICS_CONFIG.enemy.bossScaleMultiplier : baseScale);
     scene.physics.add.existing(enemy);
-    enemy.body.setBounce(0.2);
+    enemy.body.setBounce(PHYSICS_CONFIG.enemy.bounce);
     enemy.body.setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
@@ -64,9 +64,9 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier;
     enemy.aggroTarget = undefined;
 
-    const barWidth = 30;
-    const barHeight = 4;
-    const healthBarOffsetY = enemy.displayHeight / 2 + 10;
+    const barWidth = VISUAL_CONFIG.healthBar.width;
+    const barHeight = VISUAL_CONFIG.healthBar.height;
+    const healthBarOffsetY = enemy.displayHeight / 2 + VISUAL_CONFIG.healthBar.offsetY;
     enemy.healthBarBg = scene.add.rectangle(
         x,
         y - healthBarOffsetY,
@@ -81,8 +81,8 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         barHeight,
         0xff0000
     );
-    enemy.healthBar.setDepth(50);
-    enemy.healthBarBg.setDepth(50);
+    enemy.healthBar.setDepth(VISUAL_CONFIG.healthBar.depth);
+    enemy.healthBarBg.setDepth(VISUAL_CONFIG.healthBar.depth);
     enemy.healthBarOffsetY = healthBarOffsetY;
 
     gameState.enemies.add(enemy);
@@ -157,11 +157,11 @@ function updateAggroAI(enemy: Enemy): void {
         enemy.setFlipX(velocityX < 0);
         
         // Keep enemies within screen bounds
-        if (enemy.y < 50) {
-            enemy.y = 50;
+        if (enemy.y < PHYSICS_CONFIG.enemy.screenTopBoundary) {
+            enemy.y = PHYSICS_CONFIG.enemy.screenTopBoundary;
             enemy.body.setVelocityY(Math.abs(enemy.body.velocity.y));
-        } else if (enemy.y > 750) {
-            enemy.y = 750;
+        } else if (enemy.y > PHYSICS_CONFIG.enemy.screenBottomBoundary) {
+            enemy.y = PHYSICS_CONFIG.enemy.screenBottomBoundary;
             enemy.body.setVelocityY(-Math.abs(enemy.body.velocity.y));
         }
     } else {
@@ -174,13 +174,15 @@ function updateAggroAI(enemy: Enemy): void {
         const verticalDistance = enemy.y - enemy.aggroTarget.y;
         const horizontalDistance = Math.abs(enemy.x - enemy.aggroTarget.x);
         
-        if (enemy.body.touching.down && verticalDistance > 50 && horizontalDistance < 200) {
+        if (enemy.body.touching.down && 
+            verticalDistance > PHYSICS_CONFIG.enemy.aggroJump.verticalThreshold && 
+            horizontalDistance < PHYSICS_CONFIG.enemy.aggroJump.horizontalThreshold) {
             // Jump towards player
-            enemy.body.setVelocityY(-250);
+            enemy.body.setVelocityY(PHYSICS_CONFIG.enemy.aggroJump.velocity);
         }
         
         // Keep enemy above ground
-        const groundY = 750;
+        const groundY = PHYSICS_CONFIG.enemy.groundY;
         const enemyHalfHeight = enemy.displayHeight / 2;
         const minY = groundY - enemyHalfHeight;
         if (enemy.y > minY) {
@@ -207,19 +209,23 @@ function updatePatrolAI(enemy: Enemy): void {
         }
 
         // Float with sinusoidal vertical movement - allow full screen height
-        enemy.floatAngle += 0.02;
-        const floatSpeed = enemy.speed * (enemy.enemyType === "plankton" ? 0.3 : 0.5);
-        const verticalAmplitude = enemy.enemyType === "plankton" ? 30 : 50;
+        enemy.floatAngle += PHYSICS_CONFIG.enemy.patrol.floatAngleIncrement;
+        const floatSpeed = enemy.speed * (enemy.enemyType === "plankton" ? 
+            PHYSICS_CONFIG.enemy.patrol.floatSpeedPlankton : 
+            PHYSICS_CONFIG.enemy.patrol.floatSpeedOther);
+        const verticalAmplitude = enemy.enemyType === "plankton" ? 
+            PHYSICS_CONFIG.enemy.patrol.verticalAmplitudePlankton : 
+            PHYSICS_CONFIG.enemy.patrol.verticalAmplitudeOther;
 
         enemy.body.setVelocityX(floatSpeed * enemy.direction);
         enemy.body.setVelocityY(Math.cos(enemy.floatAngle) * verticalAmplitude);
 
         // Keep enemies within screen bounds (but allow them to reach top)
-        if (enemy.y < 50) {
-            enemy.y = 50;
+        if (enemy.y < PHYSICS_CONFIG.enemy.screenTopBoundary) {
+            enemy.y = PHYSICS_CONFIG.enemy.screenTopBoundary;
             enemy.body.setVelocityY(Math.abs(enemy.body.velocity.y));
-        } else if (enemy.y > 750) {
-            enemy.y = 750;
+        } else if (enemy.y > PHYSICS_CONFIG.enemy.screenBottomBoundary) {
+            enemy.y = PHYSICS_CONFIG.enemy.screenBottomBoundary;
             enemy.body.setVelocityY(-Math.abs(enemy.body.velocity.y));
         }
     } else if (enemy.enemyType === "crab") {
@@ -239,13 +245,13 @@ function updatePatrolAI(enemy: Enemy): void {
 
         enemy.body.setVelocityX(enemy.speed * enemy.direction);
 
-        // Occasional small jump (10% chance per frame when on ground)
-        if (enemy.body.touching.down && Math.random() < 0.01) {
-            enemy.body.setVelocityY(-150); // Small jump
+        // Occasional small jump (configurable chance per frame when on ground)
+        if (enemy.body.touching.down && Math.random() < PHYSICS_CONFIG.enemy.patrol.crabJumpProbability) {
+            enemy.body.setVelocityY(PHYSICS_CONFIG.enemy.patrol.crabJumpVelocity);
         }
 
         // Keep enemy above ground
-        const groundY = 750;
+        const groundY = PHYSICS_CONFIG.enemy.groundY;
         const enemyHalfHeight = enemy.displayHeight / 2;
         const minY = groundY - enemyHalfHeight;
         if (enemy.y > minY) {
@@ -269,7 +275,7 @@ function updatePatrolAI(enemy: Enemy): void {
         enemy.body.setVelocityX(enemy.speed * enemy.direction);
 
         // Keep enemy above ground
-        const groundY = 750;
+        const groundY = PHYSICS_CONFIG.enemy.groundY;
         const enemyHalfHeight = enemy.displayHeight / 2;
         const minY = groundY - enemyHalfHeight;
         if (enemy.y > minY) {
@@ -281,9 +287,9 @@ function updatePatrolAI(enemy: Enemy): void {
 function updateEnemyHealthBar(enemy: Enemy): void {
     // Update health bar for all enemies
     if (enemy.healthBar && enemy.healthBarBg) {
-        const barWidth = 30;
+        const barWidth = VISUAL_CONFIG.healthBar.width;
         const healthPercent = enemy.health / enemy.maxHealth;
-        enemy.healthBar.setDisplayOrigin(barWidth / 2, 2);
+        enemy.healthBar.setDisplayOrigin(barWidth / VISUAL_CONFIG.healthBar.yDivisor, 2);
         enemy.healthBar.setScale(healthPercent, 1);
         const healthBarY = enemy.y - enemy.healthBarOffsetY;
         enemy.healthBar.x = enemy.x;
