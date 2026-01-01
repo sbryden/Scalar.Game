@@ -9,12 +9,15 @@ import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
 import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
+import { GameOverScreen } from '../ui/GameOverScreen';
+import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy, Player } from '../types/game';
 
 export default class UnderwaterMicroScene extends Phaser.Scene {
@@ -25,6 +28,8 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     xpOrbs!: Phaser.Physics.Arcade.Group;
     hud!: HUD;
     debugDisplay!: DebugDisplay;
+    gameOverScreen!: GameOverScreen;
+    levelCompleteScreen!: LevelCompleteScreen;
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
@@ -178,6 +183,42 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         // Create HUD
         this.hud = new HUD(this);
         gameState.levelText = this.hud.levelText;
+        
+        // Create Game Over Screen
+        this.gameOverScreen = new GameOverScreen(this);
+        this.gameOverScreen.create();
+        
+        // Set up game over callback
+        playerStatsSystem.setGameOverCallback(() => {
+            this.handleGameOver();
+        });
+        
+        // Set up continue and quit callbacks
+        this.gameOverScreen.setContinueCallback(() => {
+            this.handleContinue();
+        });
+        
+        this.gameOverScreen.setQuitCallback(() => {
+            this.handleQuit();
+        });
+        
+        // Create Level Complete Screen
+        this.levelCompleteScreen = new LevelCompleteScreen(this);
+        this.levelCompleteScreen.create();
+        
+        // Set up boss defeat callback
+        combatSystem.setBossDefeatCallback(() => {
+            this.handleLevelComplete();
+        });
+        
+        // Set up replay and exit callbacks
+        this.levelCompleteScreen.setReplayCallback(() => {
+            this.handleReplay();
+        });
+        
+        this.levelCompleteScreen.setExitCallback(() => {
+            this.handleExitToMenu();
+        });
     }
     
     restoreOrSpawnEnemies() {
@@ -198,6 +239,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
             for (let x = 300; x < WORLD_WIDTH; x += 300) {
                 spawnEnemy(this, x, 300 + Math.random() * 200, 'plankton');
             }
+            
+            // Spawn boss enemy toward the end of the level
+            spawnEnemy(this, 7500, 400, 'boss_plankton');
         }
     }
     
@@ -258,6 +302,111 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         
         // Update camera
         this.cameraManager.update();
+    }
+    
+    handleGameOver() {
+        console.log('Game Over - Showing screen...');
+        this.gameOverScreen.show();
+    }
+    
+    startImmunityFlash(player: Phaser.Physics.Arcade.Sprite): void {
+        let flashCount = 0;
+        const maxFlashes = 20; // Flash 20 times over 2 seconds (10 on/off cycles)
+        
+        const flashTimer = this.time.addEvent({
+            delay: 100, // Flash every 100ms
+            callback: () => {
+                flashCount++;
+                if (flashCount % 2 === 0) {
+                    player.setAlpha(1);
+                } else {
+                    player.setAlpha(0.3);
+                }
+                
+                if (flashCount >= maxFlashes) {
+                    player.setAlpha(1); // Ensure fully visible at end
+                    flashTimer.destroy();
+                }
+            },
+            loop: true
+        });
+    }
+    
+    handleContinue() {
+        console.log('Player chose to continue');
+        
+        // Reset player stats
+        playerStatsSystem.reset();
+        
+        // Reset player position
+        this.player.setPosition(400, 100);
+        this.player.setVelocity(0, 0);
+        
+        // Clear player tint if any
+        this.player.clearTint();
+        
+        // Activate immunity for 2 seconds
+        const now = Date.now();
+        this.player.immuneUntil = now + 2000;
+        
+        // Start flashing effect
+        this.startImmunityFlash(this.player);
+        
+        // Disable collisions with enemies temporarily
+        this.physics.world.removeCollider(this.collisionManager.playerEnemyCollider);
+        
+        // Re-enable collisions after immunity ends
+        this.time.delayedCall(2000, () => {
+            this.collisionManager.setupPlayerEnemyCollision();
+        });
+        
+        // Clear all enemies and their health bars
+        this.enemies.children.entries.forEach((enemy: any) => {
+            if (enemy.healthBar) enemy.healthBar.destroy();
+            if (enemy.healthBarBg) enemy.healthBarBg.destroy();
+        });
+        this.enemies.clear(true, true);
+        
+        // Clear all projectiles and XP orbs
+        this.projectiles.clear(true, true);
+        this.xpOrbs.clear(true, true);
+        
+        // Spawn new enemies
+        for (let x = 300; x < WORLD_WIDTH; x += 400) {
+            spawnEnemy(this, x, 680, 'plankton');
+        }
+        
+        // Update HUD
+        this.hud.update(playerStatsSystem.getStats());
+    }
+    
+    handleQuit() {
+        console.log('Player chose to quit');
+        
+        // Reset player stats
+        playerStatsSystem.reset();
+        
+        // Go back to menu
+        this.scene.start('MenuScene');
+    }
+    
+    handleLevelComplete() {
+        console.log('Level Complete - Boss Defeated!');
+        this.levelCompleteScreen.show();
+    }
+    
+    handleReplay() {
+        console.log('Replaying level');
+        
+        // Restart the current scene
+        this.scene.restart();
+    }
+    
+    handleExitToMenu() {
+        console.log('Exiting to main menu');
+        
+        // Go back to menu
+        this.scene.start('MenuScene');
     }
     
     shutdown() {

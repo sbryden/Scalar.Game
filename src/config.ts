@@ -1,5 +1,5 @@
 // World configuration
-export const WORLD_WIDTH = 16384;
+export const WORLD_WIDTH = 8192;
 export const WORLD_HEIGHT = 768;
 export const CAMERA_PADDING = 256;
 
@@ -16,12 +16,6 @@ export const SIZE_CONFIG = {
         speedMultiplier: 1.0,
         jumpMultiplier: 1.0,
         color: 0x00FF00 // Green
-    },
-    large: {
-        scale: 1.5,
-        speedMultiplier: 0.7,
-        jumpMultiplier: 0.8,
-        color: 0xFF8C00 // Orange
     }
 };
 
@@ -42,6 +36,19 @@ export const ENEMY_CONFIG = {
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
         aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
     },
+    boss_generic: {
+        width: 90,
+        height: 90,
+        color: 0xFF0000, // Red
+        speed: 80,
+        health: 100,  // 5x base health
+        damage: 15,
+        xpReward: 150,
+        patrolDistance: 400,
+        knockbackResistance: 2.0,  // More resistant to knockback
+        aggroRangeMultiplier: 8.0, // Larger aggro range
+        aggroSpeedMultiplier: 1.3  // Slightly slower when aggroed
+    },
     micro: {
         width: 30,
         height: 30,
@@ -55,6 +62,19 @@ export const ENEMY_CONFIG = {
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
         aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
     },
+    boss_micro: {
+        width: 90,
+        height: 90,
+        color: 0x00FF88, // Green-cyan (bacteria)
+        speed: 60,
+        health: 25,  // 5x base health
+        damage: 8,
+        xpReward: 60,
+        patrolDistance: 300,
+        knockbackResistance: 1.5,
+        aggroRangeMultiplier: 8.0,
+        aggroSpeedMultiplier: 1.3
+    },
     fish: {
         width: 30,
         height: 30,
@@ -67,6 +87,19 @@ export const ENEMY_CONFIG = {
         knockbackResistance: 0.7,  // Swims smoothly, less affected by knockback
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
         aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+    },
+    boss_fish: {
+        width: 90,
+        height: 90,
+        color: 0x00BFFF, // Deep sky blue
+        speed: 70,
+        health: 75,  // 5x base health
+        damage: 12,
+        xpReward: 120,
+        patrolDistance: 500,
+        knockbackResistance: 1.5,
+        aggroRangeMultiplier: 8.0,
+        aggroSpeedMultiplier: 1.3
     },
     crab: {
         width: 30,
@@ -93,6 +126,19 @@ export const ENEMY_CONFIG = {
         knockbackResistance: 0.5,  // Very light, easily knocked back
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
         aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+    },
+    boss_plankton: {
+        width: 60,
+        height: 60,
+        color: 0x7FFFD4, // Aquamarine
+        speed: 50,
+        health: 15,  // 5x base health
+        damage: 5,
+        xpReward: 50,
+        patrolDistance: 280,
+        knockbackResistance: 1.2,
+        aggroRangeMultiplier: 8.0,
+        aggroSpeedMultiplier: 1.3
     }
 };
 

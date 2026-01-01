@@ -3,6 +3,7 @@
  * Main menu with title, difficulty selection, and start button
  */
 import Phaser from 'phaser';
+import gameState from '../utils/gameState';
 
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
@@ -338,6 +339,16 @@ export default class MenuScene extends Phaser.Scene {
             // Store difficulty and environment in registry for access by other scenes
             this.registry.set('difficulty', this.selectedDifficulty);
             this.registry.set('gameEnvironment', this.selectedEnvironment);
+            
+            // Clear saved enemies when starting a new game
+            gameState.savedEnemies = {
+                BootScene: [],
+                MenuScene: [],
+                MainGameScene: [],
+                MicroScene: [],
+                UnderwaterScene: [],
+                UnderwaterMicroScene: []
+            };
             
             // Start the appropriate scene based on environment
             if (this.selectedEnvironment === 'water') {
