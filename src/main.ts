@@ -8,6 +8,7 @@ import MainGameScene from './scenes/MainGameScene';
 import MicroScene from './scenes/MicroScene';
 import UnderwaterScene from './scenes/UnderwaterScene';
 import UnderwaterMicroScene from './scenes/UnderwaterMicroScene';
+import ConfigEditorScene from './scenes/ConfigEditorScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -21,9 +22,14 @@ const config = {
             debug: false
         }
     },
-    scene: [BootScene, MenuScene, MainGameScene, MicroScene, UnderwaterScene, UnderwaterMicroScene]
+    scene: [BootScene, MenuScene, MainGameScene, MicroScene, UnderwaterScene, UnderwaterMicroScene, ConfigEditorScene]
 };
 
 const game = new Phaser.Game(config);
+
+// Expose game to window in development mode for testing
+if (import.meta.env.DEV) {
+    (window as any).game = game;
+}
 
 export default game;

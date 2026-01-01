@@ -3,10 +3,16 @@
  * Handles asset preloading before the main game starts
  */
 import Phaser from 'phaser';
+import { applyStoredConfig } from '../utils/configUtils';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BootScene' });
+    }
+    
+    init() {
+        // Apply any stored custom configuration before the game starts
+        applyStoredConfig();
     }
     
     preload() {

@@ -98,6 +98,11 @@ export default class MenuScene extends Phaser.Scene {
         });
         instructions.setOrigin(0.5);
         instructions.setAlpha(0.6);
+        
+        // Config Editor button (dev only)
+        if (import.meta.env.DEV) {
+            this.createConfigEditorButton(width - 150, height - 50);
+        }
     }
     
     createDifficultyDropdown(centerX: number, y: number): void {
@@ -359,5 +364,42 @@ export default class MenuScene extends Phaser.Scene {
                 this.scene.start('MainGameScene');
             }
         });
+    }
+    
+    createConfigEditorButton(x: number, y: number): void {
+        const buttonWidth = 180;
+        const buttonHeight = 40;
+        
+        const configButton = this.add.rectangle(x, y, buttonWidth, buttonHeight, 0xFF8800);
+        const configText = this.add.text(x, y, 'CONFIG EDITOR', {
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        configText.setOrigin(0.5);
+        
+        configButton.setInteractive({ useHandCursor: true });
+        configButton.on('pointerover', () => {
+            configButton.setFillStyle(0xFFAA00);
+            configButton.setScale(1.05);
+            configText.setScale(1.05);
+        });
+        configButton.on('pointerout', () => {
+            configButton.setFillStyle(0xFF8800);
+            configButton.setScale(1);
+            configText.setScale(1);
+        });
+        configButton.on('pointerdown', () => {
+            this.scene.start('ConfigEditorScene');
+        });
+        
+        // Add dev badge
+        const devBadge = this.add.text(x, y - 25, '[DEV]', {
+            fontSize: '10px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffaa00'
+        });
+        devBadge.setOrigin(0.5);
     }
 }
