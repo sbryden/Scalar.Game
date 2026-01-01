@@ -32,9 +32,9 @@
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
-    "strict": false,
-    "noImplicitAny": false,  // TODO: Enable after fixing all implicit any types
-    "strictNullChecks": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "noImplicitThis": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,

@@ -15,6 +15,12 @@ function isSwimmingEnemy(enemyType: string): boolean {
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
     const config = ENEMY_CONFIG[enemyType];
     
+    // Guard against unknown enemy types
+    if (!config) {
+        console.error(`Unknown enemy type: ${enemyType}`);
+        throw new Error(`Unknown enemy type: ${enemyType}`);
+    }
+    
     // Check if this is a boss enemy
     const isBoss = enemyType.startsWith('boss_');
     
@@ -31,17 +37,20 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         texture = "water_enemy_crab_1";
     }
     
-    const enemy = scene.add.sprite(x, y, texture);
+    const enemy = scene.add.sprite(x, y, texture) as Enemy;
     // Boss enemies are 3x the size (0.2 * 3 = 0.6 for bosses)
     const baseScale = 0.2;
     enemy.setScale(isBoss ? baseScale * 3 : baseScale);
     scene.physics.add.existing(enemy);
-    enemy.body.setBounce(0.2);
-    enemy.body.setCollideWorldBounds(true);
+    
+    // Type assertion since we know enemy.body is an Arcade Body after physics.add.existing
+    const body = enemy.body as Phaser.Physics.Arcade.Body;
+    body.setBounce(0.2);
+    body.setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
     if (isSwimmingEnemy(enemyType)) {
-        enemy.body.setAllowGravity(false);
+        body.setAllowGravity(false);
     }
 
     enemy.health = config.health;
@@ -85,6 +94,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.healthBarBg.setDepth(50);
     enemy.healthBarOffsetY = healthBarOffsetY;
 
+    if (!gameState.enemies) {
+        console.error('gameState.enemies is not initialized');
+        throw new Error('gameState.enemies is not initialized');
+    }
+    
     gameState.enemies.add(enemy);
     return enemy;
 }
@@ -136,6 +150,13 @@ function updateAggroAI(enemy: Enemy): void {
     if (!enemy.aggroTarget) return;
     
     const config = ENEMY_CONFIG[enemy.enemyType];
+    
+    // Guard against unknown enemy types
+    if (!config) {
+        console.error(`Unknown enemy type: ${enemy.enemyType}`);
+        return;
+    }
+    
     const aggroSpeed = enemy.speed * config.aggroSpeedMultiplier;
     
     // Calculate direction to player

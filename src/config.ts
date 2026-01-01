@@ -4,7 +4,12 @@ export const WORLD_HEIGHT = 768;
 export const CAMERA_PADDING = 256;
 
 // Size configuration
-export const SIZE_CONFIG = {
+export const SIZE_CONFIG: Record<string, {
+    scale: number;
+    speedMultiplier: number;
+    jumpMultiplier: number;
+    color: number;
+}> = {
     small: {
         scale: 0.5,
         speedMultiplier: 1.5,
@@ -22,7 +27,19 @@ export const SIZE_CONFIG = {
 export const SIZE_CHANGE_COOLDOWN = 500;
 
 // Enemy configuration
-export const ENEMY_CONFIG = {
+export const ENEMY_CONFIG: Record<string, {
+    width: number;
+    height: number;
+    color: number;
+    speed: number;
+    health: number;
+    damage: number;
+    xpReward: number;
+    patrolDistance: number;
+    knockbackResistance: number;
+    aggroRangeMultiplier: number;
+    aggroSpeedMultiplier: number;
+}> = {
     generic: {
         width: 30,
         height: 30,
