@@ -38,6 +38,7 @@ export class StaminaSystem {
     private config: StaminaConfig;
     private onStaminaDepleted: StaminaDepletedCallback | null;
     private lastUpdateTime: number;
+    private godModeEnabled: boolean; // God mode flag for near-infinite stamina
 
     constructor(config: StaminaConfig) {
         this.config = config;
@@ -54,6 +55,7 @@ export class StaminaSystem {
         };
         this.onStaminaDepleted = null;
         this.lastUpdateTime = 0; // Will be set on first update call
+        this.godModeEnabled = false; // Initialize god mode as disabled
     }
 
     /**
@@ -68,6 +70,33 @@ export class StaminaSystem {
      */
     getStaminaPercent(): number {
         return this.state.max > 0 ? this.state.current / this.state.max : 0;
+    }
+
+    /**
+     * Enable or disable god mode for stamina
+     * When enabled, stamina is held at max and consumption/recharge logic is skipped
+     * @param enabled - Whether to enable god mode
+     * @param maxOverride - Optional very large max/current value to use in god mode
+     */
+    setGodMode(enabled: boolean, maxOverride?: number): void {
+        this.godModeEnabled = enabled;
+        
+        if (enabled) {
+            // Set stamina to very large value if maxOverride provided
+            if (maxOverride !== undefined) {
+                this.state.max = maxOverride;
+                this.state.current = maxOverride;
+            } else {
+                // Otherwise just set current to max
+                this.state.current = this.state.max;
+            }
+            // Clear any exhaustion/depletion states in god mode
+            this.state.isExhausted = false;
+            this.state.isDepleted = false;
+            this.state.needsReset = false;
+            this.state.depletionPauseRemaining = 0;
+        }
+        // Note: When disabled, stamina values remain as-is (caller should restore normal values)
     }
 
     /**
@@ -100,6 +129,12 @@ export class StaminaSystem {
         const deltaSeconds = deltaMs / 1000;
         this.lastUpdateTime = gameTime;
 
+        // In god mode, hold stamina at max and skip normal consumption/recharge logic
+        if (this.godModeEnabled) {
+            this.state.current = this.state.max;
+            return;
+        }
+
         // Decrease depletion pause timer
         if (this.state.depletionPauseRemaining > 0) {
             this.state.depletionPauseRemaining -= deltaMs;
@@ -122,6 +157,11 @@ export class StaminaSystem {
      * Consume stamina (used during melee mode)
      */
     private consumeStamina(amount: number): void {
+        // Skip stamina consumption in god mode
+        if (this.godModeEnabled) {
+            return;
+        }
+
         const previousStamina = this.state.current;
         this.state.current = Math.max(0, this.state.current - amount);
 
@@ -144,6 +184,11 @@ export class StaminaSystem {
      * Recharge stamina automatically
      */
     private rechargeStamina(amount: number): void {
+        // Skip stamina recharge in god mode (stamina already held at max)
+        if (this.godModeEnabled) {
+            return;
+        }
+
         this.state.current = Math.min(this.state.max, this.state.current + amount);
     }
 
@@ -151,6 +196,11 @@ export class StaminaSystem {
      * Restore stamina (e.g., from collecting XP orbs)
      */
     restoreStamina(amount: number): void {
+        // Skip stamina restoration in god mode (stamina already held at max)
+        if (this.godModeEnabled) {
+            return;
+        }
+
         this.state.current = Math.min(this.state.max, this.state.current + amount);
         this.updateStateFlags();
     }
@@ -211,6 +261,7 @@ export class StaminaSystem {
         this.state.needsReset = false;
         this.state.depletionPauseRemaining = 0;
         this.lastUpdateTime = gameTime ?? 0;
+        this.godModeEnabled = false; // Reset god mode when resetting stamina system
     }
 
     /**
