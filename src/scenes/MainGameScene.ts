@@ -1,7 +1,3 @@
-/**
- * Main Game Scene
- * Primary gameplay scene
- */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT, HARD_MODE_CONFIG } from '../config';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
@@ -16,12 +12,12 @@ import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
+import type { Enemy, Player } from '../types/game';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
-import type { Enemy } from '../types/game';
 
 export default class MainGameScene extends Phaser.Scene {
-    player!: Phaser.Physics.Arcade.Sprite;
+    player!: Player;
     platforms!: Phaser.Physics.Arcade.StaticGroup;
     enemies!: Phaser.Physics.Arcade.Group;
     projectiles!: Phaser.Physics.Arcade.Group;
@@ -105,7 +101,7 @@ export default class MainGameScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.MainGameScene;
         
         // Create player (car)
-        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1');
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1') as Player;
         this.player.setScale(0.25);
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);
@@ -243,14 +239,15 @@ export default class MainGameScene extends Phaser.Scene {
         this.inputManager.handleMovement();
         
         // Update enemies
-        this.enemies.children.entries.forEach(enemy => {
+        this.enemies.children.entries.forEach(obj => {
+            const enemy = obj as Enemy;
             if (enemy.active) {
                 updateEnemyAI(enemy);
             }
         });
         
         // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies.children.entries, this.player);
+        combatSystem.updateStunEffects(this.enemies, this.player);
         
         // Update projectiles
         updateProjectiles();

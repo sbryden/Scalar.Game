@@ -43,12 +43,12 @@ export function fireProjectile(scene: Phaser.Scene): void {
     
     // Create projectile (torpedo underwater, beam on land)
     const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
-    const projectile = scene.add.image(projectileX, projectileY, projectileTexture);
+    const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
     projectile.setOrigin(0.5, 0.5);
     projectile.setDepth(0);
     
     // Scale projectile based on player scale
-    const playerScale = gameState.player.scaleX;
+    const playerScale = gameState.player!.scaleX;
     projectile.setScale(playerScale);
     
     // Flip the image if firing left
@@ -56,7 +56,7 @@ export function fireProjectile(scene: Phaser.Scene): void {
         projectile.setFlipX(true);
     }
     
-    gameState.projectiles.add(projectile);
+    gameState.projectiles!.add(projectile);
     scene.physics.add.existing(projectile);
     projectile.body.setAllowGravity(false);
     projectile.body.setBounce(0, 0);
@@ -72,11 +72,12 @@ export function fireProjectile(scene: Phaser.Scene): void {
 }
 
 export function updateProjectiles(): void {
-    gameState.projectiles.children.entries.forEach(proj => {
+    gameState.projectiles!.children.entries.forEach(proj => {
+        const projectile = proj as Projectile;
         // Destroy projectile if it exceeds max range or goes off world
-        const distanceTraveled = Math.abs(proj.x - proj.spawnX);
-        if (distanceTraveled > proj.maxRange || proj.x < 0 || proj.x > WORLD_WIDTH) {
-            proj.destroy();
+        const distanceTraveled = Math.abs(projectile.x - projectile.spawnX);
+        if (distanceTraveled > projectile.maxRange || projectile.x < 0 || projectile.x > WORLD_WIDTH) {
+            projectile.destroy();
         }
     });
 }

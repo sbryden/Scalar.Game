@@ -5,6 +5,7 @@
 import gameState from '../utils/gameState';
 import { damageEnemy } from '../enemies';
 import combatSystem from '../systems/CombatSystem';
+import type { Player, Enemy, Projectile } from '../types/game';
 
 export class CollisionManager {
     scene: Phaser.Scene;
@@ -35,7 +36,7 @@ export class CollisionManager {
         });
         
         this.scene.physics.add.collider(projectiles, enemies, (proj, enemy) => {
-            damageEnemy(proj, enemy);
+            damageEnemy(proj as Projectile, enemy as Enemy);
         }, null, this.scene);
         
         // Player-Enemy collision (bidirectional damage and knockback)
@@ -54,7 +55,7 @@ export class CollisionManager {
         }
         
         this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (p, enemy) => {
-            combatSystem.handlePlayerEnemyCollision(p, enemy);
+            combatSystem.handlePlayerEnemyCollision(p as Player, enemy as Enemy);
         }, null, this.scene);
     }
 }
