@@ -166,16 +166,20 @@ export class LevelCompleteScreen {
             
             // Add score breakdown with actual counts
             if (stats.regularBossesDestroyed > 0) {
-                statsDisplay.push(`Regular Bosses: ${stats.regularBossesDestroyed} × ${20 * currentLevel} = ${Math.round(score.regularBossPoints)} pts`);
+                const pointsPerBoss = score.baseValues.regularBossPoints * currentLevel;
+                statsDisplay.push(`Regular Bosses: ${stats.regularBossesDestroyed} × ${pointsPerBoss} = ${Math.round(score.regularBossPoints)} pts`);
             }
             if (stats.regularEnemiesDestroyed > 0) {
-                statsDisplay.push(`Regular Enemies: ${stats.regularEnemiesDestroyed} × ${5 * currentLevel} = ${Math.round(score.regularEnemyPoints)} pts`);
+                const pointsPerEnemy = score.baseValues.regularEnemyPoints * currentLevel;
+                statsDisplay.push(`Regular Enemies: ${stats.regularEnemiesDestroyed} × ${pointsPerEnemy} = ${Math.round(score.regularEnemyPoints)} pts`);
             }
             if (stats.microBossesDestroyed > 0) {
-                statsDisplay.push(`Micro-World Bosses: ${stats.microBossesDestroyed} × ${10 * currentLevel} = ${Math.round(score.microBossPoints)} pts`);
+                const pointsPerBoss = score.baseValues.microBossPoints * currentLevel;
+                statsDisplay.push(`Micro-World Bosses: ${stats.microBossesDestroyed} × ${pointsPerBoss} = ${Math.round(score.microBossPoints)} pts`);
             }
             if (stats.microEnemiesDestroyed > 0) {
-                statsDisplay.push(`Micro-World Enemies: ${stats.microEnemiesDestroyed} × ${2.5 * currentLevel} = ${Math.round(score.microEnemyPoints)} pts`);
+                const pointsPerEnemy = score.baseValues.microEnemyPoints * currentLevel;
+                statsDisplay.push(`Micro-World Enemies: ${stats.microEnemiesDestroyed} × ${pointsPerEnemy} = ${Math.round(score.microEnemyPoints)} pts`);
             }
             
             statsDisplay.push('');
