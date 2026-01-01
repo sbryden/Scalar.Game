@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import playerStatsSystem from './PlayerStatsSystem';
+import levelProgressionSystem from './LevelProgressionSystem';
 import { gainXP } from '../xpOrbs';
 import { getStaminaSystem } from './StaminaSystem';
 import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG } from '../config';
@@ -141,6 +142,12 @@ export class SpawnSystem {
         const isHardMode = playerStatsSystem.difficulty === 'hard';
         const difficultyMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpawnMultiplier : 1;
         
+        // Apply level-based multiplier (stacks with difficulty)
+        const levelMultiplier = levelProgressionSystem.getEnemyCountMultiplier();
+        
+        // Combine multipliers
+        const finalSpawnMultiplier = difficultyMultiplier * levelMultiplier;
+        
         // Calculate segment width
         const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
         
@@ -160,7 +167,7 @@ export class SpawnSystem {
             const densityMultiplier = densities[densityIndex] ?? 1.0; // Safety fallback
             
             // Calculate interval for this segment
-            const interval = baseInterval / (densityMultiplier * difficultyMultiplier);
+            const interval = baseInterval / (densityMultiplier * finalSpawnMultiplier);
             
             // Generate spawn points within this segment
             this.generateSpawnPointsInZone(

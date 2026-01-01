@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import { STAMINA_UI_CONFIG } from '../config';
+import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import type { PlayerStats } from '../types/game';
 
 export class HUD {
@@ -15,6 +16,7 @@ export class HUD {
     staminaBar: Phaser.GameObjects.Rectangle | null;
     staminaBarBackground: Phaser.GameObjects.Rectangle | null;
     levelText: Phaser.GameObjects.Text | null;
+    mapLevelText: Phaser.GameObjects.Text | null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -25,6 +27,7 @@ export class HUD {
         this.staminaBar = null;
         this.staminaBarBackground = null;
         this.levelText = null;
+        this.mapLevelText = null;
         
         this.create();
     }
@@ -61,7 +64,7 @@ export class HUD {
         this.staminaBarBackground.setScrollFactor(0);
         this.staminaBar.setScrollFactor(0);
         
-        // Level text
+        // Level text (player level)
         this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
             fontSize: '24px',
             color: '#FFFFFF',
@@ -69,6 +72,16 @@ export class HUD {
         });
         this.levelText.setDepth(1000);
         this.levelText.setScrollFactor(0);
+        
+        // Map level text
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        this.mapLevelText = this.scene.add.text(50, 50, `MAP ${mapLevel}`, {
+            fontSize: '20px',
+            color: '#FFD700',
+            fontStyle: 'bold'
+        });
+        this.mapLevelText.setDepth(1000);
+        this.mapLevelText.setScrollFactor(0);
     }
     
     /**
@@ -103,6 +116,10 @@ export class HUD {
             // Normal - blue
             this.staminaBar?.setFillStyle(STAMINA_UI_CONFIG.colors.normal);
         }
+        
+        // Update map level text
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        this.mapLevelText?.setText(`MAP ${mapLevel}`);
     }
     
     /**
@@ -116,5 +133,6 @@ export class HUD {
         if (this.staminaBar) this.staminaBar.destroy();
         if (this.staminaBarBackground) this.staminaBarBackground.destroy();
         if (this.levelText) this.levelText.destroy();
+        if (this.mapLevelText) this.mapLevelText.destroy();
     }
 }
