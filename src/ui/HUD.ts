@@ -62,13 +62,13 @@ export class HUD {
         
         // Update health bar
         const healthPercent = playerStats.health / playerStats.maxHealth;
-        this.healthBar.setDisplayOrigin(barWidth / 2, 4);
-        this.healthBar.setScale(healthPercent, 1);
+        this.healthBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.healthBar?.setScale(healthPercent, 1);
         
         // Update XP bar
         const xpPercent = playerStats.xp / playerStats.xpToLevel;
-        this.xpBar.setDisplayOrigin(barWidth / 2, 4);
-        this.xpBar.setScale(xpPercent, 1);
+        this.xpBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.xpBar?.setScale(xpPercent, 1);
     }
     
     /**

@@ -65,7 +65,7 @@ export default class BootScene extends Phaser.Scene {
         progressBox.fillRect(width / 2 - 160, height / 2, 320, 50);
         
         // Update progress
-        this.load.on('progress', (value) => {
+        this.load.on('progress', (value: number) => {
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
             progressBar.fillRect(width / 2 - 150, height / 2 + 10, 300 * value, 30);

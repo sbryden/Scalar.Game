@@ -37,7 +37,7 @@ export class CollisionManager {
         
         this.scene.physics.add.collider(projectiles, enemies, (proj, enemy) => {
             damageEnemy(proj as Projectile, enemy as Enemy);
-        }, null, this.scene);
+        }, undefined, this.scene);
         
         // Player-Enemy collision (bidirectional damage and knockback)
         this.setupPlayerEnemyCollision();
@@ -56,6 +56,6 @@ export class CollisionManager {
         
         this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (p, enemy) => {
             combatSystem.handlePlayerEnemyCollision(p as Player, enemy as Enemy);
-        }, null, this.scene);
+        }, undefined, this.scene);
     }
 }

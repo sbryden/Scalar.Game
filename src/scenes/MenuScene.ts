@@ -129,8 +129,10 @@ export default class MenuScene extends Phaser.Scene {
         this.dropdownArrow.setOrigin(1, 0.5);
         
         // Options container (hidden by default)
-        this.optionsContainer = this.add.container(0, dropdownHeight / 2 + 5);
+        // Position it relative to the dropdown position, not as a child of dropdownContainer
+        this.optionsContainer = this.add.container(centerX, y + dropdownHeight / 2 + 5);
         this.optionsContainer.setVisible(false);
+        this.optionsContainer.setDepth(200); // Higher depth to appear above environment dropdown
         
         // Create options
         const options = [
@@ -182,8 +184,8 @@ export default class MenuScene extends Phaser.Scene {
             this.toggleDropdown();
         });
         
-        // Add elements to container
-        this.dropdownContainer.add([this.dropdownBox, this.selectedText, this.dropdownArrow, this.optionsContainer]);
+        // Add elements to container (not including optionsContainer as it's positioned independently)
+        this.dropdownContainer.add([this.dropdownBox, this.selectedText, this.dropdownArrow]);
         
         // Set depth to ensure dropdown appears on top
         this.dropdownContainer.setDepth(100);
