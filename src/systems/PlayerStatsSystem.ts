@@ -43,11 +43,26 @@ export class PlayerStatsSystem {
         this.difficulty = difficulty;
         
         if (difficulty === 'godMode') {
+            // Enable god mode for health
             this.stats.maxHealth = COMBAT_CONFIG.godMode.health;
             this.stats.health = COMBAT_CONFIG.godMode.health;
+            
+            // Enable god mode for stamina with near-infinite value
+            const staminaSystem = getStaminaSystem();
+            staminaSystem.setGodMode(true, COMBAT_CONFIG.godMode.health);
+            this.stats.stamina = COMBAT_CONFIG.godMode.health;
+            this.stats.maxStamina = COMBAT_CONFIG.godMode.health;
         } else {
+            // Restore normal health values
             this.stats.maxHealth = XP_CONFIG.progression.startingMaxHealth;
             this.stats.health = XP_CONFIG.progression.startingHealth;
+            
+            // Disable god mode for stamina and restore normal values
+            const staminaSystem = getStaminaSystem();
+            staminaSystem.setGodMode(false);
+            staminaSystem.reset(); // Reset to normal starting stamina values
+            this.stats.stamina = STAMINA_CONFIG.startingStamina;
+            this.stats.maxStamina = STAMINA_CONFIG.startingMaxStamina;
         }
     }
     
