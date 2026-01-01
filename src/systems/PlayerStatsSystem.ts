@@ -6,6 +6,7 @@
 import gameState from '../utils/gameState';
 import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
+import levelStatsTracker from './LevelStatsTracker';
 import type { PlayerStats, Difficulty } from '../types/game';
 
 type LevelUpCallback = (level: number) => void;
@@ -120,6 +121,9 @@ export class PlayerStatsSystem {
         
         if (this.stats.health <= 0) {
             console.log('Player defeated! Game Over.');
+            
+            // Track player death
+            levelStatsTracker.recordDeath();
             
             // Trigger game over callback if set
             if (this.onGameOver) {
