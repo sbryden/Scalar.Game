@@ -4,7 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
+import { generateMixedSpawnPoints } from '../utils/spawnHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -246,20 +246,26 @@ export default class UnderwaterScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Spawn initial underwater enemies (80% fish, 20% crabs)
-            const spawnInterval = getEnemySpawnInterval();
+            // Generate dynamic mixed spawn points (80% fish, 20% crabs)
+            const { fishSpawns, crabSpawns } = generateMixedSpawnPoints(0.8);
             
-            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
-                const enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
-                spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
-            }
+            // Spawn fish enemies
+            fishSpawns.forEach(point => {
+                if (point.isBoss) {
+                    spawnEnemy(this, point.x, point.y, 'boss_shark');
+                } else {
+                    spawnEnemy(this, point.x, point.y, 'fish');
+                }
+            });
             
-            // Spawn boss enemy toward the end of the level
-            // Randomly choose between shark boss (swimming) or crab boss (ground)
-            const bossType = Math.random() < 0.5 ? 'boss_shark' : 'boss_crab';
-            // Boss shark swims at mid-depth, boss crab on ground (adjusted for 3x scale)
-            const bossY = bossType === 'boss_shark' ? 400 : 600;
-            spawnEnemy(this, 7500, bossY, bossType);
+            // Spawn crab enemies
+            crabSpawns.forEach(point => {
+                if (point.isBoss) {
+                    spawnEnemy(this, point.x, point.y, 'boss_crab');
+                } else {
+                    spawnEnemy(this, point.x, point.y, 'crab');
+                }
+            });
         }
     }
     
