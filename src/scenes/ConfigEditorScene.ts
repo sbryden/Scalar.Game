@@ -91,8 +91,9 @@ export default class ConfigEditorScene extends Phaser.Scene {
     
     parseValue(fullPath: string, value: any, key: string): void {
         if (typeof value === 'number') {
-            // Check if it's a color (hex number > 0x1000)
-            const isColor = value >= 0x100000 || (fullPath.toLowerCase().includes('color') && value >= 0x0);
+            // Check if it's a color (hex number >= 0xFF or path contains 'color')
+            const isColor = (value >= 0xFF && fullPath.toLowerCase().includes('color')) || 
+                          (value >= 0x1000 && /color/i.test(fullPath));
             this.configValues.push({
                 path: fullPath,
                 key: key,
@@ -146,7 +147,8 @@ export default class ConfigEditorScene extends Phaser.Scene {
             
             if (configValue.type === 'color') {
                 input.type = 'text';
-                input.value = '0x' + currentValue.toString(16).toUpperCase().padStart(6, '0');
+                const hexValue = currentValue >= 0 ? currentValue.toString(16).toUpperCase().padStart(6, '0') : '000000';
+                input.value = '0x' + hexValue;
                 input.placeholder = '0xFFFFFF';
             } else {
                 input.type = 'number';
@@ -179,13 +181,16 @@ export default class ConfigEditorScene extends Phaser.Scene {
         
         // Update HTML input positions
         this.inputElements.forEach((input, path) => {
-            const baseY = parseInt(input.style.top.replace('px', ''));
-            const originalY = baseY + this.scrollY;
-            input.style.top = `${originalY - this.scrollY}px`;
-            
-            // Hide inputs that are out of view
-            const y = parseInt(input.style.top.replace('px', ''));
-            input.style.display = (y < 100 || y > this.cameras.main.height - 150) ? 'none' : 'block';
+            const configValueIndex = this.configValues.findIndex(cv => cv.path === path);
+            if (configValueIndex >= 0) {
+                const lineHeight = 50;
+                const baseY = 120 + 20 + configValueIndex * lineHeight - 15;
+                input.style.top = `${baseY - this.scrollY}px`;
+                
+                // Hide inputs that are out of view
+                const y = baseY - this.scrollY;
+                input.style.display = (y < 100 || y > this.cameras.main.height - 150) ? 'none' : 'block';
+            }
         });
     }
     
@@ -240,10 +245,17 @@ export default class ConfigEditorScene extends Phaser.Scene {
         const configData: Record<string, any> = {};
         
         this.inputElements.forEach((input, path) => {
-            const value = input.type === 'number' 
-                ? parseFloat(input.value) 
-                : parseInt(input.value, 16);
+            let value: number;
             
+            if (input.type === 'number') {
+                value = parseFloat(input.value);
+            } else {
+                // Parse hex color value
+                const hexStr = input.value.replace(/^0x/i, '');
+                value = parseInt(hexStr, 16);
+            }
+            
+            // Only save valid numbers
             if (!isNaN(value)) {
                 configData[path] = value;
             }
@@ -280,7 +292,8 @@ export default class ConfigEditorScene extends Phaser.Scene {
             const input = this.inputElements.get(configValue.path);
             if (input) {
                 if (configValue.type === 'color') {
-                    input.value = '0x' + configValue.value.toString(16).toUpperCase().padStart(6, '0');
+                    const hexValue = configValue.value >= 0 ? configValue.value.toString(16).toUpperCase().padStart(6, '0') : '000000';
+                    input.value = '0x' + hexValue;
                 } else {
                     input.value = configValue.value.toString();
                 }

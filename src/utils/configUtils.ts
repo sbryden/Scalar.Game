@@ -35,7 +35,9 @@ export function applyStoredConfig(): void {
         
         // Apply each stored value to the config object
         for (const [path, value] of Object.entries(configData)) {
-            setConfigValue(path, value);
+            if (typeof value === 'number' || typeof value === 'string') {
+                setConfigValue(path, value);
+            }
         }
         
         console.log('Custom configuration applied');
@@ -47,7 +49,7 @@ export function applyStoredConfig(): void {
 /**
  * Set a configuration value by path (e.g., "WORLD_WIDTH" or "SIZE_CONFIG.small.scale")
  */
-function setConfigValue(path: string, value: any): void {
+function setConfigValue(path: string, value: number | string): void {
     const parts = path.split('.');
     let obj: any = config;
     
