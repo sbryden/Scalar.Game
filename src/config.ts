@@ -113,7 +113,7 @@ export const ENEMY_CONFIG: Record<string, {
         speed: 80,
         health: 150,  // Boss health - will spawn 4 minions with ~37.5 health each
         damage: 15,
-        xpReward: 150,
+        xpReward: 230, // Total XP including minions (150 base + 4*20 minion rewards)
         patrolDistance: 400,
         knockbackResistance: 2.0,
         lineOfSightMultiplier: 8.0,
@@ -126,7 +126,7 @@ export const ENEMY_CONFIG: Record<string, {
         speed: 90,  // Faster than regular enemies
         health: 37.5,  // 4 minions = 150 total health
         damage: 8,
-        xpReward: 20,
+        xpReward: 0, // XP handled by parent spawner boss
         patrolDistance: 250,
         knockbackResistance: 0.8,
         lineOfSightMultiplier: 5.0,
