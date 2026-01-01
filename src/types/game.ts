@@ -50,6 +50,8 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     minionType?: string;
     minionCount?: number;
     spawnRadius?: number;
+    spawnerBossId?: string; // Unique ID for spawner bosses
+    parentSpawnerBossId?: string; // For minions to reference their parent
     // Ranged ability properties
     hasRangedAbility?: boolean;
     projectileTexture?: string;
