@@ -187,7 +187,7 @@ export default class MainGameScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Generate dynamic spawn points with density gradients
+            // Generate dynamic spawn points with randomized density distribution
             const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
                 SPAWN_CONFIG.defaults.baseInterval,
                 SPAWN_CONFIG.defaults.groundY,
