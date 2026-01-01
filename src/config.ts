@@ -168,3 +168,11 @@ export const PROJECTILE_CONFIG = {
         cooldown: 500 // milliseconds between shots
     }
 };
+
+// Hard mode configuration
+export const HARD_MODE_CONFIG = {
+    enemyHealthMultiplier: 1.5,      // Enemies have 50% more HP
+    enemySpeedMultiplier: 1.3,       // Enemies move 30% faster
+    enemyAggroRangeMultiplier: 1.5,  // Enemies have 50% larger line of sight
+    enemySpawnMultiplier: 1.5        // 50% more enemies spawn
+};

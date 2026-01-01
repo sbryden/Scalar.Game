@@ -3,7 +3,7 @@
  * Submarine gameplay scene with lighter gravity
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, HARD_MODE_CONFIG } from '../config';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -246,7 +246,11 @@ export default class UnderwaterScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial underwater enemies (80% fish, 20% crabs)
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            // Calculate spawn interval based on difficulty
+            const isHardMode = playerStatsSystem.difficulty === 'hard';
+            const spawnInterval = isHardMode ? 300 / HARD_MODE_CONFIG.enemySpawnMultiplier : 300;
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 const enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
                 spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
             }

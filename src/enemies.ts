@@ -1,7 +1,8 @@
-import { ENEMY_CONFIG } from "./config";
+import { ENEMY_CONFIG, HARD_MODE_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
+import playerStatsSystem from './systems/PlayerStatsSystem';
 
 /**
  * Helper function to check if an enemy type is a swimming enemy
@@ -17,6 +18,12 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     
     // Check if this is a boss enemy
     const isBoss = enemyType.startsWith('boss_');
+    
+    // Apply hard mode multipliers if in hard mode
+    const isHardMode = playerStatsSystem.difficulty === 'hard';
+    const healthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
+    const speedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
+    const aggroRangeMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyAggroRangeMultiplier : 1;
     
     // Select appropriate texture based on enemy type
     let texture = "enemy";
@@ -44,11 +51,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         enemy.body.setAllowGravity(false);
     }
 
-    enemy.health = config.health;
-    enemy.maxHealth = config.health;
+    enemy.health = config.health * healthMultiplier;
+    enemy.maxHealth = config.health * healthMultiplier;
     enemy.damage = config.damage;
     enemy.xpReward = config.xpReward;
-    enemy.speed = config.speed;
+    enemy.speed = config.speed * speedMultiplier;
     enemy.patrolDistance = config.patrolDistance;
     enemy.knockbackResistance = config.knockbackResistance;
     enemy.startX = x;
@@ -61,7 +68,7 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     
     // Initialize aggro system properties
     enemy.isAggroed = false;
-    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier;
+    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier * aggroRangeMultiplier;
     enemy.aggroTarget = undefined;
 
     const barWidth = 30;
