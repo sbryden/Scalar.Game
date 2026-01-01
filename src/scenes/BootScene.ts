@@ -41,6 +41,10 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('zombie_blob', '/Scalar.Game/zombie_blob.png');
         this.load.image('micromonkeyboss', '/Scalar.Game/micromonkeyboss.png');
         this.load.image('micro_boss', '/Scalar.Game/micro_boss.png');
+        this.load.image('rock_car_with_minions', '/Scalar.Game/rock_car_with_minions.png');
+        
+        // Load minion images
+        this.load.image('rock_minion_1', '/Scalar.Game/rock_minion_1.png');
         
         // Load other game assets
         this.load.image('dead_skull', '/Scalar.Game/dead_skull.png');
