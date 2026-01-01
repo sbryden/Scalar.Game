@@ -220,6 +220,32 @@ export const ENEMY_CONFIG: Record<string, {
     }
 };
 
+// Boss texture configuration with weighted random selection
+// Each boss type can have multiple texture options with spawn weights
+export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight: number }>> = {
+    boss_generic: [
+        { texture: 'snake_boss', weight: 0.5 },
+        { texture: 'rockgiant', weight: 0.5 }
+    ],
+    boss_micro: [
+        { texture: 'zombie_blob', weight: 0.8 },
+        { texture: 'micromonkeyboss', weight: 0.2 }
+    ],
+    boss_fish: [
+        { texture: 'water_enemy_fish_1', weight: 0.25 },
+        { texture: 'water_enemy_needle_fish_1', weight: 0.75 }
+    ],
+    boss_shark: [
+        { texture: 'sharkboss', weight: 1.0 }
+    ],
+    boss_crab: [
+        { texture: 'crabboss', weight: 1.0 }
+    ],
+    boss_plankton: [
+        { texture: 'bacteria', weight: 1.0 }
+    ]
+};
+
 // Player combat configuration
 export const PLAYER_COMBAT_CONFIG = {
     baseMeleeDamage: 5,           // Base damage when colliding with enemies
@@ -366,4 +392,27 @@ export const HARD_MODE_CONFIG = {
 
 export const GOD_MODE_CONFIG = {
     playerSpeedMultiplier: 4.0       // Player moves 4x faster in god mode
+};
+
+// Stamina configuration
+export const STAMINA_CONFIG = {
+    startingMaxStamina: 100,         // Starting maximum stamina
+    startingStamina: 100,            // Starting current stamina (full)
+    rechargeRate: 10,                // Stamina recharged per second
+    consumptionRate: 25,             // Stamina consumed per second in melee mode
+    exhaustionThreshold: 0.2,        // 20% - cannot activate melee below this
+    xpOrbRestoration: 15,            // Stamina restored per XP orb collected
+    staminaIncreasePerLevel: 10,     // Max stamina increase per level up
+    depletionPauseDuration: 2500     // Pause duration when stamina hits 0 (ms) before recharge resumes
+};
+
+
+// UI configuration for stamina display
+export const STAMINA_UI_CONFIG = {
+    exhaustionFlashDuration: 300,    // Duration of exhaustion flash effect (ms)
+    colors: {
+        normal: 0x00BFFF,            // Deep sky blue for normal stamina (>20%)
+        exhaustion: 0xFF8800,        // Orange for exhaustion warning (≤20%)
+        depleted: 0xFF0000           // Red for depleted (0%)
+    }
 };

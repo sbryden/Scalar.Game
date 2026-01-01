@@ -11,13 +11,13 @@ export function setInputs(c: Phaser.Types.Input.Keyboard.CursorKeys, w: WASDKeys
 }
 
 export function fireProjectile(scene: Phaser.Scene): void {
-    const now = Date.now();
+    const gameTime = scene.time.now;
     
-    if (now - lastProjectileTime < PROJECTILE_CONFIG.basic.cooldown) {
+    if (gameTime - lastProjectileTime < PROJECTILE_CONFIG.basic.cooldown) {
         return;
     }
     
-    lastProjectileTime = now;
+    lastProjectileTime = gameTime;
     
     const config = PROJECTILE_CONFIG.basic;
     

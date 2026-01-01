@@ -12,6 +12,7 @@ import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
+import { getStaminaSystem } from '../systems/StaminaSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
@@ -289,6 +290,11 @@ export default class UnderwaterScene extends Phaser.Scene {
     update() {
         const playerStats = getPlayerStats();
         
+        // Update stamina system
+        const staminaSystem = getStaminaSystem();
+        const isMeleeActive = this.player?.isMeleeMode || false;
+        staminaSystem.update(isMeleeActive, this.time.now);
+        
         // Update debug display (only if enabled)
         if (this.debugDisplay?.enabled) {
             this.debugDisplay.update(this.player.x, playerStats);
@@ -311,12 +317,12 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.enemies.children.entries.forEach(obj => {
             const enemy = obj as Enemy;
             if (enemy.active) {
-                updateEnemyAI(enemy);
+                updateEnemyAI(enemy, this.time.now);
             }
         });
         
         // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies, this.player);
+        combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
         
         // Update projectiles
         updateProjectiles();
@@ -370,8 +376,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.player.clearTint();
         
         // Activate immunity for 4 seconds
-        const now = Date.now();
-        this.player.immuneUntil = now + 4000;
+        this.player.immuneUntil = this.time.now + 4000;
         
         // Start flashing effect
         this.startImmunityFlash(this.player);

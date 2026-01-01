@@ -1,13 +1,10 @@
-/**
- * Input Manager
- * Handles all keyboard input setup and player movement controls
- */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
-import { SIZE_CONFIG, GOD_MODE_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
+import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -95,22 +92,55 @@ export class InputManager {
     handleMovement(): void {
         if (!gameState.player) return;
         
-        // Update melee mode state based on Shift key
+        const staminaSystem = getStaminaSystem();
         const wasMeleeMode = gameState.player.isMeleeMode || false;
-        gameState.player.isMeleeMode = this.shiftKey.isDown;
+        const wantsToActivateMelee = this.shiftKey.isDown;
+        
+        // Determine if melee mode should be active
+        let newMeleeMode = false;
+        if (wantsToActivateMelee) {
+            // Check if player can activate melee mode
+            if (wasMeleeMode) {
+                // Already in melee mode - can continue until stamina hits 0
+                const staminaState = staminaSystem.getState();
+                newMeleeMode = !staminaState.isDepleted;
+            } else {
+                // Trying to activate - check if allowed
+                newMeleeMode = staminaSystem.canActivateMeleeMode();
+            }
+        } else {
+            // Player released shift - reset the ability
+            staminaSystem.resetAbility();
+            newMeleeMode = false;
+        }
+        
+        // Update melee mode state
+        gameState.player.isMeleeMode = newMeleeMode;
         
         // Visual feedback when entering/exiting melee mode
         if (gameState.player.isMeleeMode && !wasMeleeMode) {
             // Entering melee mode - add blue tint
             gameState.player.setTint(0x88ccff);
         } else if (!gameState.player.isMeleeMode && wasMeleeMode) {
-            // Exiting melee mode - clear tint
-            gameState.player.clearTint();
+            // Exiting melee mode - check if due to exhaustion
+            const staminaState = staminaSystem.getState();
+            if (staminaState.isExhausted) {
+                // Add orange/red tint to indicate exhaustion
+                gameState.player.setTint(STAMINA_UI_CONFIG.colors.exhaustion);
+                // Clear tint after configured delay
+                this.scene.time.delayedCall(STAMINA_UI_CONFIG.exhaustionFlashDuration, () => {
+                    if (gameState.player && !gameState.player.isMeleeMode) {
+                        gameState.player.clearTint();
+                    }
+                });
+            } else {
+                // Normal exit - clear tint
+                gameState.player.clearTint();
+            }
         }
         
         // Check if player is stunned
-        const now = Date.now();
-        if (gameState.player.stunnedUntil && now < gameState.player.stunnedUntil) {
+        if (gameState.player.stunnedUntil && this.scene.time.now < gameState.player.stunnedUntil) {
             // Player is stunned, no input allowed
             return;
         }

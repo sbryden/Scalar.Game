@@ -55,7 +55,7 @@ export class CollisionManager {
         }
         
         this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (p, enemy) => {
-            combatSystem.handlePlayerEnemyCollision(p as Player, enemy as Enemy);
+            combatSystem.handlePlayerEnemyCollision(p as Player, enemy as Enemy, this.scene.time.now);
         }, undefined, this.scene);
     }
 }
