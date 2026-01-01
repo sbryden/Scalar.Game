@@ -4,7 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { generateMixedSpawnPoints } from '../utils/spawnHelpers';
+import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -247,7 +247,7 @@ export default class UnderwaterScene extends Phaser.Scene {
             });
         } else {
             // Generate dynamic mixed spawn points (80% fish, 20% crabs)
-            const { fishSpawns, crabSpawns } = generateMixedSpawnPoints(0.8);
+            const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
             
             // Spawn fish enemies
             fishSpawns.forEach(point => {
