@@ -208,7 +208,7 @@ export default class MicroScene extends Phaser.Scene {
                 enemy.floatAngle = enemyData.floatAngle || 0;
             });
         } else {
-            // Generate dynamic spawn points with density gradients
+            // Generate dynamic spawn points with randomized density distribution
             // Micro enemies can swim, so allow Y variance
             const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
                 SPAWN_CONFIG.defaults.baseInterval,
