@@ -17,6 +17,7 @@ import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
+import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy } from '../types/game';
 
 export default class UnderwaterScene extends Phaser.Scene {
@@ -28,6 +29,7 @@ export default class UnderwaterScene extends Phaser.Scene {
     hud!: HUD;
     debugDisplay!: DebugDisplay;
     gameOverScreen!: GameOverScreen;
+    levelCompleteScreen!: LevelCompleteScreen;
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
@@ -209,6 +211,24 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.gameOverScreen.setQuitCallback(() => {
             this.handleQuit();
         });
+        
+        // Create Level Complete Screen
+        this.levelCompleteScreen = new LevelCompleteScreen(this);
+        this.levelCompleteScreen.create();
+        
+        // Set up boss defeat callback
+        combatSystem.setBossDefeatCallback(() => {
+            this.handleLevelComplete();
+        });
+        
+        // Set up replay and exit callbacks
+        this.levelCompleteScreen.setReplayCallback(() => {
+            this.handleReplay();
+        });
+        
+        this.levelCompleteScreen.setExitCallback(() => {
+            this.handleExitToMenu();
+        });
     }
     
     restoreOrSpawnEnemies() {
@@ -230,6 +250,9 @@ export default class UnderwaterScene extends Phaser.Scene {
                 const enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
                 spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
             }
+            
+            // Spawn boss enemy toward the end of the level
+            spawnEnemy(this, 7500, 400, 'boss_fish');
         }
     }
     
@@ -372,6 +395,25 @@ export default class UnderwaterScene extends Phaser.Scene {
         
         // Reset player stats
         playerStatsSystem.reset();
+        
+        // Go back to menu
+        this.scene.start('MenuScene');
+    }
+    
+    handleLevelComplete() {
+        console.log('Level Complete - Boss Defeated!');
+        this.levelCompleteScreen.show();
+    }
+    
+    handleReplay() {
+        console.log('Replaying level');
+        
+        // Restart the current scene
+        this.scene.restart();
+    }
+    
+    handleExitToMenu() {
+        console.log('Exiting to main menu');
         
         // Go back to menu
         this.scene.start('MenuScene');

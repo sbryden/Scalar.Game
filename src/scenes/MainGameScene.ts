@@ -17,6 +17,7 @@ import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
+import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy } from '../types/game';
 
 export default class MainGameScene extends Phaser.Scene {
@@ -28,6 +29,7 @@ export default class MainGameScene extends Phaser.Scene {
     hud!: HUD;
     debugDisplay!: DebugDisplay;
     gameOverScreen!: GameOverScreen;
+    levelCompleteScreen!: LevelCompleteScreen;
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
@@ -154,6 +156,24 @@ export default class MainGameScene extends Phaser.Scene {
         this.gameOverScreen.setQuitCallback(() => {
             this.handleQuit();
         });
+        
+        // Create Level Complete Screen
+        this.levelCompleteScreen = new LevelCompleteScreen(this);
+        this.levelCompleteScreen.create();
+        
+        // Set up boss defeat callback
+        combatSystem.setBossDefeatCallback(() => {
+            this.handleLevelComplete();
+        });
+        
+        // Set up replay and exit callbacks
+        this.levelCompleteScreen.setReplayCallback(() => {
+            this.handleReplay();
+        });
+        
+        this.levelCompleteScreen.setExitCallback(() => {
+            this.handleExitToMenu();
+        });
     }
     
     restoreOrSpawnEnemies() {
@@ -163,7 +183,7 @@ export default class MainGameScene extends Phaser.Scene {
         if (savedEnemies.length > 0) {
             // Restore saved enemies
             savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, 'generic');
+                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'generic');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
                 enemy.startY = enemyData.startY || enemyData.y;
@@ -174,6 +194,9 @@ export default class MainGameScene extends Phaser.Scene {
             for (let x = 300; x < WORLD_WIDTH; x += 300) {
                 spawnEnemy(this, x, 680, 'generic');
             }
+            
+            // Spawn boss enemy toward the end of the level
+            spawnEnemy(this, 7500, 680, 'boss_generic');
         }
     }
     
@@ -316,6 +339,25 @@ export default class MainGameScene extends Phaser.Scene {
         
         // Reset player stats
         playerStatsSystem.reset();
+        
+        // Go back to menu
+        this.scene.start('MenuScene');
+    }
+    
+    handleLevelComplete() {
+        console.log('Level Complete - Boss Defeated!');
+        this.levelCompleteScreen.show();
+    }
+    
+    handleReplay() {
+        console.log('Replaying level');
+        
+        // Restart the current scene
+        this.scene.restart();
+    }
+    
+    handleExitToMenu() {
+        console.log('Exiting to main menu');
         
         // Go back to menu
         this.scene.start('MenuScene');

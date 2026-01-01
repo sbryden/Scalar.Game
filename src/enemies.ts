@@ -8,27 +8,33 @@ import type { Enemy, Projectile } from './types/game';
  * Swimming enemies can move freely in all directions and don't have gravity
  */
 function isSwimmingEnemy(enemyType: string): boolean {
-    return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton";
+    return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton" ||
+           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton";
 }
 
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
     const config = ENEMY_CONFIG[enemyType];
     
+    // Check if this is a boss enemy
+    const isBoss = enemyType.startsWith('boss_');
+    
     // Select appropriate texture based on enemy type
     let texture = "enemy";
-    if (enemyType === "micro") {
+    if (enemyType === "micro" || enemyType === "boss_micro") {
         texture = "bacteria";
-    } else if (enemyType === "fish") {
+    } else if (enemyType === "fish" || enemyType === "boss_fish") {
         // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
         texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
-    } else if (enemyType === "plankton") {
+    } else if (enemyType === "plankton" || enemyType === "boss_plankton") {
         texture = "bacteria"; // Use bacteria as placeholder for plankton
     } else if (enemyType === "crab") {
         texture = "water_enemy_crab_1";
     }
     
     const enemy = scene.add.sprite(x, y, texture);
-    enemy.setScale(0.2);
+    // Boss enemies are 3x the size (0.2 * 3 = 0.6 for bosses)
+    const baseScale = 0.2;
+    enemy.setScale(isBoss ? baseScale * 3 : baseScale);
     scene.physics.add.existing(enemy);
     enemy.body.setBounce(0.2);
     enemy.body.setCollideWorldBounds(true);

@@ -15,6 +15,15 @@ import type { Player, Enemy, Projectile } from '../types/game';
 type DamageEntity = Player | Enemy | Projectile;
 
 export class CombatSystem {
+    private onBossDefeat: (() => void) | null = null;
+
+    /**
+     * Set callback for when a boss is defeated
+     */
+    setBossDefeatCallback(callback: () => void): void {
+        this.onBossDefeat = callback;
+    }
+
     /**
      * Check if player is moving toward enemy
      * Uses dot product to determine if player velocity is directed toward enemy
@@ -248,6 +257,9 @@ export class CombatSystem {
      * Kill an enemy and spawn XP orb
      */
     killEnemy(enemy: Enemy): void {
+        // Check if this is a boss enemy
+        const isBoss = enemy.enemyType?.startsWith('boss_');
+        
         // Spawn XP orb at enemy location
         if (enemy.scene && enemy.xpReward) {
             spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
@@ -259,6 +271,11 @@ export class CombatSystem {
         
         // Destroy enemy
         enemy.destroy();
+        
+        // Trigger boss defeat callback if this was a boss
+        if (isBoss && this.onBossDefeat) {
+            this.onBossDefeat();
+        }
     }
     
     /**
