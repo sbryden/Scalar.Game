@@ -1,6 +1,6 @@
 /**
  * Spawn Helper Functions
- * Utility functions for dynamic enemy spawn point generation
+ * Utility functions for dynamic enemy spawn point generation using 16-segment system
  */
 import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
 import { HARD_MODE_CONFIG } from '../config';
@@ -16,7 +16,30 @@ export interface SpawnPoint {
 }
 
 /**
- * Generate dynamic spawn points with density gradients
+ * Generate random density multipliers for segments that sum to maintain target enemy count
+ * @param segmentCount - Number of segments to generate densities for
+ * @returns Array of density multipliers
+ */
+function generateBalancedDensities(segmentCount: number): number[] {
+    const densities: number[] = [];
+    
+    // Generate random densities within range
+    for (let i = 0; i < segmentCount; i++) {
+        const density = SPAWN_CONFIG.densityRange.min + 
+            Math.random() * (SPAWN_CONFIG.densityRange.max - SPAWN_CONFIG.densityRange.min);
+        densities.push(density);
+    }
+    
+    // Normalize densities to maintain consistent total enemy count
+    const sum = densities.reduce((acc, val) => acc + val, 0);
+    const targetSum = segmentCount; // Average density of 1.0 across all segments
+    const normalizationFactor = targetSum / sum;
+    
+    return densities.map(d => d * normalizationFactor);
+}
+
+/**
+ * Generate dynamic spawn points with 16-segment system
  * @param baseInterval - Base spawn interval in pixels (default from SPAWN_CONFIG)
  * @param baseY - Base Y coordinate for spawning (default from SPAWN_CONFIG)
  * @param allowYVariance - Whether to add Y variance (true for swimming enemies)
@@ -33,45 +56,43 @@ export function generateDynamicSpawnPoints(
     const isHardMode = playerStatsSystem.difficulty === 'hard';
     const difficultyMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpawnMultiplier : 1;
     
-    // Generate spawn points for each zone
-    const startZoneEnd = WORLD_WIDTH * SPAWN_CONFIG.zones.start.end;
-    const middleZoneEnd = WORLD_WIDTH * SPAWN_CONFIG.zones.middle.end;
-    const endZoneEnd = WORLD_WIDTH * SPAWN_CONFIG.zones.end.end;
+    // Calculate segment width
+    const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
     
-    // Start zone (sparse)
-    generateSpawnPointsInZone(
-        300,
-        startZoneEnd,
-        baseInterval / (SPAWN_CONFIG.densityMultipliers.start * difficultyMultiplier),
-        baseY,
-        allowYVariance,
-        spawnPoints
-    );
+    // Generate random densities for segments 2-14 (excluding first, last, and second-to-last)
+    const spawnSegmentCount = SPAWN_CONFIG.segmentCount - 3; // Segments 2-14 (13 segments)
+    const densities = generateBalancedDensities(spawnSegmentCount);
     
-    // Middle zone (dense)
-    generateSpawnPointsInZone(
-        startZoneEnd,
-        middleZoneEnd,
-        baseInterval / (SPAWN_CONFIG.densityMultipliers.middle * difficultyMultiplier),
-        baseY,
-        allowYVariance,
-        spawnPoints
-    );
+    // Generate spawn points for each segment
+    for (let segmentIndex = 1; segmentIndex < SPAWN_CONFIG.segmentCount - 2; segmentIndex++) {
+        // Segment 0: no enemies
+        // Segments 1-13: spawn enemies with random density
+        // Segment 14: boss segment (handled separately)
+        // Segment 15: no enemies
+        
+        const segmentStart = segmentIndex * segmentWidth;
+        const segmentEnd = (segmentIndex + 1) * segmentWidth;
+        const densityIndex = segmentIndex - 1; // Map to densities array (0-12)
+        const densityMultiplier = densities[densityIndex] || 1.0; // Default to 1.0 if undefined
+        
+        // Calculate interval for this segment
+        const interval = baseInterval / (densityMultiplier * difficultyMultiplier);
+        
+        // Generate spawn points within this segment
+        generateSpawnPointsInZone(
+            segmentStart,
+            segmentEnd,
+            interval,
+            baseY,
+            allowYVariance,
+            spawnPoints
+        );
+    }
     
-    // End zone (sparse)
-    generateSpawnPointsInZone(
-        middleZoneEnd,
-        endZoneEnd,
-        baseInterval / (SPAWN_CONFIG.densityMultipliers.end * difficultyMultiplier),
-        baseY,
-        allowYVariance,
-        spawnPoints
-    );
-    
-    // Add boss spawn point
-    const bossX = WORLD_WIDTH - 
-        SPAWN_CONFIG.boss.minDistanceFromEnd - 
-        Math.random() * (SPAWN_CONFIG.boss.maxDistanceFromEnd - SPAWN_CONFIG.boss.minDistanceFromEnd);
+    // Add boss spawn point in segment 14 (second-to-last segment)
+    const bossSegmentStart = (SPAWN_CONFIG.segmentCount - 2) * segmentWidth;
+    const bossSegmentEnd = (SPAWN_CONFIG.segmentCount - 1) * segmentWidth;
+    const bossX = bossSegmentStart + (bossSegmentEnd - bossSegmentStart) * 0.5; // Center of segment
     
     const bossY = allowYVariance 
         ? baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y
