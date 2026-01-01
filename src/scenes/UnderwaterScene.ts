@@ -189,6 +189,9 @@ export default class UnderwaterScene extends Phaser.Scene {
         gameState.scene = this;
         gameState.currentSceneKey = 'UnderwaterScene';
         gameState.spawnEnemyFunc = spawnEnemy;
+        
+        // Apply correct vehicle texture based on player level
+        spawnSystem.upgradePlayerCar();
     }
     
     createUI() {
