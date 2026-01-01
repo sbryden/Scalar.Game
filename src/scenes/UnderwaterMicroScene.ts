@@ -43,6 +43,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     }
     
     create() {
+        // Reset spawner boss tracking
+        combatSystem.resetSpawnerTracking();
+        
         // Start tracking level stats
         levelStatsTracker.startLevel(this.time.now);
         
