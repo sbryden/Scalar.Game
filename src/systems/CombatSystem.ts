@@ -59,6 +59,12 @@ export class CombatSystem {
     damageEnemy(projectile: Projectile, enemy: Enemy): void {
         if (!projectile.active) return;
         
+        // Skip damage for dead enemies
+        if (enemy.isDead) {
+            projectile.destroy();
+            return;
+        }
+        
         const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
         enemy.health -= damage;
         
@@ -92,6 +98,11 @@ export class CombatSystem {
      * @param gameTime - Current game time from Phaser scene (scene.time.now)
      */
     handlePlayerEnemyCollision(player: Player, enemy: Enemy, gameTime: number): void {
+        // Skip collision for dead enemies
+        if (enemy.isDead) {
+            return;
+        }
+        
         // Check if player is immune (after respawn)
         if (player.immuneUntil && gameTime < player.immuneUntil) {
             // Player is immune, no collision effects
@@ -272,17 +283,60 @@ export class CombatSystem {
         // Track enemy destruction
         levelStatsTracker.recordEnemyDestroyed(isBoss);
         
-        // Spawn XP orb at enemy location
-        if (enemy.scene && enemy.xpReward) {
-            spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
+        // Mark enemy as dead to prevent further AI/damage processing
+        enemy.health = 0;
+        enemy.isDead = true;
+        
+        // Disable physics body so player can pass through during fade-out
+        if (enemy.body) {
+            enemy.body.setVelocity(0, 0);
+            enemy.body.setEnable(false);
         }
         
-        // Destroy health bars
+        // Spawn XP orb immediately at enemy location
+        if (enemy.scene && enemy.xpReward) {
+            spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
+            
+            // Set depth for XP orbs to ensure they appear above dying enemies
+            if (gameState.xpOrbs) {
+                gameState.xpOrbs.children.entries.forEach((obj) => {
+                    const orb = obj as Phaser.GameObjects.Arc;
+                    orb.setDepth(100);
+                });
+            }
+        }
+        
+        // Destroy health bars immediately
         if (enemy.healthBar) enemy.healthBar.destroy();
         if (enemy.healthBarBg) enemy.healthBarBg.destroy();
         
-        // Destroy enemy
-        enemy.destroy();
+        // Spawn floating skull death effect
+        const skull = enemy.scene.add.image(enemy.x, enemy.y, 'dead_skull');
+        skull.setDepth(150); // Above XP orbs and enemies
+        skull.setScale(0.3); // Smaller skull size
+        
+        // Float skull up 100px and fade out over 2 seconds
+        enemy.scene.tweens.add({
+            targets: skull,
+            y: skull.y - 100,
+            alpha: 0,
+            duration: 2000,
+            ease: 'Linear',
+            onComplete: () => {
+                skull.destroy();
+            }
+        });
+        
+        // Fade out enemy faster (1 second), then destroy
+        enemy.scene.tweens.add({
+            targets: enemy,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Linear',
+            onComplete: () => {
+                enemy.destroy();
+            }
+        });
         
         // Trigger boss defeat callback if this was a boss
         if (isBoss && this.onBossDefeat) {

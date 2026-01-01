@@ -134,6 +134,9 @@ export default class MainGameScene extends Phaser.Scene {
         gameState.scene = this;
         gameState.currentSceneKey = 'MainGameScene';
         gameState.spawnEnemyFunc = spawnEnemy;
+        
+        // Apply correct vehicle texture based on player level
+        spawnSystem.upgradePlayerCar();
     }
     
     createUI() {
@@ -203,7 +206,7 @@ export default class MainGameScene extends Phaser.Scene {
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
                     // Spawn boss enemy
-                    spawnEnemy(this, point.x, point.y, 'boss_generic');
+                    spawnEnemy(this, point.x, point.y, 'boss_land');
                 } else {
                     // Spawn regular enemy
                     spawnEnemy(this, point.x, point.y, 'generic');

@@ -154,6 +154,9 @@ export default class MicroScene extends Phaser.Scene {
         gameState.scene = this;
         gameState.currentSceneKey = 'MicroScene';
         gameState.spawnEnemyFunc = spawnEnemy;
+        
+        // Apply correct vehicle texture based on player level
+        spawnSystem.upgradePlayerCar();
     }
     
     createUI() {
@@ -225,7 +228,7 @@ export default class MicroScene extends Phaser.Scene {
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
                     // Spawn boss enemy
-                    spawnEnemy(this, point.x, point.y, 'boss_micro');
+                    spawnEnemy(this, point.x, point.y, 'boss_land_micro');
                 } else {
                     // Spawn regular micro enemy
                     spawnEnemy(this, point.x, point.y, 'micro');
