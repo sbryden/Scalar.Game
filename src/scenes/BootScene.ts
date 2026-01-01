@@ -36,6 +36,14 @@ export default class BootScene extends Phaser.Scene {
         // Load boss images
         this.load.image('sharkboss', '/Scalar.Game/sharkboss.png');
         this.load.image('crabboss', '/Scalar.Game/crabboss.png');
+        this.load.image('snake_boss', '/Scalar.Game/snake_boss.png');
+        this.load.image('rockgiant', '/Scalar.Game/rockgiant.png');
+        this.load.image('zombie_blob', '/Scalar.Game/zombie_blob.png');
+        this.load.image('micromonkeyboss', '/Scalar.Game/micromonkeyboss.png');
+        this.load.image('micro_boss', '/Scalar.Game/micro_boss.png');
+        
+        // Load other game assets
+        this.load.image('dead_skull', '/Scalar.Game/dead_skull.png');
         
         // Load projectile images
         this.load.image('torpedo', '/Scalar.Game/torpedo.png');
