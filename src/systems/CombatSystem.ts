@@ -204,7 +204,8 @@ export class CombatSystem {
         }
         
         // Handle enemy stuns
-        entities.forEach(enemy => {
+        entities.children.entries.forEach(obj => {
+            const enemy = obj as Enemy;
             if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
                 // Enemy is stunned, freeze AI movement
                 if (enemy.body) {

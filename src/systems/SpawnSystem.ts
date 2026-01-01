@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import playerStatsSystem from './PlayerStatsSystem';
 import { gainXP } from '../xpOrbs';
+import type { XPOrb } from '../types/game';
 
 export class SpawnSystem {
     constructor() {
@@ -19,7 +20,7 @@ export class SpawnSystem {
      * Spawn an XP orb at the given location
      */
     spawnXPOrb(scene: Phaser.Scene, x: number, y: number, xpValue: number): void {
-        const orb = scene.add.circle(x, y, 6, 0xFFD700);
+        const orb = scene.add.circle(x, y, 6, 0xFFD700) as XPOrb;
         scene.physics.add.existing(orb);
         orb.body.setVelocity(
             Phaser.Math.Between(-50, 50),
@@ -41,11 +42,12 @@ export class SpawnSystem {
             );
         }
         
-        gameState.xpOrbs.add(orb);
-        scene.physics.add.collider(orb, gameState.platforms);
-        scene.physics.add.overlap(gameState.player, orb, (p, o) => {
-            gainXP(o.xpValue || 25);
-            o.destroy();
+        gameState.xpOrbs!.add(orb);
+        scene.physics.add.collider(orb, gameState.platforms!);
+        scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
+            const xpOrb = o as XPOrb;
+            gainXP(xpOrb.xpValue || 25);
+            xpOrb.destroy();
         });
     }
     

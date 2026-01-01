@@ -1,6 +1,6 @@
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config';
 import gameState from './utils/gameState';
-import type { PlayerSize } from './types/game';
+import type { PlayerSize, Enemy } from './types/game';
 
 export function getPlayerSize(): PlayerSize { return gameState.playerSize; }
 export function getSizeChangeTimer(): number { return gameState.sizeChangeTimer; }
@@ -83,8 +83,8 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     const baseDisplayScale = 0.25;
     
     // Apply new scale
-    gameState.player.setScale(baseDisplayScale * config.scale);
-    gameState.player.body.updateFromGameObject();
+    gameState.player!.setScale(baseDisplayScale * config.scale);
+    gameState.player!.body.updateFromGameObject();
     
     // Small jump to account for size change
     gameState.player.body.setVelocityY(-200);

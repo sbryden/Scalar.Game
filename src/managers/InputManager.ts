@@ -77,10 +77,11 @@ export class InputManager {
             return;
         }
         
-        const currentVelocityX = gameState.player.body.velocity.x;
+        const body = gameState.player.body;
+        const currentVelocityX = body.velocity.x;
         const jumpPower = 330 * SIZE_CONFIG[getPlayerSize()].jumpMultiplier;
-        gameState.player.body.setVelocityY(-jumpPower);
-        gameState.player.body.setVelocityX(currentVelocityX);
+        body.setVelocityY(-jumpPower);
+        body.setVelocityX(currentVelocityX);
     }
     
     /**
@@ -126,15 +127,16 @@ export class InputManager {
     handleLandMovement(): void {
         const baseSpeed = 160;
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
+        const body = gameState.player!.body;
         
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
-            gameState.player.body.setVelocityX(-baseSpeed * speedMultiplier);
-            gameState.player.setFlipX(true);  // Face left
+            body.setVelocityX(-baseSpeed * speedMultiplier);
+            gameState.player!.setFlipX(true);  // Face left
         } else if (this.wasdKeys.D.isDown || this.cursors.right.isDown) {
-            gameState.player.body.setVelocityX(baseSpeed * speedMultiplier);
-            gameState.player.setFlipX(false); // Face right
+            body.setVelocityX(baseSpeed * speedMultiplier);
+            gameState.player!.setFlipX(false); // Face right
         } else {
-            gameState.player.body.setVelocityX(0);
+            body.setVelocityX(0);
         }
     }
     
@@ -145,27 +147,28 @@ export class InputManager {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
+        const body = gameState.player!.body;
         
         // Horizontal movement
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
-            gameState.player.body.setVelocityX(-baseSpeed * speedMultiplier);
-            gameState.player.setFlipX(true);  // Face left
+            body.setVelocityX(-baseSpeed * speedMultiplier);
+            gameState.player!.setFlipX(true);  // Face left
         } else if (this.wasdKeys.D.isDown || this.cursors.right.isDown) {
-            gameState.player.body.setVelocityX(baseSpeed * speedMultiplier);
-            gameState.player.setFlipX(false); // Face right
+            body.setVelocityX(baseSpeed * speedMultiplier);
+            gameState.player!.setFlipX(false); // Face right
         } else {
-            gameState.player.body.setVelocityX(0);
+            body.setVelocityX(0);
         }
         
         // Vertical thrust controls (W for up, S for down, Space also for up)
         if (this.wasdKeys.W.isDown || this.cursors.up.isDown || this.spaceKey.isDown) {
             // Thrust upward
-            const currentVelY = gameState.player.body.velocity.y;
-            gameState.player.body.setVelocityY(Math.max(currentVelY - thrustPower * 0.15, -thrustPower));
+            const currentVelY = body.velocity.y;
+            body.setVelocityY(Math.max(currentVelY - thrustPower * 0.15, -thrustPower));
         } else if (this.wasdKeys.S.isDown || this.cursors.down.isDown) {
             // Thrust downward
-            const currentVelY = gameState.player.body.velocity.y;
-            gameState.player.body.setVelocityY(Math.min(currentVelY + thrustPower * 0.15, thrustPower));
+            const currentVelY = body.velocity.y;
+            body.setVelocityY(Math.min(currentVelY + thrustPower * 0.15, thrustPower));
         }
     }
     
