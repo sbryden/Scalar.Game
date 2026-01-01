@@ -1,4 +1,4 @@
-import { ENEMY_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG } from "./config";
+import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
@@ -47,17 +47,17 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         texture = enemyType === "boss_crab" ? "crabboss" : "water_enemy_crab_1";
     }
     
-    const enemy = scene.add.sprite(x, y, texture);
+    const enemy = scene.add.sprite(x, y, texture) as Enemy;
     // Boss enemies are scaled according to config
     const baseScale = PHYSICS_CONFIG.enemy.baseScale;
     enemy.setScale(isBoss ? baseScale * PHYSICS_CONFIG.enemy.bossScaleMultiplier : baseScale);
     scene.physics.add.existing(enemy);
-    enemy.body.setBounce(PHYSICS_CONFIG.enemy.bounce);
-    enemy.body.setCollideWorldBounds(true);
+    (enemy.body as Phaser.Physics.Arcade.Body).setBounce(PHYSICS_CONFIG.enemy.bounce);
+    (enemy.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
     if (isSwimmingEnemy(enemyType)) {
-        body.setAllowGravity(false);
+        (enemy.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
 
     enemy.health = config.health * healthMultiplier;
