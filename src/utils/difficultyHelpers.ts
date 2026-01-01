@@ -20,8 +20,3 @@ class DifficultyHelper {
 // Export singleton instance
 const difficultyHelper = new DifficultyHelper();
 export default difficultyHelper;
-
-// Backwards compatibility export
-export function getEnemySpawnInterval(baseInterval: number = 300): number {
-    return difficultyHelper.getEnemySpawnInterval(baseInterval);
-}

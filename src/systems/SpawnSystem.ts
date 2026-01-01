@@ -5,7 +5,7 @@
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import playerStatsSystem from './PlayerStatsSystem';
-import { gainXP } from '../xpOrbs';
+import xpOrbManager from '../xpOrbs';
 import type { XPOrb } from '../types/game';
 
 export class SpawnSystem {
@@ -46,7 +46,7 @@ export class SpawnSystem {
         scene.physics.add.collider(orb, gameState.platforms!);
         scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
             const xpOrb = o as XPOrb;
-            gainXP(xpOrb.xpValue || 25);
+            xpOrbManager.gainXP(xpOrb.xpValue || 25);
             xpOrb.destroy();
         });
     }

@@ -4,8 +4,8 @@
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
-import { changeSize, getPlayerSize } from '../player';
-import { fireProjectile } from '../projectiles';
+import playerManager from '../player';
+import projectileManager from '../projectiles';
 import { SIZE_CONFIG } from '../config';
 import type { WASDKeys } from '../types/game';
 
@@ -58,13 +58,13 @@ export class InputManager {
         }
         
         // Size changes - Q for smaller, E for larger (one step at a time)
-        this.scene.input.keyboard?.on('keydown-Q', () => changeSize('smaller'));
-        this.scene.input.keyboard?.on('keydown-E', () => changeSize('larger'));
+        this.scene.input.keyboard?.on('keydown-Q', () => playerManager.changeSize('smaller'));
+        this.scene.input.keyboard?.on('keydown-E', () => playerManager.changeSize('larger'));
         
         // Attack
         this.scene.input.keyboard?.on('keydown-F', () => {
             if (gameState.player) {
-                fireProjectile(gameState.player.scene);
+                projectileManager.fireProjectile(gameState.player.scene);
             }
         });
     }
@@ -80,7 +80,7 @@ export class InputManager {
         
         const body = player.body;
         const currentVelocityX = body.velocity.x;
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         const jumpPower = 330 * sizeConfig.jumpMultiplier;
@@ -130,7 +130,7 @@ export class InputManager {
      */
     handleLandMovement(): void {
         const baseSpeed = 160;
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         const speedMultiplier = sizeConfig.speedMultiplier;
@@ -153,7 +153,7 @@ export class InputManager {
     handleUnderwaterMovement(): void {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         const speedMultiplier = sizeConfig.speedMultiplier;

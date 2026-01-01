@@ -330,16 +330,3 @@ class EnemyManager {
 // Export singleton instance
 const enemyManager = new EnemyManager();
 export default enemyManager;
-
-// Backwards compatibility exports
-export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
-    return enemyManager.spawnEnemy(scene, x, y, enemyType);
-}
-
-export function updateEnemyAI(enemy: Enemy): void {
-    enemyManager.updateEnemyAI(enemy);
-}
-
-export async function damageEnemy(projectile: Projectile, enemy: Enemy): Promise<void> {
-    await enemyManager.damageEnemy(projectile, enemy);
-}

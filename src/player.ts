@@ -115,20 +115,3 @@ class PlayerManager {
 // Export singleton instance
 const playerManager = new PlayerManager();
 export default playerManager;
-
-// Backwards compatibility exports
-export function getPlayerSize(): PlayerSize { 
-    return playerManager.getPlayerSize(); 
-}
-
-export function getSizeChangeTimer(): number { 
-    return playerManager.getSizeChangeTimer(); 
-}
-
-export function setSizeChangeTimer(t: number): void { 
-    playerManager.setSizeChangeTimer(t); 
-}
-
-export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
-    playerManager.changeSize(direction);
-}

@@ -4,11 +4,11 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
-import { spawnEnemy, updateEnemyAI } from '../enemies';
-import { updateProjectiles } from '../projectiles';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
+import difficultyHelper from '../utils/difficultyHelpers';
+import enemyManager from '../enemies';
+import projectileManager from '../projectiles';
+import xpOrbManager from '../xpOrbs';
+import playerManager from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
@@ -187,7 +187,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         gameState.platforms = this.platforms;
         gameState.scene = this;
         gameState.currentSceneKey = 'UnderwaterScene';
-        gameState.spawnEnemyFunc = spawnEnemy;
+        gameState.spawnEnemyFunc = enemyManager.spawnEnemy.bind(enemyManager);
     }
     
     createUI() {
@@ -239,7 +239,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         if (savedEnemies && savedEnemies.length > 0) {
             // Restore saved enemies
             savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'fish');
+                const enemy = enemyManager.spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'fish');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
                 enemy.startY = enemyData.startY || enemyData.y;
@@ -247,15 +247,15 @@ export default class UnderwaterScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial underwater enemies (80% fish, 20% crabs)
-            const spawnInterval = getEnemySpawnInterval();
+            const spawnInterval = difficultyHelper.getEnemySpawnInterval();
             
             for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 const enemyType = Math.random() < 0.8 ? 'fish' : 'crab';
-                spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
+                enemyManager.spawnEnemy(this, x, enemyType === 'fish' ? 400 : 680, enemyType);
             }
             
             // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 400, 'boss_fish');
+            enemyManager.spawnEnemy(this, 7500, 400, 'boss_fish');
         }
     }
     
@@ -277,7 +277,7 @@ export default class UnderwaterScene extends Phaser.Scene {
     }
     
     update() {
-        const playerStats = getPlayerStats();
+        const playerStats = xpOrbManager.getPlayerStats();
         
         // Update debug display (only if enabled)
         if (this.debugDisplay?.enabled) {
@@ -288,10 +288,10 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.hud.update(playerStats);
         
         // Update size change cooldown
-        let timer = getSizeChangeTimer();
+        let timer = playerManager.getSizeChangeTimer();
         if (timer > 0) {
             timer -= 1000 / 60;
-            setSizeChangeTimer(timer);
+            playerManager.setSizeChangeTimer(timer);
         }
         
         // Handle player movement
@@ -301,7 +301,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         this.enemies.children.entries.forEach(obj => {
             const enemy = obj as Enemy;
             if (enemy.active) {
-                updateEnemyAI(enemy);
+                enemyManager.updateEnemyAI(enemy);
             }
         });
         
@@ -309,10 +309,10 @@ export default class UnderwaterScene extends Phaser.Scene {
         combatSystem.updateStunEffects(this.enemies, this.player);
         
         // Update projectiles
-        updateProjectiles();
+        projectileManager.updateProjectiles();
         
         // Update XP orb magnetism
-        updateXPOrbMagnetism();
+        xpOrbManager.updateXPOrbMagnetism();
         
         // Update camera
         this.cameraManager.update();
@@ -390,7 +390,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         
         // Spawn new enemies
         for (let x = 300; x < WORLD_WIDTH; x += 300) {
-            spawnEnemy(this, x, 680, 'shark');
+            enemyManager.spawnEnemy(this, x, 680, 'shark');
         }
         
         // Update HUD

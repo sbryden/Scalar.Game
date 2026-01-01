@@ -96,16 +96,3 @@ class ProjectileManager {
 // Export singleton instance
 const projectileManager = new ProjectileManager();
 export default projectileManager;
-
-// Backwards compatibility exports
-export function setInputs(c: Phaser.Types.Input.Keyboard.CursorKeys, w: WASDKeys): void {
-    projectileManager.setInputs(c, w);
-}
-
-export function fireProjectile(scene: Phaser.Scene): void {
-    projectileManager.fireProjectile(scene);
-}
-
-export function updateProjectiles(): void {
-    projectileManager.updateProjectiles();
-}

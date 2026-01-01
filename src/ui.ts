@@ -67,12 +67,3 @@ class UIManager {
 // Export singleton instance
 const uiManager = new UIManager();
 export default uiManager;
-
-// Backwards compatibility exports
-export function createUIElements(scene: Phaser.Scene): UIElements {
-    return uiManager.createUIElements(scene);
-}
-
-export function updateUIBars(playerStats: PlayerStats): void {
-    uiManager.updateUIBars(playerStats);
-}

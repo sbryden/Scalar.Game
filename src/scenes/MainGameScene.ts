@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
-import { spawnEnemy, updateEnemyAI } from '../enemies';
-import { updateProjectiles } from '../projectiles';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
+import difficultyHelper from '../utils/difficultyHelpers';
+import enemyManager from '../enemies';
+import projectileManager from '../projectiles';
+import xpOrbManager from '../xpOrbs';
+import playerManager from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
@@ -128,7 +128,7 @@ export default class MainGameScene extends Phaser.Scene {
         gameState.platforms = this.platforms;
         gameState.scene = this;
         gameState.currentSceneKey = 'MainGameScene';
-        gameState.spawnEnemyFunc = spawnEnemy;
+        gameState.spawnEnemyFunc = enemyManager.spawnEnemy.bind(enemyManager);
     }
     
     createUI() {
@@ -180,7 +180,7 @@ export default class MainGameScene extends Phaser.Scene {
         if (savedEnemies.length > 0) {
             // Restore saved enemies
             savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'generic');
+                const enemy = enemyManager.spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'generic');
                 enemy.health = enemyData.health;
                 enemy.startX = enemyData.startX;
                 enemy.startY = enemyData.startY || enemyData.y;
@@ -188,14 +188,14 @@ export default class MainGameScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial enemies
-            const spawnInterval = getEnemySpawnInterval();
+            const spawnInterval = difficultyHelper.getEnemySpawnInterval();
             
             for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
-                spawnEnemy(this, x, 680, 'generic');
+                enemyManager.spawnEnemy(this, x, 680, 'generic');
             }
             
             // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 680, 'boss_generic');
+            enemyManager.spawnEnemy(this, 7500, 680, 'boss_generic');
         }
     }
     
@@ -217,7 +217,7 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     update() {
-        const playerStats = getPlayerStats();
+        const playerStats = xpOrbManager.getPlayerStats();
         
         // Update debug display (only if enabled)
         if (this.debugDisplay?.enabled) {
@@ -228,10 +228,10 @@ export default class MainGameScene extends Phaser.Scene {
         this.hud.update(playerStats);
         
         // Update size change cooldown
-        let timer = getSizeChangeTimer();
+        let timer = playerManager.getSizeChangeTimer();
         if (timer > 0) {
             timer -= 1000 / 60;
-            setSizeChangeTimer(timer);
+            playerManager.setSizeChangeTimer(timer);
         }
         
         // Handle player movement
@@ -241,7 +241,7 @@ export default class MainGameScene extends Phaser.Scene {
         this.enemies.children.entries.forEach(obj => {
             const enemy = obj as Enemy;
             if (enemy.active) {
-                updateEnemyAI(enemy);
+                enemyManager.updateEnemyAI(enemy);
             }
         });
         
@@ -249,10 +249,10 @@ export default class MainGameScene extends Phaser.Scene {
         combatSystem.updateStunEffects(this.enemies, this.player);
         
         // Update projectiles
-        updateProjectiles();
+        projectileManager.updateProjectiles();
         
         // Update XP orb magnetism
-        updateXPOrbMagnetism();
+        xpOrbManager.updateXPOrbMagnetism();
         
         // Update camera
         this.cameraManager.update();
@@ -330,7 +330,7 @@ export default class MainGameScene extends Phaser.Scene {
         
         // Spawn new enemies
         for (let x = 300; x < WORLD_WIDTH; x += 300) {
-            spawnEnemy(this, x, 680, 'generic');
+            enemyManager.spawnEnemy(this, x, 680, 'generic');
         }
         
         // Update HUD

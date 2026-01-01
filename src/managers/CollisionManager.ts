@@ -3,7 +3,7 @@
  * Sets up and manages all physics collisions in the game
  */
 import gameState from '../utils/gameState';
-import { damageEnemy } from '../enemies';
+import enemyManager from '../enemies';
 import combatSystem from '../systems/CombatSystem';
 import type { Player, Enemy, Projectile } from '../types/game';
 
@@ -36,7 +36,7 @@ export class CollisionManager {
         });
         
         this.scene.physics.add.collider(projectiles, enemies, (proj, enemy) => {
-            damageEnemy(proj as Projectile, enemy as Enemy);
+            enemyManager.damageEnemy(proj as Projectile, enemy as Enemy);
         }, undefined, this.scene);
         
         // Player-Enemy collision (bidirectional damage and knockback)
