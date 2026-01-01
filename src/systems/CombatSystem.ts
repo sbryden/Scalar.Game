@@ -384,7 +384,7 @@ export class CombatSystem {
         const isSpawnerBoss = enemy.isSpawnerBoss === true;
         
         // Track enemy destruction with enemy type for scoring
-        levelStatsTracker.recordEnemyDestroyed(isBoss, enemy.enemyType);
+        levelStatsTracker.recordEnemyDestroyed(enemy.enemyType, isBoss);
         
         // Mark enemy as dead to prevent further AI/damage processing
         enemy.health = 0;

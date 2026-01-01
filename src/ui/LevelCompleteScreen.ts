@@ -164,22 +164,18 @@ export class LevelCompleteScreen {
                 ''
             ];
             
-            // Add score breakdown with actual counts
+            // Add score breakdown with actual counts using pre-calculated scaled values
             if (stats.regularBossesDestroyed > 0) {
-                const pointsPerBoss = score.baseValues.regularBossPoints * currentLevel;
-                statsDisplay.push(`Regular Bosses: ${stats.regularBossesDestroyed} × ${pointsPerBoss} = ${Math.round(score.regularBossPoints)} pts`);
+                statsDisplay.push(`Regular Bosses: ${stats.regularBossesDestroyed} × ${score.scaledValues.regularBoss} = ${Math.round(score.regularBossPoints)} pts`);
             }
             if (stats.regularEnemiesDestroyed > 0) {
-                const pointsPerEnemy = score.baseValues.regularEnemyPoints * currentLevel;
-                statsDisplay.push(`Regular Enemies: ${stats.regularEnemiesDestroyed} × ${pointsPerEnemy} = ${Math.round(score.regularEnemyPoints)} pts`);
+                statsDisplay.push(`Regular Enemies: ${stats.regularEnemiesDestroyed} × ${score.scaledValues.regularEnemy} = ${Math.round(score.regularEnemyPoints)} pts`);
             }
             if (stats.microBossesDestroyed > 0) {
-                const pointsPerBoss = score.baseValues.microBossPoints * currentLevel;
-                statsDisplay.push(`Micro-World Bosses: ${stats.microBossesDestroyed} × ${pointsPerBoss} = ${Math.round(score.microBossPoints)} pts`);
+                statsDisplay.push(`Micro-World Bosses: ${stats.microBossesDestroyed} × ${score.scaledValues.microBoss} = ${Math.round(score.microBossPoints)} pts`);
             }
             if (stats.microEnemiesDestroyed > 0) {
-                const pointsPerEnemy = score.baseValues.microEnemyPoints * currentLevel;
-                statsDisplay.push(`Micro-World Enemies: ${stats.microEnemiesDestroyed} × ${pointsPerEnemy} = ${Math.round(score.microEnemyPoints)} pts`);
+                statsDisplay.push(`Micro-World Enemies: ${stats.microEnemiesDestroyed} × ${score.scaledValues.microEnemy} = ${Math.round(score.microEnemyPoints)} pts`);
             }
             
             statsDisplay.push('');
