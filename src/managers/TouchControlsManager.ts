@@ -27,17 +27,11 @@ export class TouchControlsManager {
     create(isUnderwater: boolean = false): void {
         this.isUnderwater = isUnderwater;
         
-        // Create container for all controls
-        this.controlsContainer = this.scene.add.container(0, 0);
-        this.controlsContainer.setDepth(2000);
-        this.controlsContainer.setScrollFactor(0);
-        
         const width = this.scene.cameras.main.width;
         const height = this.scene.cameras.main.height;
         
         // Create D-Pad for movement (left side)
         this.dpad = new VirtualDPad(this.scene, 120, height - 120, 100);
-        this.controlsContainer.add(this.dpad.getContainer());
         
         // Action buttons (right side)
         const buttonSize = 60;
@@ -117,7 +111,6 @@ export class TouchControlsManager {
         onRelease?: () => void
     ): TouchButton {
         const button = new TouchButton(this.scene, x, y, size, label, color, onPress, onRelease);
-        this.controlsContainer?.add(button.getGraphics());
         return button;
     }
     
@@ -210,7 +203,6 @@ export class TouchControlsManager {
         this.buttons.forEach(button => button.destroy());
         this.buttons.clear();
         this.activeButtons.clear();
-        this.controlsContainer?.destroy();
     }
 }
 
@@ -219,7 +211,6 @@ export class TouchControlsManager {
  */
 class VirtualDPad {
     private scene: Phaser.Scene;
-    private container: Phaser.GameObjects.Container;
     private base: Phaser.GameObjects.Circle;
     private stick: Phaser.GameObjects.Circle;
     private centerX: number;
@@ -234,21 +225,22 @@ class VirtualDPad {
         this.centerY = y;
         this.radius = radius;
         
-        this.container = this.scene.add.container(0, 0);
-        
         // Create base
         this.base = this.scene.add.circle(x, y, radius, 0x333333, 0.5);
         this.base.setStrokeStyle(3, 0xffffff, 0.8);
+        this.base.setDepth(2000);
+        this.base.setScrollFactor(0);
         
         // Create stick
         this.stick = this.scene.add.circle(x, y, radius * 0.4, 0x666666, 0.8);
         this.stick.setStrokeStyle(2, 0xffffff, 0.9);
-        
-        this.container.add([this.base, this.stick]);
+        this.stick.setDepth(2001);
+        this.stick.setScrollFactor(0);
         
         // Make interactive with larger hit area
+        // Use world coordinates for hit area (0, 0 in the hitArea means center of the circle)
         this.base.setInteractive(
-            new Phaser.Geom.Circle(x, y, radius * 1.2),
+            new Phaser.Geom.Circle(0, 0, radius * 1.2),
             Phaser.Geom.Circle.Contains
         );
         
@@ -308,10 +300,6 @@ class VirtualDPad {
         return this.currentDirection;
     }
     
-    getContainer(): Phaser.GameObjects.Container {
-        return this.container;
-    }
-    
     update(): void {
         // Animation or visual feedback could go here
     }
@@ -320,7 +308,8 @@ class VirtualDPad {
         this.scene.input.off('pointermove', this.handlePointerMove, this);
         this.scene.input.off('pointerup', this.handlePointerUp, this);
         this.base.off('pointerdown', this.handlePointerDown, this);
-        this.container.destroy();
+        this.base.destroy();
+        this.stick.destroy();
     }
 }
 
@@ -329,7 +318,6 @@ class VirtualDPad {
  */
 class TouchButton {
     private scene: Phaser.Scene;
-    private graphics: Phaser.GameObjects.Container;
     private button: Phaser.GameObjects.Circle;
     private label: Phaser.GameObjects.Text;
     private isPressed: boolean = false;
@@ -352,11 +340,11 @@ class TouchButton {
         this.onReleaseCallback = onRelease;
         this.normalColor = color;
         
-        this.graphics = this.scene.add.container(0, 0);
-        
         // Create button
         this.button = this.scene.add.circle(x, y, size / 2, color, 0.6);
         this.button.setStrokeStyle(3, 0xffffff, 0.9);
+        this.button.setDepth(2000);
+        this.button.setScrollFactor(0);
         
         // Create label
         this.label = this.scene.add.text(x, y, labelText, {
@@ -365,12 +353,13 @@ class TouchButton {
             fontStyle: 'bold'
         });
         this.label.setOrigin(0.5);
-        
-        this.graphics.add([this.button, this.label]);
+        this.label.setDepth(2001);
+        this.label.setScrollFactor(0);
         
         // Make interactive with larger hit area (1.5x size for easier touch)
+        // Use (0, 0) for hit area center since it's relative to the circle's position
         this.button.setInteractive(
-            new Phaser.Geom.Circle(x, y, size * 0.75),
+            new Phaser.Geom.Circle(0, 0, size * 0.75),
             Phaser.Geom.Circle.Contains
         );
         
@@ -411,15 +400,12 @@ class TouchButton {
         });
     }
     
-    getGraphics(): Phaser.GameObjects.Container {
-        return this.graphics;
-    }
-    
     update(): void {
         // Could add animations here
     }
     
     destroy(): void {
-        this.graphics.destroy();
+        this.button.destroy();
+        this.label.destroy();
     }
 }
