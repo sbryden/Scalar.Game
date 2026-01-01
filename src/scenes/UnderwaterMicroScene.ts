@@ -236,7 +236,7 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Generate dynamic spawn points with density gradients
+            // Generate dynamic spawn points with random density distribution
             // Plankton are floating enemies, so allow Y variance
             const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
                 SPAWN_CONFIG.defaults.baseInterval,
