@@ -4,6 +4,7 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/gameState';
+import { COMBAT_CONFIG, XP_CONFIG } from '../config';
 import type { PlayerStats, Difficulty } from '../types/game';
 
 type LevelUpCallback = (level: number) => void;
@@ -17,11 +18,11 @@ export class PlayerStatsSystem {
 
     constructor() {
         this.stats = {
-            level: 1,
-            maxHealth: 100,
-            health: 100,
-            xp: 0,
-            xpToLevel: 100
+            level: XP_CONFIG.progression.startingLevel,
+            maxHealth: XP_CONFIG.progression.startingMaxHealth,
+            health: XP_CONFIG.progression.startingHealth,
+            xp: XP_CONFIG.progression.startingXP,
+            xpToLevel: XP_CONFIG.progression.startingXPToLevel
         };
         this.difficulty = 'normal';
         this.onLevelUp = null;
@@ -35,11 +36,11 @@ export class PlayerStatsSystem {
         this.difficulty = difficulty;
         
         if (difficulty === 'godMode') {
-            this.stats.maxHealth = 10000000;
-            this.stats.health = 10000000;
+            this.stats.maxHealth = COMBAT_CONFIG.godMode.health;
+            this.stats.health = COMBAT_CONFIG.godMode.health;
         } else {
-            this.stats.maxHealth = 100;
-            this.stats.health = 100;
+            this.stats.maxHealth = XP_CONFIG.progression.startingMaxHealth;
+            this.stats.health = XP_CONFIG.progression.startingHealth;
         }
     }
     
@@ -73,9 +74,9 @@ export class PlayerStatsSystem {
         while (this.stats.xp >= this.stats.xpToLevel) {
             this.stats.xp -= this.stats.xpToLevel;
             this.stats.level += 1;
-            this.stats.maxHealth += 20;
+            this.stats.maxHealth += XP_CONFIG.progression.healthIncreasePerLevel;
             this.stats.health = this.stats.maxHealth;
-            this.stats.xpToLevel = Math.floor(this.stats.xpToLevel * 1.1);
+            this.stats.xpToLevel = Math.floor(this.stats.xpToLevel * XP_CONFIG.progression.xpScalingFactor);
             
             // Update level text UI
             if (gameState.levelText) {
@@ -127,11 +128,11 @@ export class PlayerStatsSystem {
      */
     reset(): void {
         this.stats = {
-            level: 1,
-            maxHealth: 100,
-            health: 100,
-            xp: 0,
-            xpToLevel: 100
+            level: XP_CONFIG.progression.startingLevel,
+            maxHealth: XP_CONFIG.progression.startingMaxHealth,
+            health: XP_CONFIG.progression.startingHealth,
+            xp: XP_CONFIG.progression.startingXP,
+            xpToLevel: XP_CONFIG.progression.startingXPToLevel
         };
     }
     

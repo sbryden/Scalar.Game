@@ -1,4 +1,4 @@
-import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
+import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG } from './config';
 import gameState from './utils/gameState';
 import playerStatsSystem from './systems/PlayerStatsSystem';
 import type { WASDKeys, Projectile } from './types/game';
@@ -29,7 +29,7 @@ export function fireProjectile(scene: Phaser.Scene): void {
     // Check if underwater for slower projectile speed
     const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
                         gameState.currentSceneKey === 'UnderwaterMicroScene';
-    const speedMultiplier = isUnderwater ? 0.5 : 1.0; // Half speed underwater
+    const speedMultiplier = isUnderwater ? PHYSICS_CONFIG.underwater.speedMultiplier : 1.0;
     
     const velocityX = config.speed * direction * speedMultiplier;
     
@@ -37,18 +37,18 @@ export function fireProjectile(scene: Phaser.Scene): void {
     if (!player) return;
     
     // Offset projectile spawn behind the vehicle (opposite of direction)
-    const spawnOffsetX = direction === 1 ? 40 : -40;
+    const spawnOffsetX = direction === 1 ? PHYSICS_CONFIG.projectile.spawnOffsetX : -PHYSICS_CONFIG.projectile.spawnOffsetX;
     const projectileX = player.x + spawnOffsetX;
     
-    // Projectile spawns at 1/6 height of tank (1/6 from top)
+    // Projectile spawns at configured height ratio from top of tank
     const tankHeight = player.displayHeight;
-    const projectileY = player.y - tankHeight / 2 + (1 / 6) * tankHeight;
+    const projectileY = player.y - tankHeight / 2 + PHYSICS_CONFIG.projectile.heightRatio * tankHeight;
     
     // Create projectile (torpedo underwater, beam on land)
     const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
     const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
     projectile.setOrigin(0.5, 0.5);
-    projectile.setDepth(0);
+    projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
     
     // Scale projectile based on player scale
     const playerScale = player.scaleX;
@@ -69,12 +69,12 @@ export function fireProjectile(scene: Phaser.Scene): void {
     body.setCollideWorldBounds(true);
     body.setVelocity(velocityX, 0);
     
-    // Set damage (1000 in god mode, normal otherwise)
-    projectile.damage = playerStatsSystem.isGodMode() ? 1000 : config.damage;
+    // Set damage (god mode damage or normal)
+    projectile.damage = playerStatsSystem.isGodMode() ? COMBAT_CONFIG.godMode.damage : config.damage;
     
-    // Track projectile spawn position and max range (1.5x screen width)
+    // Track projectile spawn position and max range (based on viewport width, not world width)
     projectile.spawnX = projectileX;
-    projectile.maxRange = 1024 * 1.5; // 1.5x screen width
+    projectile.maxRange = VISUAL_CONFIG.viewportWidth * PHYSICS_CONFIG.projectile.maxRangeMultiplier;
 }
 
 export function updateProjectiles(): void {
