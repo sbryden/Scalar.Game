@@ -1,4 +1,4 @@
-import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG } from "./config";
+import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
@@ -12,6 +12,42 @@ function isSwimmingEnemy(enemyType: string): boolean {
     return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton" ||
            enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton" ||
            enemyType === "boss_shark";
+}
+
+/**
+ * Select a texture for an enemy based on weighted random selection
+ * Supports both boss textures (with multiple weighted options) and regular enemy textures
+ */
+function selectEnemyTexture(enemyType: string): string {
+    // Check if this enemy type has weighted texture options (boss enemies)
+    if (BOSS_TEXTURE_CONFIG[enemyType]) {
+        const options = BOSS_TEXTURE_CONFIG[enemyType];
+        const random = Math.random();
+        let cumulativeWeight = 0;
+        
+        for (const option of options) {
+            cumulativeWeight += option.weight;
+            if (random < cumulativeWeight) {
+                return option.texture;
+            }
+        }
+        // Fallback to last option if no match (shouldn't happen with proper weights)
+        return options[options.length - 1]?.texture ?? "enemy";
+    }
+    
+    // Regular (non-boss) enemy textures
+    if (enemyType === "micro") {
+        return "bacteria";
+    } else if (enemyType === "fish") {
+        // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
+        return Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+    } else if (enemyType === "plankton") {
+        return "bacteria"; // Use bacteria as placeholder for plankton
+    } else if (enemyType === "crab") {
+        return "water_enemy_crab_1";
+    } else {
+        return "enemy"; // Default fallback
+    }
 }
 
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
@@ -33,19 +69,7 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     const lineOfSightMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyLineOfSightMultiplier : 1;
     
     // Select appropriate texture based on enemy type
-    let texture = "enemy";
-    if (enemyType === "micro" || enemyType === "boss_micro") {
-        texture = "bacteria";
-    } else if (enemyType === "fish" || enemyType === "boss_fish") {
-        // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
-        texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
-    } else if (enemyType === "boss_shark") {
-        texture = "sharkboss";
-    } else if (enemyType === "plankton" || enemyType === "boss_plankton") {
-        texture = "bacteria"; // Use bacteria as placeholder for plankton
-    } else if (enemyType === "crab" || enemyType === "boss_crab") {
-        texture = enemyType === "boss_crab" ? "crabboss" : "water_enemy_crab_1";
-    }
+    const texture = selectEnemyTexture(enemyType);
     
     const enemy = scene.add.sprite(x, y, texture) as Enemy;
     // Boss enemies are scaled according to config
@@ -126,10 +150,9 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     return enemy;
 }
 
-export function updateEnemyAI(enemy: Enemy): void {
+export function updateEnemyAI(enemy: Enemy, gameTime: number): void {
     // Check if enemy is stunned
-    const now = Date.now();
-    if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
+    if (enemy.stunnedUntil && gameTime < enemy.stunnedUntil) {
         // Enemy is stunned, don't update AI
         return;
     }
@@ -141,8 +164,7 @@ export function updateEnemyAI(enemy: Enemy): void {
             gameState.player.x, gameState.player.y
         );
         
-        const now = Date.now();
-        const playerIsImmune = gameState.player.immuneUntil && now < gameState.player.immuneUntil;
+        const playerIsImmune = gameState.player.immuneUntil && gameTime < gameState.player.immuneUntil;
         
         if (distanceToPlayer <= enemy.lineOfSight && !playerIsImmune) {
             enemy.isChasing = true;

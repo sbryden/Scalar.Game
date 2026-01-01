@@ -73,6 +73,8 @@ export interface PlayerStats {
     health: number;
     xp: number;
     xpToLevel: number;
+    stamina: number;
+    maxStamina: number;
 }
 
 /**
