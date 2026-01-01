@@ -210,8 +210,9 @@ export default class MainGameScene extends Phaser.Scene {
             // Spawn enemies at generated points
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
-                    // Spawn boss enemy
-                    spawnEnemy(this, point.x, point.y, 'boss_land');
+                    // 50% chance to spawn spawner boss, 50% regular boss
+                    const bossType = Math.random() < 0.5 ? 'spawner_boss_land' : 'boss_land';
+                    spawnEnemy(this, point.x, point.y, bossType);
                 } else {
                     // Spawn regular enemy
                     spawnEnemy(this, point.x, point.y, 'generic');

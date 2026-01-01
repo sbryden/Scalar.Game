@@ -45,6 +45,11 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     lastDamageTime?: number;
     lastPlayerDamageTime?: number;
     stunVelocity?: { x: number; y: number };
+    // Spawner boss properties
+    isSpawnerBoss?: boolean;
+    minionType?: string;
+    minionCount?: number;
+    spawnRadius?: number;
 }
 
 /**
