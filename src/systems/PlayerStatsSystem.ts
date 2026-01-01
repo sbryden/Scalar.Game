@@ -43,13 +43,13 @@ export class PlayerStatsSystem {
         this.difficulty = difficulty;
         
         if (difficulty === 'godMode') {
-            // Enable god mode for health
+            // Set near-infinite health
             this.stats.maxHealth = COMBAT_CONFIG.godMode.health;
             this.stats.health = COMBAT_CONFIG.godMode.health;
             
-            // Enable god mode for stamina with near-infinite value
+            // Set near-infinite stamina (let normal mechanics work with high values)
             const staminaSystem = getStaminaSystem();
-            staminaSystem.setGodMode(true, COMBAT_CONFIG.godMode.health);
+            staminaSystem.increaseMaxStamina(COMBAT_CONFIG.godMode.health - STAMINA_CONFIG.startingMaxStamina);
             this.stats.stamina = COMBAT_CONFIG.godMode.health;
             this.stats.maxStamina = COMBAT_CONFIG.godMode.health;
         } else {
@@ -57,10 +57,9 @@ export class PlayerStatsSystem {
             this.stats.maxHealth = XP_CONFIG.progression.startingMaxHealth;
             this.stats.health = XP_CONFIG.progression.startingHealth;
             
-            // Disable god mode for stamina and restore normal values
-            // Note: reset() also sets godModeEnabled = false internally
+            // Restore normal stamina values
             const staminaSystem = getStaminaSystem();
-            staminaSystem.reset(); // Reset to normal starting stamina values and disable god mode
+            staminaSystem.reset();
             this.stats.stamina = STAMINA_CONFIG.startingStamina;
             this.stats.maxStamina = STAMINA_CONFIG.startingMaxStamina;
         }
