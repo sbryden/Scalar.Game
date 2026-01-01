@@ -104,8 +104,10 @@ export class LevelStatsTracker {
 
     /**
      * Track an enemy being destroyed
+     * @param enemyType - Type of enemy destroyed (e.g., 'boss_land', 'micro', 'fish')
+     * @param isBoss - Whether this enemy is a boss
      */
-    recordEnemyDestroyed(isBoss: boolean = false, enemyType: string): void {
+    recordEnemyDestroyed(enemyType: string, isBoss: boolean = false): void {
         if (this.isLevelActive) {
             this.stats.enemiesDestroyed++;
             if (isBoss) {
@@ -193,12 +195,8 @@ export class LevelStatsTracker {
 
     /**
      * Calculate score based on enemy kills with level-based scaling
-     * Scoring:
-     * - Regular bosses: 20 points each (base)
-     * - Regular enemies: 5 points each (base)
-     * - Micro-world bosses: 10 points each (base)
-     * - Micro-world enemies: 2.5 points each (base)
-     * Points scale with map level
+     * Base point values are defined in SCORING_CONFIG constant
+     * Points scale linearly with map level
      */
     calculateScore(currentLevel: number): {
         regularBossPoints: number;
@@ -207,15 +205,27 @@ export class LevelStatsTracker {
         microEnemyPoints: number;
         totalScore: number;
         baseValues: typeof SCORING_CONFIG;
+        scaledValues: {
+            regularBoss: number;
+            regularEnemy: number;
+            microBoss: number;
+            microEnemy: number;
+        };
     } {
         // Level scaling multiplier (increases linearly with level)
         const levelMultiplier = currentLevel;
         
+        // Calculate scaled point values per enemy
+        const scaledRegularBoss = SCORING_CONFIG.regularBossPoints * levelMultiplier;
+        const scaledRegularEnemy = SCORING_CONFIG.regularEnemyPoints * levelMultiplier;
+        const scaledMicroBoss = SCORING_CONFIG.microBossPoints * levelMultiplier;
+        const scaledMicroEnemy = SCORING_CONFIG.microEnemyPoints * levelMultiplier;
+        
         // Calculate points for each category
-        const regularBossPoints = this.stats.regularBossesDestroyed * SCORING_CONFIG.regularBossPoints * levelMultiplier;
-        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * SCORING_CONFIG.regularEnemyPoints * levelMultiplier;
-        const microBossPoints = this.stats.microBossesDestroyed * SCORING_CONFIG.microBossPoints * levelMultiplier;
-        const microEnemyPoints = this.stats.microEnemiesDestroyed * SCORING_CONFIG.microEnemyPoints * levelMultiplier;
+        const regularBossPoints = this.stats.regularBossesDestroyed * scaledRegularBoss;
+        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * scaledRegularEnemy;
+        const microBossPoints = this.stats.microBossesDestroyed * scaledMicroBoss;
+        const microEnemyPoints = this.stats.microEnemiesDestroyed * scaledMicroEnemy;
         
         return {
             regularBossPoints,
@@ -223,7 +233,13 @@ export class LevelStatsTracker {
             microBossPoints,
             microEnemyPoints,
             totalScore: regularBossPoints + regularEnemyPoints + microBossPoints + microEnemyPoints,
-            baseValues: SCORING_CONFIG
+            baseValues: SCORING_CONFIG,
+            scaledValues: {
+                regularBoss: scaledRegularBoss,
+                regularEnemy: scaledRegularEnemy,
+                microBoss: scaledMicroBoss,
+                microEnemy: scaledMicroEnemy
+            }
         };
     }
 }
