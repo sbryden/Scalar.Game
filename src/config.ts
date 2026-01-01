@@ -494,3 +494,15 @@ export const LEVEL_SYSTEM_CONFIG = {
     enemySpeedIncreasePerLevel: 0.05, // +5% enemy speed per level
     maxLevel: 99                     // Maximum level (for UI display purposes)
 };
+
+// Boss Mode configuration
+export const BOSS_MODE_CONFIG = {
+    // Segments where bosses spawn (avoiding first 2 segments for starting area)
+    // Distributes bosses evenly across remaining segments (2-14)
+    bossSegments: {
+        land: [3, 10],              // 2 bosses: SnakeBoss, RockCarSpawner
+        micro: [7],                  // 1 boss: MicroBoss
+        water: [4, 11],              // 2 bosses: SharkBoss, CrabBoss
+        waterMicro: [5, 12]          // 2 bosses: MicroSwimBoss, MicroCrabBoss
+    }
+};

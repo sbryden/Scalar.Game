@@ -20,6 +20,8 @@ export class CombatSystem {
     private onBossDefeat: (() => void) | null = null;
     private spawnerBossKilled: boolean = false;
     private minionsToKill: number = 0;
+    private bossesDefeated: number = 0;
+    private totalBosses: number = 1; // Default to 1 for normal mode
 
     /**
      * Set callback for when a boss is defeated
@@ -29,11 +31,31 @@ export class CombatSystem {
     }
 
     /**
+     * Set total number of bosses for level (used in boss mode)
+     */
+    setTotalBosses(count: number): void {
+        this.totalBosses = count;
+        this.bossesDefeated = 0;
+    }
+
+    /**
+     * Get current boss defeat progress (used for HUD display)
+     */
+    getBossProgress(): { defeated: number; total: number } {
+        return {
+            defeated: this.bossesDefeated,
+            total: this.totalBosses
+        };
+    }
+
+    /**
      * Reset spawner boss tracking (call when starting a new level)
      */
     resetSpawnerTracking(): void {
         this.spawnerBossKilled = false;
         this.minionsToKill = 0;
+        this.bossesDefeated = 0;
+        this.totalBosses = 1;
     }
 
     /**
@@ -456,19 +478,32 @@ export class CombatSystem {
         
         // Trigger boss defeat callback logic
         if (isBoss && this.onBossDefeat) {
+            this.bossesDefeated++;
+            
             if (isSpawnerBoss) {
                 // For spawner bosses, don't trigger level complete yet
-                console.log('Spawner boss defeated, waiting for minions to be destroyed');
+                console.log(`Spawner boss defeated (${this.bossesDefeated}/${this.totalBosses}), waiting for minions to be destroyed`);
             } else {
-                // Regular boss defeated, trigger level complete immediately
-                this.onBossDefeat();
+                // Regular boss defeated
+                console.log(`Boss defeated (${this.bossesDefeated}/${this.totalBosses})`);
+                
+                // Check if all bosses are defeated
+                if (this.bossesDefeated >= this.totalBosses) {
+                    this.onBossDefeat();
+                }
             }
         } else if (this.spawnerBossKilled && this.minionsToKill === 0 && this.onBossDefeat) {
-            // All minions from spawner boss are destroyed, trigger level complete
-            console.log('All minions destroyed, level complete!');
-            this.onBossDefeat();
-            // Reset tracking
-            this.resetSpawnerTracking();
+            // All minions from spawner boss are destroyed
+            console.log(`All minions destroyed. Bosses: ${this.bossesDefeated}/${this.totalBosses}`);
+            
+            // Check if all bosses (including spawner) are defeated
+            if (this.bossesDefeated >= this.totalBosses) {
+                console.log('All bosses and minions destroyed, level complete!');
+                this.onBossDefeat();
+            }
+            // Reset spawner tracking but not boss count
+            this.spawnerBossKilled = false;
+            this.minionsToKill = 0;
         }
     }
     

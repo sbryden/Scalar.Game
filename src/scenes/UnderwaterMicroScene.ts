@@ -3,7 +3,7 @@
  * Microscopic underwater scene with swimming micro organisms
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../config';
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -241,6 +241,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     restoreOrSpawnEnemies() {
         // Check if we have saved enemies for this scene
         const savedEnemies = gameState.savedEnemies.UnderwaterMicroScene;
+
+        // Check if boss mode is active
+        const bossMode = this.registry.get('bossMode') === true;
         
         if (savedEnemies && savedEnemies.length > 0) {
             // Restore saved enemies
@@ -252,24 +255,42 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
                 enemy.direction = enemyData.direction;
             });
         } else {
-            // Generate dynamic spawn points with random density distribution
-            // Water swimming micro enemies are floating enemies, so allow Y variance
-            const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
-                SPAWN_CONFIG.defaults.baseInterval,
-                SPAWN_CONFIG.defaults.microWaterY,
-                true
-            );
-            
-            // Spawn water swimming micro enemies at generated points
-            spawnPoints.forEach(point => {
-                if (point.isBoss) {
-                    // Spawn boss water swimming micro
+            if (bossMode) {
+                // Boss mode: spawn only bosses (swimming micro + crab micro)
+                const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
+                
+                // Spawn boss swimming micro
+                fishSpawns.forEach(point => {
                     spawnEnemy(this, point.x, point.y, 'boss_water_swimming_micro');
-                } else {
-                    // Spawn regular water swimming micro
-                    spawnEnemy(this, point.x, point.y, 'water_swimming_micro');
-                }
-            });
+                });
+                
+                // Spawn boss micro crabs
+                crabSpawns.forEach(point => {
+                    spawnEnemy(this, point.x, point.y, 'boss_water_crab_micro');
+                });
+                
+                // Set total bosses for tracking
+                combatSystem.setTotalBosses(fishSpawns.length + crabSpawns.length);
+            } else {
+                // Normal mode: Generate dynamic spawn points with random density distribution
+                // Water swimming micro enemies are floating enemies, so allow Y variance
+                const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
+                    SPAWN_CONFIG.defaults.baseInterval,
+                    SPAWN_CONFIG.defaults.microWaterY,
+                    true
+                );
+                
+                // Spawn water swimming micro enemies at generated points
+                spawnPoints.forEach(point => {
+                    if (point.isBoss) {
+                        // Spawn boss water swimming micro
+                        spawnEnemy(this, point.x, point.y, 'boss_water_swimming_micro');
+                    } else {
+                        // Spawn regular water swimming micro
+                        spawnEnemy(this, point.x, point.y, 'water_swimming_micro');
+                    }
+                });
+            }
         }
     }
     
@@ -305,6 +326,15 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         
         // Update HUD
         this.hud.update(playerStats);
+        
+        // Update boss count display if in boss mode
+        const bossMode = this.registry.get('bossMode') === true;
+        if (bossMode) {
+            const bossProgress = combatSystem.getBossProgress();
+            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
+        } else {
+            this.hud.hideBossCount();
+        }
         
         // Update size change cooldown
         let timer = getSizeChangeTimer();
