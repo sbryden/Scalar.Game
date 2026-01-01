@@ -140,8 +140,7 @@ export class InputManager {
         }
         
         // Check if player is stunned
-        const now = Date.now();
-        if (gameState.player.stunnedUntil && now < gameState.player.stunnedUntil) {
+        if (gameState.player.stunnedUntil && this.scene.time.now < gameState.player.stunnedUntil) {
             // Player is stunned, no input allowed
             return;
         }
