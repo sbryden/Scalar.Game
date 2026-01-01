@@ -3,6 +3,7 @@ import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
 import playerStatsSystem from './systems/PlayerStatsSystem';
+import levelProgressionSystem from './systems/LevelProgressionSystem';
 
 /**
  * Helper function to check if an enemy type is a swimming enemy
@@ -64,9 +65,19 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     
     // Apply hard mode multipliers if in hard mode
     const isHardMode = playerStatsSystem.difficulty === 'hard';
-    const healthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
-    const speedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
+    const difficultyHealthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
+    const difficultySpeedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
     const lineOfSightMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyLineOfSightMultiplier : 1;
+    
+    // Apply level-based multipliers (these stack with difficulty multipliers)
+    const levelHealthMultiplier = levelProgressionSystem.getEnemyHealthMultiplier();
+    const levelDamageMultiplier = levelProgressionSystem.getEnemyDamageMultiplier();
+    const levelSpeedMultiplier = levelProgressionSystem.getEnemySpeedMultiplier();
+    
+    // Combine all multipliers
+    const finalHealthMultiplier = difficultyHealthMultiplier * levelHealthMultiplier;
+    const finalSpeedMultiplier = difficultySpeedMultiplier * levelSpeedMultiplier;
+    const finalDamageMultiplier = levelDamageMultiplier; // Damage only affected by level, not difficulty
     
     // Select appropriate texture based on enemy type
     const texture = selectEnemyTexture(enemyType);
@@ -84,11 +95,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         (enemy.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
 
-    enemy.health = config.health * healthMultiplier;
-    enemy.maxHealth = config.health * healthMultiplier;
-    enemy.damage = config.damage;
+    enemy.health = config.health * finalHealthMultiplier;
+    enemy.maxHealth = config.health * finalHealthMultiplier;
+    enemy.damage = config.damage * finalDamageMultiplier;
     enemy.xpReward = config.xpReward;
-    enemy.speed = config.speed * speedMultiplier;
+    enemy.speed = config.speed * finalSpeedMultiplier;
     enemy.patrolDistance = config.patrolDistance;
     enemy.knockbackResistance = config.knockbackResistance;
     enemy.startX = x;
