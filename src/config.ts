@@ -238,7 +238,7 @@ export const VISUAL_CONFIG = {
         height: 4, // Height of enemy health bars
         offsetY: 10, // Offset above enemy for health bar placement
         depth: 50, // Z-depth for health bar rendering
-        yDivisor: 2, // Divisor for calculating health bar Y offset
+        centerDivisor: 2, // Divisor for calculating health bar horizontal center (barWidth / 2)
         displayOriginY: 2 // Y origin point for health bar display
     },
     fishSpawn: {
@@ -255,8 +255,8 @@ export const XP_CONFIG = {
         bounce: 0.5, // Bounce value for XP orb physics
         spawnVelocity: {
             xRange: 50, // Random X velocity range (-50 to 50)
-            yMin: -100, // Minimum Y velocity
-            yMax: -50, // Maximum Y velocity
+            yRangeMin: -100, // Y velocity lower bound (more upward velocity)
+            yRangeMax: -50, // Y velocity upper bound (less upward velocity)
             underwaterRange: 30 // Velocity range for underwater orbs
         }
     },
