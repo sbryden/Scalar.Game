@@ -88,7 +88,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
         chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
-    boss_generic: {
+    boss_land: {
         width: 90,
         height: 90,
         color: 0xFF0000, // Red
@@ -114,7 +114,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
         chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
-    boss_micro: {
+    boss_land_micro: {
         width: 90,
         height: 90,
         color: 0x00FF88, // Green-cyan (bacteria)
@@ -140,7 +140,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
         chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
-    boss_fish: {
+    boss_water_swimming: {
         width: 90,
         height: 90,
         color: 0x00BFFF, // Deep sky blue
@@ -153,12 +153,12 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
     },
-    boss_shark: {
+    boss_water_shark: {
         width: 90,
         height: 90,
         color: 0x1E90FF, // Dodger blue
         speed: 80,
-        health: 80,  // Slightly stronger than boss_fish
+        health: 80,  // Slightly stronger than boss_water_swimming
         damage: 14,
         xpReward: 130,
         patrolDistance: 550,
@@ -179,7 +179,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
         chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
-    boss_crab: {
+    boss_water_crab: {
         width: 90,
         height: 90,
         color: 0xFF6347, // Tomato red (crab color)
@@ -192,7 +192,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
     },
-    plankton: {
+    water_swimming_micro: {
         width: 20,
         height: 20,
         color: 0x7FFFD4, // Aquamarine
@@ -205,7 +205,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
         chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
-    boss_plankton: {
+    boss_water_swimming_micro: {
         width: 60,
         height: 60,
         color: 0x7FFFD4, // Aquamarine
@@ -217,32 +217,48 @@ export const ENEMY_CONFIG: Record<string, {
         knockbackResistance: 1.2,
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
+    },
+    boss_water_crab_micro: {
+        width: 60,
+        height: 60,
+        color: 0xFF6347, // Tomato red
+        speed: 50,
+        health: 18,
+        damage: 6,
+        xpReward: 55,
+        patrolDistance: 270,
+        knockbackResistance: 1.3,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
     }
 };
 
 // Boss texture configuration with weighted random selection
 // Each boss type can have multiple texture options with spawn weights
 export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight: number }>> = {
-    boss_generic: [
+    boss_land: [
         { texture: 'snake_boss', weight: 0.5 },
         { texture: 'rockgiant', weight: 0.5 }
     ],
-    boss_micro: [
+    boss_land_micro: [
         { texture: 'zombie_blob', weight: 0.8 },
         { texture: 'micromonkeyboss', weight: 0.2 }
     ],
-    boss_fish: [
+    boss_water_swimming: [
         { texture: 'water_enemy_fish_1', weight: 0.25 },
         { texture: 'water_enemy_needle_fish_1', weight: 0.75 }
     ],
-    boss_shark: [
+    boss_water_shark: [
         { texture: 'sharkboss', weight: 1.0 }
     ],
-    boss_crab: [
+    boss_water_crab: [
         { texture: 'crabboss', weight: 1.0 }
     ],
-    boss_plankton: [
-        { texture: 'bacteria', weight: 1.0 }
+    boss_water_swimming_micro: [
+        { texture: 'micro_boss', weight: 1.0 }
+    ],
+    boss_water_crab_micro: [
+        { texture: 'crabboss', weight: 1.0 }
     ]
 };
 

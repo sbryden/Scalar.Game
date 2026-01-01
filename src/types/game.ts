@@ -37,6 +37,7 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     healthBarBg: Phaser.GameObjects.Rectangle;
     healthBar: Phaser.GameObjects.Rectangle;
     healthBarOffsetY: number;
+    isDead?: boolean; // Flag to indicate enemy is dead and should not be updated
     // Chase system properties
     isChasing: boolean;
     lineOfSight: number;
