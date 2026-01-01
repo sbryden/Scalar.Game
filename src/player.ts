@@ -78,6 +78,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     // Apply new size (simplified - no complex scaling needed)
     gameState.playerSize = newSize as PlayerSize;
     const config = SIZE_CONFIG[newSize];
+    if (!config) return;
     
     // Base scale for the tank sprite
     const baseDisplayScale = PHYSICS_CONFIG.player.baseDisplayScale;
@@ -90,7 +91,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     player.body.updateFromGameObject();
     
     // Small jump to account for size change
-    gameState.player.body.setVelocityY(PHYSICS_CONFIG.player.sizeChangeJumpVelocity);
+    player.body.setVelocityY(PHYSICS_CONFIG.player.sizeChangeJumpVelocity);
     
     // Reset cooldown timer
     gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
