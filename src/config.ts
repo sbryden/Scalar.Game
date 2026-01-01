@@ -101,6 +101,32 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 8.0, // Larger line of sight range
         chaseSpeedMultiplier: 1.3  // Slightly slower when chasing
     },
+    spawner_boss_land: {
+        width: 90,
+        height: 90,
+        color: 0xFF4500, // Orange-red
+        speed: 80,
+        health: 150,  // Boss health - will spawn 4 minions with ~37.5 health each
+        damage: 15,
+        xpReward: 150,
+        patrolDistance: 400,
+        knockbackResistance: 2.0,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    rock_minion: {
+        width: 25,
+        height: 25,
+        color: 0x8B4513, // Saddle brown
+        speed: 90,  // Faster than regular enemies
+        health: 37.5,  // 4 minions = 150 total health
+        damage: 8,
+        xpReward: 20,
+        patrolDistance: 250,
+        knockbackResistance: 0.8,
+        lineOfSightMultiplier: 5.0,
+        chaseSpeedMultiplier: 1.6  // Aggressive chasers
+    },
     micro: {
         width: 30,
         height: 30,
@@ -239,6 +265,9 @@ export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight
     boss_land: [
         { texture: 'snake_boss', weight: 0.5 },
         { texture: 'rockgiant', weight: 0.5 }
+    ],
+    spawner_boss_land: [
+        { texture: 'rock_car_with_minions', weight: 1.0 }
     ],
     boss_land_micro: [
         { texture: 'zombie_blob', weight: 0.8 },

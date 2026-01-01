@@ -178,12 +178,19 @@ export class SpawnSystem {
         const bossSegmentEnd = (SPAWN_CONFIG.segmentCount - 1) * segmentWidth;
         const bossX = bossSegmentStart + (bossSegmentEnd - bossSegmentStart) * 0.5; // Center of segment
         
-        const rawBossY = allowYVariance
-            ? baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y
-            : baseY;
-        const minSpawnY = SPAWN_CONFIG.defaults.minSpawnY;
-        const maxSpawnY = SPAWN_CONFIG.defaults.maxSpawnY;
-        const bossY = Math.max(minSpawnY, Math.min(maxSpawnY, rawBossY));
+        // For ground bosses (no Y variance), spawn at top of map so they drift down
+        // For swimming bosses (Y variance), use the base Y position
+        let bossY: number;
+        if (allowYVariance) {
+            // Swimming enemies - use baseY with variance
+            const rawBossY = baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y;
+            const minSpawnY = SPAWN_CONFIG.defaults.minSpawnY;
+            const maxSpawnY = SPAWN_CONFIG.defaults.maxSpawnY;
+            bossY = Math.max(minSpawnY, Math.min(maxSpawnY, rawBossY));
+        } else {
+            // Ground bosses - spawn at top of map to prevent falling through floor
+            bossY = SPAWN_CONFIG.defaults.minSpawnY + 50; // Spawn near top with small margin
+        }
         
         spawnPoints.push({ x: bossX, y: bossY, isBoss: true });
         

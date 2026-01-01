@@ -8,7 +8,7 @@ import playerStatsSystem from './systems/PlayerStatsSystem';
  * Helper function to check if an enemy type is a swimming enemy
  * Swimming enemies can move freely in all directions and don't have gravity
  */
-function isSwimmingEnemy(enemyType: string): boolean {
+export function isSwimmingEnemy(enemyType: string): boolean {
     return enemyType === "micro" || enemyType === "fish" || enemyType === "water_swimming_micro" ||
            enemyType === "boss_land_micro" || enemyType === "boss_water_swimming" || 
            enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark";
@@ -45,6 +45,8 @@ function selectEnemyTexture(enemyType: string): string {
         return "bacteria"; // Use bacteria for water_swimming_micro
     } else if (enemyType === "crab") {
         return "water_enemy_crab_1";
+    } else if (enemyType === "rock_minion") {
+        return "rock_minion_1";
     } else {
         return "enemy"; // Default fallback
     }
@@ -74,7 +76,14 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     const enemy = scene.add.sprite(x, y, texture) as Enemy;
     // Boss enemies are scaled according to config
     const baseScale = PHYSICS_CONFIG.enemy.baseScale;
-    enemy.setScale(isBoss ? baseScale * PHYSICS_CONFIG.enemy.bossScaleMultiplier : baseScale);
+    let enemyScale = isBoss ? baseScale * PHYSICS_CONFIG.enemy.bossScaleMultiplier : baseScale;
+    
+    // Spawner boss is 2x the size of regular bosses
+    if (enemyType === 'spawner_boss_land') {
+        enemyScale *= 2;
+    }
+    
+    enemy.setScale(enemyScale);
     scene.physics.add.existing(enemy);
     (enemy.body as Phaser.Physics.Arcade.Body).setBounce(PHYSICS_CONFIG.enemy.bounce);
     (enemy.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
@@ -119,6 +128,14 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.isChasing = false;
     enemy.lineOfSight = calculatedLineOfSight;
     enemy.chaseTarget = undefined;
+    
+    // Configure spawner boss properties
+    if (enemyType === 'spawner_boss_land') {
+        enemy.isSpawnerBoss = true;
+        enemy.minionType = 'rock_minion';
+        enemy.minionCount = 4;
+        enemy.spawnRadius = 100;
+    }
 
     const barWidth = VISUAL_CONFIG.healthBar.width;
     const barHeight = VISUAL_CONFIG.healthBar.height;

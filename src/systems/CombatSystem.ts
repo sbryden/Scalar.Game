@@ -7,6 +7,7 @@ import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/gameState';
+import { isSwimmingEnemy } from '../enemies';
 import type { Player, Enemy, Projectile } from '../types/game';
 
 /**
@@ -274,6 +275,49 @@ export class CombatSystem {
     }
     
     /**
+     * Spawn minions around a dead boss enemy
+     * Handles both ground-based (x-axis spread) and swimming (full circle) spawns
+     */
+    private spawnMinionsOnDeath(boss: Enemy): void {
+        if (!boss.scene || !boss.minionType || !boss.minionCount) return;
+        
+        const minionCount = boss.minionCount;
+        const spawnRadius = boss.spawnRadius || 100; // Default 100 pixel radius
+        
+        // Check if minions are swimming enemies (need full circle spawn)
+        const isSwimmingMinion = isSwimmingEnemy(boss.minionType);
+        
+        for (let i = 0; i < minionCount; i++) {
+            let minionX: number;
+            let minionY: number;
+            
+            if (isSwimmingMinion) {
+                // Full circle spawn for swimming enemies (includes y-axis)
+                const angle = (Math.PI * 2 / minionCount) * i;
+                minionX = boss.x + Math.cos(angle) * spawnRadius;
+                minionY = boss.y + Math.sin(angle) * spawnRadius;
+            } else {
+                // Ground-based spawn (x-axis line only)
+                // Spread minions in a horizontal line
+                const spacing = minionCount > 1 ? (spawnRadius * 2) / (minionCount - 1) : 0;
+                minionX = boss.x - spawnRadius + (spacing * i);
+                minionY = boss.y; // Same Y position as boss
+            }
+            
+            // Spawn minion using the gameState spawn function
+            if (gameState.spawnEnemyFunc) {
+                const minion = gameState.spawnEnemyFunc(boss.scene, minionX, minionY, boss.minionType);
+                
+                // Make minion immediately chase player
+                if (gameState.player) {
+                    minion.isChasing = true;
+                    minion.chaseTarget = gameState.player;
+                }
+            }
+        }
+    }
+    
+    /**
      * Kill an enemy and spawn XP orb
      */
     killEnemy(enemy: Enemy): void {
@@ -291,6 +335,11 @@ export class CombatSystem {
         if (enemy.body) {
             enemy.body.setVelocity(0, 0);
             enemy.body.setEnable(false);
+        }
+        
+        // Spawn minions if this is a spawner boss
+        if (enemy.isSpawnerBoss && enemy.minionType && enemy.minionCount) {
+            this.spawnMinionsOnDeath(enemy);
         }
         
         // Spawn XP orb immediately at enemy location
