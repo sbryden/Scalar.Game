@@ -220,7 +220,6 @@ export const COMBAT_CONFIG = {
     },
     visual: {
         enemyFlashDuration: 100, // How long enemy flashes when hit (ms)
-        playerFlashDuration: 150, // Already in PLAYER_COMBAT_CONFIG but needed here for reference
         cameraShakeDuration: 100, // Duration of camera shake on damage (ms)
         cameraShakeIntensityMelee: 0.003, // Shake intensity in melee mode
         cameraShakeIntensityNormal: 0.005 // Shake intensity in normal mode
@@ -275,14 +274,13 @@ export const PHYSICS_CONFIG = {
 
 // Visual configuration
 export const VISUAL_CONFIG = {
-    viewportWidth: 1024, // Reference viewport/screen width (not world width)
+    viewportWidth: 1024, // Reference/base screen width used for visual & projectile calculations (not the dynamic world/viewport width)
     healthBar: {
         width: 30, // Width of enemy health bars
         height: 4, // Height of enemy health bars
         offsetY: 10, // Offset above enemy for health bar placement
         depth: 50, // Z-depth for health bar rendering
-        centerDivisor: 2, // Divisor for calculating health bar horizontal center (barWidth / 2)
-        displayOriginY: 2 // Y origin point for health bar display
+        displayOriginY: 2 // Y origin for health bar display in pixels; 2 == height / 2, so the origin is at the vertical center of the 4px-tall bar
     },
     fishSpawn: {
         fishTextureThreshold: 0.25 // Probability threshold for water_enemy_fish_1 vs needle fish
@@ -297,10 +295,10 @@ export const XP_CONFIG = {
         defaultValue: 25, // Default XP value if not specified
         bounce: 0.5, // Bounce value for XP orb physics
         spawnVelocity: {
-            xRange: 50, // Random X velocity range (-50 to 50)
-            yRangeMin: -100, // Y velocity lower bound (more upward velocity)
-            yRangeMax: -50, // Y velocity upper bound (less upward velocity)
-            underwaterRange: 30 // Velocity range for underwater orbs
+            xMaxAbsVelocity: 50, // Maximum absolute X velocity (range from -50 to 50)
+            minUpwardVelocity: -100, // Minimum upward Y velocity (more negative = stronger upward)
+            maxUpwardVelocity: -50, // Maximum upward Y velocity (less negative = weaker upward)
+            maxUnderwaterVelocity: 30 // Maximum absolute velocity for underwater orbs (used as -max..+max)
         }
     },
     magnetism: {

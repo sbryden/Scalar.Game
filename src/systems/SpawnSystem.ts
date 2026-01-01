@@ -24,8 +24,8 @@ export class SpawnSystem {
         const orb = scene.add.circle(x, y, XP_CONFIG.orb.radius, XP_CONFIG.orb.color) as XPOrb;
         scene.physics.add.existing(orb);
         orb.body.setVelocity(
-            Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xRange, XP_CONFIG.orb.spawnVelocity.xRange),
-            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.yRangeMin, XP_CONFIG.orb.spawnVelocity.yRangeMax)
+            Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity, XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity),
+            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.minUpwardVelocity, XP_CONFIG.orb.spawnVelocity.maxUpwardVelocity)
         );
         orb.body.setCollideWorldBounds(true);
         orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
@@ -38,8 +38,8 @@ export class SpawnSystem {
             orb.body.setAllowGravity(false);
             // Give orbs a gentle floating motion
             orb.body.setVelocity(
-                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.underwaterRange, XP_CONFIG.orb.spawnVelocity.underwaterRange),
-                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.underwaterRange, XP_CONFIG.orb.spawnVelocity.underwaterRange)
+                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity, XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity),
+                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity, XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity)
             );
         }
         
