@@ -3,7 +3,7 @@
  * Cellular-level gameplay scene with bacteria enemies
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, HARD_MODE_CONFIG } from '../config';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -208,7 +208,11 @@ export default class MicroScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial bacteria enemies
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            // Calculate spawn interval based on difficulty
+            const isHardMode = playerStatsSystem.difficulty === 'hard';
+            const spawnInterval = isHardMode ? 300 / HARD_MODE_CONFIG.enemySpawnMultiplier : 300;
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 spawnEnemy(this, x, 680, 'micro');
             }
             
