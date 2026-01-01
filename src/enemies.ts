@@ -289,7 +289,7 @@ function updateEnemyHealthBar(enemy: Enemy): void {
     if (enemy.healthBar && enemy.healthBarBg) {
         const barWidth = VISUAL_CONFIG.healthBar.width;
         const healthPercent = enemy.health / enemy.maxHealth;
-        enemy.healthBar.setDisplayOrigin(barWidth / VISUAL_CONFIG.healthBar.yDivisor, 2);
+        enemy.healthBar.setDisplayOrigin(barWidth / VISUAL_CONFIG.healthBar.yDivisor, VISUAL_CONFIG.healthBar.displayOriginY);
         enemy.healthBar.setScale(healthPercent, 1);
         const healthBarY = enemy.y - enemy.healthBarOffsetY;
         enemy.healthBar.x = enemy.x;
