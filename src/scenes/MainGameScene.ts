@@ -198,7 +198,7 @@ export default class MainGameScene extends Phaser.Scene {
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
                     // Spawn boss enemy
-                    spawnEnemy(this, point.x, SPAWN_CONFIG.defaults.bossGroundY, 'boss_generic');
+                    spawnEnemy(this, point.x, point.y, 'boss_generic');
                 } else {
                     // Spawn regular enemy
                     spawnEnemy(this, point.x, point.y, 'generic');
