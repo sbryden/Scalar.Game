@@ -372,12 +372,14 @@ export const GOD_MODE_CONFIG = {
 export const STAMINA_CONFIG = {
     startingMaxStamina: 100,         // Starting maximum stamina
     startingStamina: 100,            // Starting current stamina (full)
-    rechargeRate: 20,                // Stamina recharged per second
+    rechargeRate: 10,                // Stamina recharged per second
     consumptionRate: 25,             // Stamina consumed per second in melee mode
     exhaustionThreshold: 0.2,        // 20% - cannot activate melee below this
     xpOrbRestoration: 15,            // Stamina restored per XP orb collected
-    staminaIncreasePerLevel: 10      // Max stamina increase per level up
+    staminaIncreasePerLevel: 10,     // Max stamina increase per level up
+    depletionPauseDuration: 2500     // Pause duration when stamina hits 0 (ms) before recharge resumes
 };
+
 
 // UI configuration for stamina display
 export const STAMINA_UI_CONFIG = {
