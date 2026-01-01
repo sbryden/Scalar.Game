@@ -66,9 +66,9 @@ export function fireProjectile(scene: Phaser.Scene): void {
     // Set damage (god mode damage or normal)
     projectile.damage = playerStatsSystem.isGodMode() ? COMBAT_CONFIG.godMode.damage : config.damage;
     
-    // Track projectile spawn position and max range
+    // Track projectile spawn position and max range (based on viewport width, not world width)
     projectile.spawnX = projectileX;
-    projectile.maxRange = VISUAL_CONFIG.screenWidth * PHYSICS_CONFIG.projectile.maxRangeMultiplier;
+    projectile.maxRange = VISUAL_CONFIG.viewportWidth * PHYSICS_CONFIG.projectile.maxRangeMultiplier;
 }
 
 export function updateProjectiles(): void {
