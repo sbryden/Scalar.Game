@@ -172,9 +172,12 @@ export class SpawnSystem {
         const bossSegmentEnd = (SPAWN_CONFIG.segmentCount - 1) * segmentWidth;
         const bossX = bossSegmentStart + (bossSegmentEnd - bossSegmentStart) * 0.5; // Center of segment
         
-        const bossY = allowYVariance 
+        const rawBossY = allowYVariance
             ? baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y
             : baseY;
+        const minSpawnY = SPAWN_CONFIG.minSpawnY;
+        const maxSpawnY = SPAWN_CONFIG.maxSpawnY;
+        const bossY = Math.max(minSpawnY, Math.min(maxSpawnY, rawBossY));
         
         spawnPoints.push({ x: bossX, y: bossY, isBoss: true });
         
