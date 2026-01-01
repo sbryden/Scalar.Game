@@ -1,7 +1,7 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
 import gameState from './utils/gameState';
 import playerStatsSystem from './systems/PlayerStatsSystem';
-import type { WASDKeys } from './types/game';
+import type { Projectile, WASDKeys } from './types/game';
 
 let lastProjectileTime = 0;
 
