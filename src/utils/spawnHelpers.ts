@@ -59,21 +59,20 @@ export function generateDynamicSpawnPoints(
     // Calculate segment width
     const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
     
-    // Generate random densities for segments 2-14 (excluding first, last, and second-to-last)
-    const spawnSegmentCount = SPAWN_CONFIG.segmentCount - 3; // Segments 2-14 (13 segments)
+    // Generate random densities for segments 1-13 (excluding first, last, and boss segment)
+    const spawnSegmentCount = SPAWN_CONFIG.segmentCount - 3; // 13 segments (segments 1-13)
     const densities = generateBalancedDensities(spawnSegmentCount);
     
-    // Generate spawn points for each segment
+    // Generate spawn points for segments 1-13
+    // Segment 0: empty (no enemies)
+    // Segments 1-13: spawn enemies with random density  
+    // Segment 14: boss only (handled after loop)
+    // Segment 15: empty (no enemies)
     for (let segmentIndex = 1; segmentIndex < SPAWN_CONFIG.segmentCount - 2; segmentIndex++) {
-        // Segment 0: no enemies
-        // Segments 1-13: spawn enemies with random density
-        // Segment 14: boss segment (handled separately)
-        // Segment 15: no enemies
-        
         const segmentStart = segmentIndex * segmentWidth;
         const segmentEnd = (segmentIndex + 1) * segmentWidth;
         const densityIndex = segmentIndex - 1; // Map to densities array (0-12)
-        const densityMultiplier = densities[densityIndex] || 1.0; // Default to 1.0 if undefined
+        const densityMultiplier = densities[densityIndex] ?? 1.0; // Safety fallback
         
         // Calculate interval for this segment
         const interval = baseInterval / (densityMultiplier * difficultyMultiplier);
