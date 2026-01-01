@@ -445,7 +445,7 @@ export default class MenuScene extends Phaser.Scene {
         const controlsList = [
             'WASD / Arrow Keys - Move',
             'SPACE - Jump (Land)',
-            '         Up Thrust (Water)',
+            'SPACE - Up Thrust (Water)',
             'Q / E - Change Size',
             'F - Fire Projectile',
             'SHIFT - Melee Mode',
@@ -601,8 +601,8 @@ export default class MenuScene extends Phaser.Scene {
     hideInfoScreen(): void {
         if (this.infoScreenContainer) {
             this.infoScreenContainer.destroy();
-            this.infoScreenContainer = null;
         }
+        this.infoScreenContainer = null;
         this.infoScreenVisible = false;
     }
 }
