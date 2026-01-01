@@ -12,6 +12,7 @@ import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
+import levelStatsTracker from '../systems/LevelStatsTracker';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
@@ -47,6 +48,9 @@ export default class UnderwaterScene extends Phaser.Scene {
             playerStatsSystem.initializeDifficulty(difficulty);
             gameState.difficultyInitialized = true;
         }
+        
+        // Start tracking level stats
+        levelStatsTracker.startLevel(this.time.now);
         
         // Set lighter gravity for underwater (1/3 of normal)
         this.physics.world.gravity.y = 100;
@@ -424,11 +428,18 @@ export default class UnderwaterScene extends Phaser.Scene {
     
     handleLevelComplete() {
         console.log('Level Complete - Boss Defeated!');
+        
+        // End level tracking
+        levelStatsTracker.endLevel(this.time.now);
+        
         this.levelCompleteScreen.show();
     }
     
     handleReplay() {
         console.log('Replaying level');
+        
+        // Reset stats tracker for new attempt
+        levelStatsTracker.reset();
         
         // Restart the current scene
         this.scene.restart();
@@ -436,6 +447,9 @@ export default class UnderwaterScene extends Phaser.Scene {
     
     handleExitToMenu() {
         console.log('Exiting to main menu');
+        
+        // Reset stats tracker when exiting
+        levelStatsTracker.reset();
         
         // Go back to menu
         this.scene.start('MenuScene');
