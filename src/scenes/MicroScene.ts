@@ -3,8 +3,8 @@
  * Cellular-level gameplay scene with bacteria enemies
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
-import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
+import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -208,15 +208,24 @@ export default class MicroScene extends Phaser.Scene {
                 enemy.floatAngle = enemyData.floatAngle || 0;
             });
         } else {
-            // Spawn initial bacteria enemies
-            const spawnInterval = getEnemySpawnInterval();
+            // Generate dynamic spawn points with randomized density distribution
+            // Micro enemies can swim, so allow Y variance
+            const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
+                SPAWN_CONFIG.defaults.baseInterval,
+                SPAWN_CONFIG.defaults.midWaterY,
+                true
+            );
             
-            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
-                spawnEnemy(this, x, 680, 'micro');
-            }
-            
-            // Spawn boss enemy toward the end of the level (adjusted for 3x scale)
-            spawnEnemy(this, 7500, 500, 'boss_micro');
+            // Spawn enemies at generated points
+            spawnPoints.forEach(point => {
+                if (point.isBoss) {
+                    // Spawn boss enemy
+                    spawnEnemy(this, point.x, point.y, 'boss_micro');
+                } else {
+                    // Spawn regular micro enemy
+                    spawnEnemy(this, point.x, point.y, 'micro');
+                }
+            });
         }
     }
     
