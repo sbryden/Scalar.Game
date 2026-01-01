@@ -94,7 +94,12 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.healthBarBg.setDepth(50);
     enemy.healthBarOffsetY = healthBarOffsetY;
 
-    gameState.enemies!.add(enemy);
+    if (!gameState.enemies) {
+        console.error('gameState.enemies is not initialized');
+        throw new Error('gameState.enemies is not initialized');
+    }
+    
+    gameState.enemies.add(enemy);
     return enemy;
 }
 

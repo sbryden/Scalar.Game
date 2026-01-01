@@ -1,7 +1,7 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
 import gameState from './utils/gameState';
 import playerStatsSystem from './systems/PlayerStatsSystem';
-import type { WASDKeys } from './types/game';
+import type { WASDKeys, Projectile } from './types/game';
 
 let lastProjectileTime = 0;
 
@@ -46,7 +46,7 @@ export function fireProjectile(scene: Phaser.Scene): void {
     
     // Create projectile (torpedo underwater, beam on land)
     const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
-    const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as unknown as import('./types/game').Projectile;
+    const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
     projectile.setOrigin(0.5, 0.5);
     projectile.setDepth(0);
     
@@ -82,7 +82,7 @@ export function updateProjectiles(): void {
     if (!projectiles) return;
     
     projectiles.children.entries.forEach(proj => {
-        const projectile = proj as import('./types/game').Projectile;
+        const projectile = proj as Projectile;
         // Destroy projectile if it exceeds max range or goes off world
         const distanceTraveled = Math.abs(projectile.x - projectile.spawnX);
         if (distanceTraveled > projectile.maxRange || projectile.x < 0 || projectile.x > WORLD_WIDTH) {
