@@ -118,6 +118,19 @@ export const ENEMY_CONFIG: Record<string, {
         aggroRangeMultiplier: 8.0,
         aggroSpeedMultiplier: 1.3
     },
+    boss_shark: {
+        width: 90,
+        height: 90,
+        color: 0x1E90FF, // Dodger blue
+        speed: 80,
+        health: 80,  // Slightly stronger than boss_fish
+        damage: 14,
+        xpReward: 130,
+        patrolDistance: 550,
+        knockbackResistance: 1.6,
+        aggroRangeMultiplier: 8.0,
+        aggroSpeedMultiplier: 1.4
+    },
     crab: {
         width: 30,
         height: 30,
@@ -130,6 +143,19 @@ export const ENEMY_CONFIG: Record<string, {
         knockbackResistance: 1.2,  // Heavier, more resistant to knockback
         aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
         aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+    },
+    boss_crab: {
+        width: 90,
+        height: 90,
+        color: 0xFF6347, // Tomato red (crab color)
+        speed: 60,
+        health: 125,  // 5x base health
+        damage: 18,
+        xpReward: 180,
+        patrolDistance: 350,
+        knockbackResistance: 2.2,  // Very resistant to knockback
+        aggroRangeMultiplier: 8.0,
+        aggroSpeedMultiplier: 1.3
     },
     plankton: {
         width: 20,
@@ -192,4 +218,8 @@ export const HARD_MODE_CONFIG = {
     enemySpeedMultiplier: 1.3,       // Enemies move 30% faster
     enemyAggroRangeMultiplier: 1.5,  // Enemies have 50% larger line of sight
     enemySpawnMultiplier: 1.5        // 50% more enemies spawn
+};
+
+export const GOD_MODE_CONFIG = {
+    playerSpeedMultiplier: 4.0       // Player moves 4x faster in god mode
 };

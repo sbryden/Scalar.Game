@@ -6,7 +6,8 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
-import { SIZE_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG } from '../config';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -133,7 +134,13 @@ export class InputManager {
         const sizeConfig = SIZE_CONFIG[getPlayerSize()];
         if (!sizeConfig) return;
         
-        const speedMultiplier = sizeConfig.speedMultiplier;
+        let speedMultiplier = sizeConfig.speedMultiplier;
+        
+        // Apply god mode speed multiplier if active
+        if (playerStatsSystem.isGodMode()) {
+            speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
+        }
+        
         const body = gameState.player!.body;
         
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
@@ -156,7 +163,13 @@ export class InputManager {
         const sizeConfig = SIZE_CONFIG[getPlayerSize()];
         if (!sizeConfig) return;
         
-        const speedMultiplier = sizeConfig.speedMultiplier;
+        let speedMultiplier = sizeConfig.speedMultiplier;
+        
+        // Apply god mode speed multiplier if active
+        if (playerStatsSystem.isGodMode()) {
+            speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
+        }
+        
         const body = gameState.player!.body;
         
         // Horizontal movement

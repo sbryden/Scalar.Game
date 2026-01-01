@@ -243,8 +243,8 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
                 spawnEnemy(this, x, 300 + Math.random() * 200, 'plankton');
             }
             
-            // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 400, 'boss_plankton');
+            // Spawn boss enemy toward the end of the level (adjusted for 3x scale)
+            spawnEnemy(this, 7500, 500, 'boss_plankton');
         }
     }
     

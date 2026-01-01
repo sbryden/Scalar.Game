@@ -10,7 +10,8 @@ import playerStatsSystem from './systems/PlayerStatsSystem';
  */
 function isSwimmingEnemy(enemyType: string): boolean {
     return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton" ||
-           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton";
+           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton" ||
+           enemyType === "boss_shark";
 }
 
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
@@ -38,10 +39,12 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     } else if (enemyType === "fish" || enemyType === "boss_fish") {
         // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
         texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+    } else if (enemyType === "boss_shark") {
+        texture = "sharkboss";
     } else if (enemyType === "plankton" || enemyType === "boss_plankton") {
         texture = "bacteria"; // Use bacteria as placeholder for plankton
-    } else if (enemyType === "crab") {
-        texture = "water_enemy_crab_1";
+    } else if (enemyType === "crab" || enemyType === "boss_crab") {
+        texture = enemyType === "boss_crab" ? "crabboss" : "water_enemy_crab_1";
     }
     
     const enemy = scene.add.sprite(x, y, texture) as Enemy;

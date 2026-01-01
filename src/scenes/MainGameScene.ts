@@ -194,8 +194,8 @@ export default class MainGameScene extends Phaser.Scene {
                 spawnEnemy(this, x, 680, 'generic');
             }
             
-            // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 680, 'boss_generic');
+            // Spawn boss enemy toward the end of the level (adjusted for 3x scale)
+            spawnEnemy(this, 7500, 550, 'boss_generic');
         }
     }
     

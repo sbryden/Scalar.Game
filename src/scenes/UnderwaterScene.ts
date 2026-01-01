@@ -255,7 +255,11 @@ export default class UnderwaterScene extends Phaser.Scene {
             }
             
             // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 400, 'boss_fish');
+            // Randomly choose between shark boss (swimming) or crab boss (ground)
+            const bossType = Math.random() < 0.5 ? 'boss_shark' : 'boss_crab';
+            // Boss shark swims at mid-depth, boss crab on ground (adjusted for 3x scale)
+            const bossY = bossType === 'boss_shark' ? 400 : 600;
+            spawnEnemy(this, 7500, bossY, bossType);
         }
     }
     
