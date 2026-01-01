@@ -4,6 +4,7 @@ import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
 import playerStatsSystem from './systems/PlayerStatsSystem';
 import levelProgressionSystem from './systems/LevelProgressionSystem';
+import { fireEnemyProjectile } from './projectiles';
 
 /**
  * Helper function to check if an enemy type is a swimming enemy
@@ -147,6 +148,15 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
         enemy.minionCount = 4;
         enemy.spawnRadius = 100;
     }
+    
+    // Configure ranged ability properties
+    if (config.hasRangedAbility) {
+        enemy.hasRangedAbility = true;
+        enemy.projectileTexture = config.projectileTexture;
+        enemy.projectileDamage = config.projectileDamage;
+        enemy.projectileSpeed = config.projectileSpeed;
+        enemy.projectileCooldown = config.projectileCooldown;
+    }
 
     const barWidth = VISUAL_CONFIG.healthBar.width;
     const barHeight = VISUAL_CONFIG.healthBar.height;
@@ -242,6 +252,12 @@ function updateChaseAI(enemy: Enemy): void {
         enemy.chaseTarget.y - enemy.y,
         enemy.chaseTarget.x - enemy.x
     );
+    
+    // Fire projectile if enemy has ranged ability
+    if (enemy.hasRangedAbility && enemy.scene) {
+        const gameTime = enemy.scene.time.now;
+        fireEnemyProjectile(enemy.scene, enemy, gameTime);
+    }
     
     // Different behavior for swimming vs ground enemies
     if (isSwimmingEnemy(enemy.enemyType)) {

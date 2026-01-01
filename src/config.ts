@@ -74,6 +74,11 @@ export const ENEMY_CONFIG: Record<string, {
     knockbackResistance: number;
     lineOfSightMultiplier: number;
     chaseSpeedMultiplier: number;
+    hasRangedAbility?: boolean;
+    projectileTexture?: string;
+    projectileDamage?: number;
+    projectileSpeed?: number;
+    projectileCooldown?: number;
 }> = {
     generic: {
         width: 30,
@@ -190,7 +195,13 @@ export const ENEMY_CONFIG: Record<string, {
         patrolDistance: 550,
         knockbackResistance: 1.6,
         lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.4
+        chaseSpeedMultiplier: 1.4,
+        // Ranged ability configuration
+        hasRangedAbility: true,
+        projectileTexture: 'sharkpedo',
+        projectileDamage: 15,
+        projectileSpeed: 300,
+        projectileCooldown: 3000
     },
     crab: {
         width: 30,
@@ -315,6 +326,14 @@ export const PROJECTILE_CONFIG = {
         speed: 300,
         damage: 10,
         cooldown: 500 // milliseconds between shots
+    },
+    enemy: {
+        sharkpedo: {
+            speed: 300,
+            damage: 15,
+            cooldown: 3000, // 3 seconds between shots
+            range: 800 // Max range for enemy projectiles
+        }
     }
 };
 

@@ -50,6 +50,13 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     minionType?: string;
     minionCount?: number;
     spawnRadius?: number;
+    // Ranged ability properties
+    hasRangedAbility?: boolean;
+    projectileTexture?: string;
+    projectileDamage?: number;
+    projectileSpeed?: number;
+    projectileCooldown?: number;
+    lastProjectileTime?: number;
 }
 
 /**
@@ -60,6 +67,7 @@ export interface Projectile extends Phaser.GameObjects.Image {
     damage: number;
     spawnX: number;
     maxRange: number;
+    isEnemyProjectile?: boolean; // Flag to identify enemy projectiles
 }
 
 /**

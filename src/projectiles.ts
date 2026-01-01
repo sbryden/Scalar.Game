@@ -2,7 +2,7 @@ import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_C
 import gameState from './utils/gameState';
 import playerStatsSystem from './systems/PlayerStatsSystem';
 import levelStatsTracker from './systems/LevelStatsTracker';
-import type { WASDKeys, Projectile } from './types/game';
+import type { WASDKeys, Projectile, Enemy } from './types/game';
 
 let lastProjectileTime = 0;
 
@@ -93,4 +93,78 @@ export function updateProjectiles(): void {
             projectile.destroy();
         }
     });
+}
+
+/**
+ * Fire an enemy projectile from an enemy toward the player
+ */
+export function fireEnemyProjectile(scene: Phaser.Scene, enemy: Enemy, gameTime: number): void {
+    if (!enemy.hasRangedAbility || !enemy.projectileTexture) {
+        return;
+    }
+    
+    const player = gameState.player;
+    if (!player || !player.active) {
+        return;
+    }
+    
+    // Check distance to player - only fire if within reasonable range
+    const distanceToPlayer = Phaser.Math.Distance.Between(
+        enemy.x, enemy.y,
+        player.x, player.y
+    );
+    const maxFiringRange = enemy.lineOfSight || 800; // Use enemy's line of sight as max firing range
+    if (distanceToPlayer > maxFiringRange) {
+        return;
+    }
+    
+    // Check cooldown
+    const cooldown = enemy.projectileCooldown || 3000;
+    if (enemy.lastProjectileTime && gameTime - enemy.lastProjectileTime < cooldown) {
+        return;
+    }
+    
+    enemy.lastProjectileTime = gameTime;
+    
+    // Calculate direction to player
+    const angleToPlayer = Math.atan2(
+        player.y - enemy.y,
+        player.x - enemy.x
+    );
+    
+    const speed = enemy.projectileSpeed || 300;
+    const velocityX = Math.cos(angleToPlayer) * speed;
+    const velocityY = Math.sin(angleToPlayer) * speed;
+    
+    // Spawn projectile from enemy position
+    const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture) as Projectile;
+    projectile.setOrigin(0.5, 0.5);
+    projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
+    
+    // Scale projectile based on enemy scale
+    const enemyScale = enemy.scaleX || 1;
+    projectile.setScale(enemyScale * 0.5); // Make enemy projectiles a bit smaller
+    
+    // Rotate projectile to face direction
+    projectile.setRotation(angleToPlayer);
+    
+    gameState.projectiles?.add(projectile);
+    scene.physics.add.existing(projectile);
+    
+    const body = projectile.body as Phaser.Physics.Arcade.Body;
+    body.setAllowGravity(false);
+    body.setBounce(0, 0);
+    body.setCollideWorldBounds(true);
+    body.setVelocity(velocityX, velocityY);
+    
+    // Set damage
+    projectile.damage = enemy.projectileDamage || 15;
+    
+    // Mark as enemy projectile
+    projectile.isEnemyProjectile = true;
+    
+    // Track spawn position and max range
+    projectile.spawnX = enemy.x;
+    // Use config range if available, otherwise fallback to 800
+    projectile.maxRange = PROJECTILE_CONFIG.enemy.sharkpedo?.range || 800;
 }

@@ -36,7 +36,21 @@ export class CollisionManager {
         });
         
         this.scene.physics.add.collider(projectiles, enemies, (proj, enemy) => {
-            damageEnemy(proj as Projectile, enemy as Enemy);
+            const projectile = proj as Projectile;
+            // Only player projectiles damage enemies
+            if (!projectile.isEnemyProjectile) {
+                damageEnemy(projectile, enemy as Enemy);
+            }
+        }, undefined, this.scene);
+        
+        // Enemy projectile hits player (or shield)
+        this.scene.physics.add.collider(projectiles, player, (proj, p) => {
+            const projectile = proj as Projectile;
+            const playerObj = p as Player;
+            // Only enemy projectiles can hit player
+            if (projectile.isEnemyProjectile) {
+                combatSystem.handleEnemyProjectileHit(projectile, playerObj, this.scene.time.now);
+            }
         }, undefined, this.scene);
         
         // Player-Enemy collision (bidirectional damage and knockback)
