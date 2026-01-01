@@ -22,8 +22,8 @@ export default class MenuScene extends Phaser.Scene {
     environmentDropdownArrow!: Phaser.GameObjects.Text;
     environmentOptionsContainer!: Phaser.GameObjects.Container;
     environmentOptionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
-    infoScreenVisible!: boolean;
-    infoScreenContainer!: Phaser.GameObjects.Container | null;
+    infoScreenVisible: boolean;
+    infoScreenContainer: Phaser.GameObjects.Container | null;
 
     constructor() {
         super({ key: 'MenuScene' });
@@ -401,6 +401,9 @@ export default class MenuScene extends Phaser.Scene {
     showInfoScreen(): void {
         if (this.infoScreenVisible) return;
         
+        // Set state immediately to prevent duplicate calls
+        this.infoScreenVisible = true;
+        
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
@@ -594,14 +597,10 @@ export default class MenuScene extends Phaser.Scene {
             combatTitle, combatText,
             closeButton, closeText
         ]);
-        
-        this.infoScreenVisible = true;
     }
     
     hideInfoScreen(): void {
-        if (this.infoScreenContainer) {
-            this.infoScreenContainer.destroy();
-        }
+        this.infoScreenContainer?.destroy();
         this.infoScreenContainer = null;
         this.infoScreenVisible = false;
     }
