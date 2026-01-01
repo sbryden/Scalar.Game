@@ -1,6 +1,7 @@
 /**
  * Input Manager
  * Handles all keyboard input setup and player movement controls
+ * Now supports touch controls for iPad and mobile devices
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
@@ -8,6 +9,9 @@ import { changeSize, getPlayerSize } from '../player';
 import { fireProjectile } from '../projectiles';
 import { SIZE_CONFIG } from '../config';
 import type { WASDKeys } from '../types/game';
+import { TouchControlsManager } from './TouchControlsManager';
+import { shouldEnableTouchControls } from '../utils/deviceDetection';
+import { GestureDetector } from '../utils/gestureDetection';
 
 export class InputManager {
     scene: Phaser.Scene;
@@ -15,6 +19,11 @@ export class InputManager {
     wasdKeys!: WASDKeys;
     spaceKey!: Phaser.Input.Keyboard.Key;
     shiftKey!: Phaser.Input.Keyboard.Key;
+    
+    // Touch controls
+    touchControls: TouchControlsManager | null = null;
+    gestureDetector: GestureDetector | null = null;
+    useTouchControls: boolean = false;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -22,6 +31,7 @@ export class InputManager {
         this.wasdKeys = null as any;
         this.spaceKey = null as any;
         this.shiftKey = null as any;
+        this.useTouchControls = shouldEnableTouchControls();
     }
     
     /**
@@ -40,6 +50,42 @@ export class InputManager {
         
         // Setup action key handlers
         this.setupActionKeys();
+        
+        // Setup touch controls if on a touch device
+        if (this.useTouchControls) {
+            this.setupTouchControls();
+        }
+    }
+    
+    /**
+     * Setup touch controls for iPad and mobile devices
+     */
+    setupTouchControls(): void {
+        const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
+                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+        
+        // Create touch controls UI
+        this.touchControls = new TouchControlsManager(this.scene);
+        this.touchControls.create(isUnderwater);
+        
+        // Setup gesture detector
+        this.gestureDetector = new GestureDetector(this.scene);
+        this.gestureDetector.onSwipe((event) => {
+            // Handle swipe gestures
+            switch (event.direction) {
+                case 'up':
+                    if (!isUnderwater) {
+                        this.handleJump();
+                    }
+                    break;
+                case 'left':
+                    changeSize('smaller');
+                    break;
+                case 'right':
+                    changeSize('larger');
+                    break;
+            }
+        });
     }
     
     /**
@@ -114,6 +160,11 @@ export class InputManager {
             return;
         }
         
+        // Update touch controls if enabled
+        if (this.useTouchControls && this.touchControls) {
+            this.touchControls.update();
+        }
+        
         // Check if we're underwater for different movement physics
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
                             gameState.currentSceneKey === 'UnderwaterMicroScene';
@@ -136,10 +187,23 @@ export class InputManager {
         const speedMultiplier = sizeConfig.speedMultiplier;
         const body = gameState.player!.body;
         
-        if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
+        // Check for touch controls input
+        let moveLeft = this.wasdKeys.A.isDown || this.cursors.left.isDown;
+        let moveRight = this.wasdKeys.D.isDown || this.cursors.right.isDown;
+        
+        if (this.useTouchControls && this.touchControls) {
+            const direction = this.touchControls.getDirection();
+            if (direction.x < -0.3) {
+                moveLeft = true;
+            } else if (direction.x > 0.3) {
+                moveRight = true;
+            }
+        }
+        
+        if (moveLeft) {
             body.setVelocityX(-baseSpeed * speedMultiplier);
             gameState.player!.setFlipX(true);  // Face left
-        } else if (this.wasdKeys.D.isDown || this.cursors.right.isDown) {
+        } else if (moveRight) {
             body.setVelocityX(baseSpeed * speedMultiplier);
             gameState.player!.setFlipX(false); // Face right
         } else {
@@ -159,11 +223,33 @@ export class InputManager {
         const speedMultiplier = sizeConfig.speedMultiplier;
         const body = gameState.player!.body;
         
+        // Check for touch controls input
+        let moveLeft = this.wasdKeys.A.isDown || this.cursors.left.isDown;
+        let moveRight = this.wasdKeys.D.isDown || this.cursors.right.isDown;
+        let moveUp = this.wasdKeys.W.isDown || this.cursors.up.isDown || this.spaceKey.isDown;
+        let moveDown = this.wasdKeys.S.isDown || this.cursors.down.isDown;
+        
+        if (this.useTouchControls && this.touchControls) {
+            const direction = this.touchControls.getDirection();
+            if (direction.x < -0.3) {
+                moveLeft = true;
+            } else if (direction.x > 0.3) {
+                moveRight = true;
+            }
+            
+            if (this.touchControls.isJumpPressed()) {
+                moveUp = true;
+            }
+            if (this.touchControls.isDownPressed()) {
+                moveDown = true;
+            }
+        }
+        
         // Horizontal movement
-        if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
+        if (moveLeft) {
             body.setVelocityX(-baseSpeed * speedMultiplier);
             gameState.player!.setFlipX(true);  // Face left
-        } else if (this.wasdKeys.D.isDown || this.cursors.right.isDown) {
+        } else if (moveRight) {
             body.setVelocityX(baseSpeed * speedMultiplier);
             gameState.player!.setFlipX(false); // Face right
         } else {
@@ -171,11 +257,11 @@ export class InputManager {
         }
         
         // Vertical thrust controls (W for up, S for down, Space also for up)
-        if (this.wasdKeys.W.isDown || this.cursors.up.isDown || this.spaceKey.isDown) {
+        if (moveUp) {
             // Thrust upward
             const currentVelY = body.velocity.y;
             body.setVelocityY(Math.max(currentVelY - thrustPower * 0.15, -thrustPower));
-        } else if (this.wasdKeys.S.isDown || this.cursors.down.isDown) {
+        } else if (moveDown) {
             // Thrust downward
             const currentVelY = body.velocity.y;
             body.setVelocityY(Math.min(currentVelY + thrustPower * 0.15, thrustPower));
@@ -187,5 +273,16 @@ export class InputManager {
      */
     destroy(): void {
         this.scene.input.keyboard?.removeAllListeners();
+        
+        // Clean up touch controls
+        if (this.touchControls) {
+            this.touchControls.destroy();
+            this.touchControls = null;
+        }
+        
+        if (this.gestureDetector) {
+            this.gestureDetector.destroy();
+            this.gestureDetector = null;
+        }
     }
 }
