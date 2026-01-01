@@ -73,11 +73,11 @@ export class InputManager {
      * Handle jump action
      */
     handleJump(): void {
-        if (!gameState.player || !(gameState.player.body as Phaser.Physics.Arcade.Body).touching.down) {
+        if (!gameState.player || !gameState.player.body.touching.down) {
             return;
         }
         
-        const body = gameState.player.body as Phaser.Physics.Arcade.Body;
+        const body = gameState.player.body;
         const currentVelocityX = body.velocity.x;
         const jumpPower = 330 * SIZE_CONFIG[getPlayerSize()].jumpMultiplier;
         body.setVelocityY(-jumpPower);
@@ -127,7 +127,7 @@ export class InputManager {
     handleLandMovement(): void {
         const baseSpeed = 160;
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
-        const body = gameState.player!.body as Phaser.Physics.Arcade.Body;
+        const body = gameState.player!.body;
         
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
             body.setVelocityX(-baseSpeed * speedMultiplier);
@@ -147,7 +147,7 @@ export class InputManager {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
         const speedMultiplier = SIZE_CONFIG[getPlayerSize()].speedMultiplier;
-        const body = gameState.player!.body as Phaser.Physics.Arcade.Body;
+        const body = gameState.player!.body;
         
         // Horizontal movement
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {

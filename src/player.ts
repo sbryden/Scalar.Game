@@ -89,12 +89,12 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     
     // Apply new scale
     gameState.player!.setScale(baseDisplayScale * config.scale);
-    (gameState.player!.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
+    gameState.player!.body.updateFromGameObject();
     
     // Small jump to account for size change
     const sizeDifference = Math.abs(newScale - oldScale);
     const jumpPower = 50 + (sizeDifference * 150);
-    (gameState.player!.body as Phaser.Physics.Arcade.Body).setVelocityY(-jumpPower);
+    gameState.player!.body.setVelocityY(-jumpPower);
     
     // Scale enemies inversely
     const enemyScale = 1 / newScale;
@@ -107,7 +107,7 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
         const enemySprite = enemy as Enemy;
         enemySprite.setScale(enemyScale);
         enemySprite.y -= enemyHeightDifference / 2;
-        (enemySprite.body as Phaser.Physics.Arcade.Body).updateFromGameObject();
+        enemySprite.body.updateFromGameObject();
     });
     
     // Reset cooldown timer

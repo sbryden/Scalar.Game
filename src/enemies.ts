@@ -27,12 +27,12 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     const enemy = scene.add.sprite(x, y, texture) as Enemy;
     enemy.setScale(0.2);
     scene.physics.add.existing(enemy);
-    (enemy.body as Phaser.Physics.Arcade.Body).setBounce(0.2);
-    (enemy.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
+    enemy.body.setBounce(0.2);
+    enemy.body.setCollideWorldBounds(true);
 
     // Swimming enemies don't have gravity
     if (isSwimmingEnemy(enemyType)) {
-        (enemy.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        enemy.body.setAllowGravity(false);
     }
 
     enemy.health = config.health;
