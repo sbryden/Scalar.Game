@@ -3,6 +3,14 @@
  * Tracks player performance statistics throughout a level
  */
 
+// Base point values for scoring
+export const SCORING_CONFIG = {
+    regularBossPoints: 20,
+    regularEnemyPoints: 5,
+    microBossPoints: 10,
+    microEnemyPoints: 2.5
+} as const;
+
 export interface LevelStats {
     levelStartTime: number;
     levelEndTime: number | null;
@@ -97,7 +105,7 @@ export class LevelStatsTracker {
     /**
      * Track an enemy being destroyed
      */
-    recordEnemyDestroyed(isBoss: boolean = false, enemyType?: string): void {
+    recordEnemyDestroyed(isBoss: boolean = false, enemyType: string): void {
         if (this.isLevelActive) {
             this.stats.enemiesDestroyed++;
             if (isBoss) {
@@ -105,21 +113,19 @@ export class LevelStatsTracker {
             }
             
             // Track by category for scoring
-            if (enemyType) {
-                const isMicro = this.isMicroEnemy(enemyType);
-                
-                if (isBoss) {
-                    if (isMicro) {
-                        this.stats.microBossesDestroyed++;
-                    } else {
-                        this.stats.regularBossesDestroyed++;
-                    }
+            const isMicro = this.isMicroEnemy(enemyType);
+            
+            if (isBoss) {
+                if (isMicro) {
+                    this.stats.microBossesDestroyed++;
                 } else {
-                    if (isMicro) {
-                        this.stats.microEnemiesDestroyed++;
-                    } else {
-                        this.stats.regularEnemiesDestroyed++;
-                    }
+                    this.stats.regularBossesDestroyed++;
+                }
+            } else {
+                if (isMicro) {
+                    this.stats.microEnemiesDestroyed++;
+                } else {
+                    this.stats.regularEnemiesDestroyed++;
                 }
             }
         }
@@ -200,28 +206,24 @@ export class LevelStatsTracker {
         microBossPoints: number;
         microEnemyPoints: number;
         totalScore: number;
+        baseValues: typeof SCORING_CONFIG;
     } {
-        // Base point values
-        const baseRegularBossPoints = 20;
-        const baseRegularEnemyPoints = 5;
-        const baseMicroBossPoints = 10;
-        const baseMicroEnemyPoints = 2.5;
-        
         // Level scaling multiplier (increases linearly with level)
         const levelMultiplier = currentLevel;
         
         // Calculate points for each category
-        const regularBossPoints = this.stats.regularBossesDestroyed * baseRegularBossPoints * levelMultiplier;
-        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * baseRegularEnemyPoints * levelMultiplier;
-        const microBossPoints = this.stats.microBossesDestroyed * baseMicroBossPoints * levelMultiplier;
-        const microEnemyPoints = this.stats.microEnemiesDestroyed * baseMicroEnemyPoints * levelMultiplier;
+        const regularBossPoints = this.stats.regularBossesDestroyed * SCORING_CONFIG.regularBossPoints * levelMultiplier;
+        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * SCORING_CONFIG.regularEnemyPoints * levelMultiplier;
+        const microBossPoints = this.stats.microBossesDestroyed * SCORING_CONFIG.microBossPoints * levelMultiplier;
+        const microEnemyPoints = this.stats.microEnemiesDestroyed * SCORING_CONFIG.microEnemyPoints * levelMultiplier;
         
         return {
             regularBossPoints,
             regularEnemyPoints,
             microBossPoints,
             microEnemyPoints,
-            totalScore: regularBossPoints + regularEnemyPoints + microBossPoints + microEnemyPoints
+            totalScore: regularBossPoints + regularEnemyPoints + microBossPoints + microEnemyPoints,
+            baseValues: SCORING_CONFIG
         };
     }
 }
