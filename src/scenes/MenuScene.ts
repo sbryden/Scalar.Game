@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import { BUILD_NUMBER } from '../buildInfo';
 
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
@@ -104,6 +105,15 @@ export default class MenuScene extends Phaser.Scene {
         });
         instructions.setOrigin(0.5);
         instructions.setAlpha(0.6);
+        
+        // Build number
+        const buildNumber = this.add.text(width / 2, 680, `Build: ${BUILD_NUMBER}`, {
+            fontSize: '12px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#888888'
+        });
+        buildNumber.setOrigin(0.5);
+        buildNumber.setAlpha(0.5);
     }
     
     createDifficultyDropdown(centerX: number, y: number): void {
