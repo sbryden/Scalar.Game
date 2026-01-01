@@ -264,6 +264,52 @@ export class CombatSystem {
     }
     
     /**
+     * Handle enemy projectile hitting player
+     * Shield completely blocks damage from enemy projectiles
+     */
+    handleEnemyProjectileHit(projectile: Projectile, player: Player, gameTime: number): void {
+        if (!projectile.active) return;
+        
+        // Check if player is immune (after respawn)
+        if (player.immuneUntil && gameTime < player.immuneUntil) {
+            projectile.destroy();
+            return;
+        }
+        
+        // Check if player is in melee mode (shield active)
+        if (player.isMeleeMode) {
+            // Shield completely blocks the projectile
+            projectile.destroy();
+            // Visual feedback: flash the player blue briefly to show shield block
+            player.setTint(0x0099FF);
+            player.scene.time.delayedCall(100, () => {
+                if (player.active && player.isMeleeMode) {
+                    // Restore melee mode tint
+                    player.setTint(0x00FF00);
+                }
+            });
+            return;
+        }
+        
+        // Player not shielded - take damage
+        const damage = projectile.damage;
+        this.damagePlayer(damage);
+        
+        // Visual feedback: flash player red and shake camera
+        player.setTint(0xff0000);
+        player.scene.time.delayedCall(PLAYER_COMBAT_CONFIG.invulnerabilityDuration, () => {
+            if (player.active && !player.isMeleeMode) {
+                player.clearTint();
+            }
+        });
+        
+        // Camera shake effect
+        player.scene.cameras.main.shake(COMBAT_CONFIG.visual.cameraShakeDuration, COMBAT_CONFIG.visual.cameraShakeIntensityNormal);
+        
+        projectile.destroy();
+    }
+    
+    /**
      * Apply knockback force to player based on enemy position
      */
     applyPlayerKnockback(player: Player, enemy: Enemy): void {
