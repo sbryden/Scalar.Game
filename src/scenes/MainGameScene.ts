@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../config';
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -192,6 +192,9 @@ export default class MainGameScene extends Phaser.Scene {
     restoreOrSpawnEnemies() {
         // Check if we have saved enemies for this scene
         const savedEnemies = gameState.savedEnemies.MainGameScene;
+
+        // Check if boss mode is active
+        const bossMode = this.registry.get('bossMode') === true;
         
         if (savedEnemies.length > 0) {
             // Restore saved enemies
@@ -211,16 +214,32 @@ export default class MainGameScene extends Phaser.Scene {
             );
             
             // Spawn enemies at generated points
-            spawnPoints.forEach(point => {
-                if (point.isBoss) {
-                    // 50% chance to spawn spawner boss, 50% regular boss
-                    const bossType = Math.random() < 0.5 ? 'spawner_boss_land' : 'boss_land';
-                    spawnEnemy(this, point.x, point.y, bossType);
-                } else {
-                    // Spawn regular enemy
-                    spawnEnemy(this, point.x, point.y, 'generic');
-                }
-            });
+            if (bossMode) {
+                // Boss mode: spawn one of each boss type
+                // Land has 2 bosses: regular boss and spawner boss
+                spawnPoints.forEach((point, index) => {
+                    if (index === 0) {
+                        spawnEnemy(this, point.x, point.y, 'boss_land');
+                    } else {
+                        spawnEnemy(this, point.x, point.y, 'spawner_boss_land');
+                    }
+                });
+
+                // Set total bosses for tracking
+                combatSystem.setTotalBosses(spawnPoints.length);
+            } else {
+                // Normal mode: regular enemies + random boss
+                spawnPoints.forEach(point => {
+                    if (point.isBoss) {
+                        // 50% chance to spawn spawner boss, 50% regular boss
+                        const bossType = Math.random() < 0.5 ? 'spawner_boss_land' : 'boss_land';
+                        spawnEnemy(this, point.x, point.y, bossType);
+                    } else {
+                        // Spawn regular enemy
+                        spawnEnemy(this, point.x, point.y, 'generic');
+                    }
+                });
+            }
         }
     }
     
@@ -256,6 +275,15 @@ export default class MainGameScene extends Phaser.Scene {
         
         // Update HUD
         this.hud.update(playerStats);
+        
+        // Update boss count display if in boss mode
+        const bossMode = this.registry.get('bossMode') === true;
+        if (bossMode) {
+            const bossProgress = combatSystem.getBossProgress();
+            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
+        } else {
+            this.hud.hideBossCount();
+        }
         
         // Update size change cooldown
         let timer = getSizeChangeTimer();

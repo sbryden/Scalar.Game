@@ -3,7 +3,7 @@
  * Cellular-level gameplay scene with bacteria enemies
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../config';
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -212,6 +212,9 @@ export default class MicroScene extends Phaser.Scene {
     restoreOrSpawnEnemies() {
         // Check if we have saved enemies for this scene
         const savedEnemies = gameState.savedEnemies.MicroScene;
+
+        // Check if boss mode is active
+        const bossMode = this.registry.get('bossMode') === true;
         
         if (savedEnemies.length > 0) {
             // Restore saved enemies
@@ -233,15 +236,26 @@ export default class MicroScene extends Phaser.Scene {
             );
             
             // Spawn enemies at generated points
-            spawnPoints.forEach(point => {
-                if (point.isBoss) {
-                    // Spawn boss enemy
+            if (bossMode) {
+                // Boss mode: spawn only boss(es)
+                spawnPoints.forEach(point => {
                     spawnEnemy(this, point.x, point.y, 'boss_land_micro');
-                } else {
-                    // Spawn regular micro enemy
-                    spawnEnemy(this, point.x, point.y, 'micro');
-                }
-            });
+                });
+                
+                // Set total bosses for tracking
+                combatSystem.setTotalBosses(spawnPoints.length);
+            } else {
+                // Normal mode: regular enemies + boss
+                spawnPoints.forEach(point => {
+                    if (point.isBoss) {
+                        // Spawn boss enemy
+                        spawnEnemy(this, point.x, point.y, 'boss_land_micro');
+                    } else {
+                        // Spawn regular micro enemy
+                        spawnEnemy(this, point.x, point.y, 'micro');
+                    }
+                });
+            }
         }
     }
     
@@ -277,6 +291,15 @@ export default class MicroScene extends Phaser.Scene {
         
         // Update HUD
         this.hud.update(playerStats);
+        
+        // Update boss count display if in boss mode
+        const bossMode = this.registry.get('bossMode') === true;
+        if (bossMode) {
+            const bossProgress = combatSystem.getBossProgress();
+            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
+        } else {
+            this.hud.hideBossCount();
+        }
         
         // Update size change cooldown
         let timer = getSizeChangeTimer();

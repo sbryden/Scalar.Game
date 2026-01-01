@@ -17,6 +17,7 @@ export class HUD {
     staminaBarBackground: Phaser.GameObjects.Rectangle | null;
     levelText: Phaser.GameObjects.Text | null;
     mapLevelText: Phaser.GameObjects.Text | null;
+    bossCountText: Phaser.GameObjects.Text | null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -28,6 +29,7 @@ export class HUD {
         this.staminaBarBackground = null;
         this.levelText = null;
         this.mapLevelText = null;
+        this.bossCountText = null;
         
         this.create();
     }
@@ -82,6 +84,16 @@ export class HUD {
         });
         this.mapLevelText.setDepth(1000);
         this.mapLevelText.setScrollFactor(0);
+        
+        // Boss count text (only visible in boss mode)
+        this.bossCountText = this.scene.add.text(50, 80, '', {
+            fontSize: '20px',
+            color: '#FF6B6B',
+            fontStyle: 'bold'
+        });
+        this.bossCountText.setDepth(1000);
+        this.bossCountText.setScrollFactor(0);
+        this.bossCountText.setVisible(false);
     }
     
     /**
@@ -123,6 +135,23 @@ export class HUD {
     }
     
     /**
+     * Update boss count display (only shown in boss mode)
+     */
+    updateBossCount(defeated: number, total: number): void {
+        if (this.bossCountText) {
+            this.bossCountText.setText(`BOSSES: ${defeated}/${total}`);
+            this.bossCountText.setVisible(true);
+        }
+    }
+    
+    /**
+     * Hide boss count display (for normal mode)
+     */
+    hideBossCount(): void {
+        this.bossCountText?.setVisible(false);
+    }
+    
+    /**
      * Clean up HUD elements
      */
     destroy(): void {
@@ -134,5 +163,6 @@ export class HUD {
         if (this.staminaBarBackground) this.staminaBarBackground.destroy();
         if (this.levelText) this.levelText.destroy();
         if (this.mapLevelText) this.mapLevelText.destroy();
+        if (this.bossCountText) this.bossCountText.destroy();
     }
 }

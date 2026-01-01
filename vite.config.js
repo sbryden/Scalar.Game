@@ -1,6 +1,17 @@
 import { defineConfig } from 'vite'
+import { execSync } from 'child_process'
 
-export default defineConfig({
+// Get git commit hash or use 'dev' for development
+function getBuildNumber() {
+  try {
+    const commit = execSync('git rev-parse --short HEAD').toString().trim()
+    return commit
+  } catch (e) {
+    return 'dev'
+  }
+}
+
+export default defineConfig(({ command }) => ({
   base: '/Scalar.Game/',
   server: {
     port: 3000,
@@ -12,5 +23,8 @@ export default defineConfig({
     assetsInlineLimit: 0, // Don't inline assets as base64
     copyPublicDir: true
   },
-  publicDir: 'assets' // Copy assets folder to dist root
-})
+  publicDir: 'assets', // Copy assets folder to dist root
+  define: {
+    '__BUILD_NUMBER__': JSON.stringify(command === 'build' ? getBuildNumber() : 'dev')
+  }
+}))
