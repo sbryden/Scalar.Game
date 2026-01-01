@@ -54,6 +54,13 @@ export const SPAWN_CONFIG = {
     }
 };
 
+// Detection configuration
+export const DETECTION_CONFIG = {
+    minLineOfSight: 100, // Minimum line of sight distance for small enemies
+    bossLineOfSightScreenPercent: 0.6, // Boss line of sight as % of screen width (60%)
+    maxLineOfSightScreenPercent: 1.0 // Maximum line of sight (100% of screen width)
+};
+
 // Enemy configuration
 export const ENEMY_CONFIG: Record<string, {
     width: number;
@@ -65,8 +72,8 @@ export const ENEMY_CONFIG: Record<string, {
     xpReward: number;
     patrolDistance: number;
     knockbackResistance: number;
-    aggroRangeMultiplier: number;
-    aggroSpeedMultiplier: number;
+    lineOfSightMultiplier: number;
+    chaseSpeedMultiplier: number;
 }> = {
     generic: {
         width: 30,
@@ -78,8 +85,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 25,
         patrolDistance: 300,
         knockbackResistance: 1.0,  // 1.0 = normal knockback, 0 = immune, >1 = takes more knockback
-        aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
+        chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
     boss_generic: {
         width: 90,
@@ -91,8 +98,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 150,
         patrolDistance: 400,
         knockbackResistance: 2.0,  // More resistant to knockback
-        aggroRangeMultiplier: 8.0, // Larger aggro range
-        aggroSpeedMultiplier: 1.3  // Slightly slower when aggroed
+        lineOfSightMultiplier: 8.0, // Larger line of sight range
+        chaseSpeedMultiplier: 1.3  // Slightly slower when chasing
     },
     micro: {
         width: 30,
@@ -104,8 +111,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 10,
         patrolDistance: 200,
         knockbackResistance: 0.8,  // Lighter, knocked back less
-        aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
+        chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
     boss_micro: {
         width: 90,
@@ -117,8 +124,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 60,
         patrolDistance: 300,
         knockbackResistance: 1.5,
-        aggroRangeMultiplier: 8.0,
-        aggroSpeedMultiplier: 1.3
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
     },
     fish: {
         width: 30,
@@ -130,8 +137,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 20,
         patrolDistance: 400,
         knockbackResistance: 0.7,  // Swims smoothly, less affected by knockback
-        aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
+        chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
     boss_fish: {
         width: 90,
@@ -143,8 +150,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 120,
         patrolDistance: 500,
         knockbackResistance: 1.5,
-        aggroRangeMultiplier: 8.0,
-        aggroSpeedMultiplier: 1.3
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
     },
     boss_shark: {
         width: 90,
@@ -156,8 +163,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 130,
         patrolDistance: 550,
         knockbackResistance: 1.6,
-        aggroRangeMultiplier: 8.0,
-        aggroSpeedMultiplier: 1.4
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.4
     },
     crab: {
         width: 30,
@@ -169,8 +176,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 30,
         patrolDistance: 250,
         knockbackResistance: 1.2,  // Heavier, more resistant to knockback
-        aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
+        chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
     boss_crab: {
         width: 90,
@@ -182,8 +189,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 180,
         patrolDistance: 350,
         knockbackResistance: 2.2,  // Very resistant to knockback
-        aggroRangeMultiplier: 8.0,
-        aggroSpeedMultiplier: 1.3
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
     },
     plankton: {
         width: 20,
@@ -195,8 +202,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 8,
         patrolDistance: 180,
         knockbackResistance: 0.5,  // Very light, easily knocked back
-        aggroRangeMultiplier: 5.0, // Aggro range = enemy size * this multiplier
-        aggroSpeedMultiplier: 1.5  // Speed when aggroed = base speed * this multiplier
+        lineOfSightMultiplier: 5.0, // Line of sight = enemy size * this multiplier
+        chaseSpeedMultiplier: 1.5  // Speed when chasing = base speed * this multiplier
     },
     boss_plankton: {
         width: 60,
@@ -208,8 +215,8 @@ export const ENEMY_CONFIG: Record<string, {
         xpReward: 50,
         patrolDistance: 280,
         knockbackResistance: 1.2,
-        aggroRangeMultiplier: 8.0,
-        aggroSpeedMultiplier: 1.3
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
     }
 };
 
@@ -286,7 +293,7 @@ export const PHYSICS_CONFIG = {
         aggroJump: {
             verticalThreshold: 50, // Jump if player is this many pixels above
             horizontalThreshold: 200, // Only jump if player within this horizontal distance
-            velocity: -250 // Y velocity for aggro jump
+            velocity: -250 // Y velocity for chase jump
         },
         patrol: {
             floatAngleIncrement: 0.02, // How fast the float angle changes per frame
@@ -353,7 +360,7 @@ export const XP_CONFIG = {
 export const HARD_MODE_CONFIG = {
     enemyHealthMultiplier: 1.5,      // Enemies have 50% more HP
     enemySpeedMultiplier: 1.3,       // Enemies move 30% faster
-    enemyAggroRangeMultiplier: 1.5,  // Enemies have 50% larger line of sight
+    enemyLineOfSightMultiplier: 1.5,  // Enemies have 50% larger line of sight
     enemySpawnMultiplier: 1.5        // 50% more enemies spawn
 };
 

@@ -1,4 +1,4 @@
-import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG } from "./config";
+import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
@@ -30,7 +30,7 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     const isHardMode = playerStatsSystem.difficulty === 'hard';
     const healthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
     const speedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
-    const aggroRangeMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyAggroRangeMultiplier : 1;
+    const lineOfSightMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyLineOfSightMultiplier : 1;
     
     // Select appropriate texture based on enemy type
     let texture = "enemy";
@@ -75,10 +75,26 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.floatAngle = Math.random() * Math.PI * 2; // Random starting angle for floating
     enemy.setFlipX(false); // Start facing right
     
-    // Initialize aggro system properties
-    enemy.isAggroed = false;
-    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier * aggroRangeMultiplier;
-    enemy.aggroTarget = undefined;
+    // Initialize chase system properties
+    // Calculate line of sight based on larger of width and height
+    const largerDimension = Math.max(enemy.displayWidth, enemy.displayHeight);
+    let calculatedLineOfSight = largerDimension * config.lineOfSightMultiplier * lineOfSightMultiplier;
+    
+    // Apply minimum line of sight
+    calculatedLineOfSight = Math.max(calculatedLineOfSight, DETECTION_CONFIG.minLineOfSight);
+    
+    // Bosses get enhanced line of sight based on screen width
+    if (isBoss && enemy.scene && enemy.scene.cameras.main) {
+        const screenWidth = enemy.scene.cameras.main.width;
+        const bossLineOfSight = screenWidth * DETECTION_CONFIG.bossLineOfSightScreenPercent;
+        const maxLineOfSight = screenWidth * DETECTION_CONFIG.maxLineOfSightScreenPercent;
+        // Use the larger of calculated or boss-specific, but cap at max
+        calculatedLineOfSight = Math.min(Math.max(calculatedLineOfSight, bossLineOfSight), maxLineOfSight);
+    }
+    
+    enemy.isChasing = false;
+    enemy.lineOfSight = calculatedLineOfSight;
+    enemy.chaseTarget = undefined;
 
     const barWidth = VISUAL_CONFIG.healthBar.width;
     const barHeight = VISUAL_CONFIG.healthBar.height;
@@ -118,8 +134,8 @@ export function updateEnemyAI(enemy: Enemy): void {
         return;
     }
     
-    // Check for proximity-based aggro if not already aggroed
-    if (!enemy.isAggroed && gameState.player) {
+    // Check for proximity-based detection if not already chasing
+    if (!enemy.isChasing && gameState.player) {
         const distanceToPlayer = Phaser.Math.Distance.Between(
             enemy.x, enemy.y,
             gameState.player.x, gameState.player.y
@@ -128,24 +144,24 @@ export function updateEnemyAI(enemy: Enemy): void {
         const now = Date.now();
         const playerIsImmune = gameState.player.immuneUntil && now < gameState.player.immuneUntil;
         
-        if (distanceToPlayer <= enemy.aggroRange && !playerIsImmune) {
-            enemy.isAggroed = true;
-            enemy.aggroTarget = gameState.player;
+        if (distanceToPlayer <= enemy.lineOfSight && !playerIsImmune) {
+            enemy.isChasing = true;
+            enemy.chaseTarget = gameState.player;
         }
     }
     
-    // If aggroed, use aggro AI instead of patrol AI
-    if (enemy.isAggroed && enemy.aggroTarget && enemy.aggroTarget.active) {
-        updateAggroAI(enemy);
-        // Update health bar after aggro AI
+    // If chasing, use chase AI instead of patrol AI
+    if (enemy.isChasing && enemy.chaseTarget && enemy.chaseTarget.active) {
+        updateChaseAI(enemy);
+        // Update health bar after chase AI
         updateEnemyHealthBar(enemy);
         return;
     }
     
-    // Reset aggro if target is no longer valid
-    if (enemy.isAggroed && (!enemy.aggroTarget || !enemy.aggroTarget.active)) {
-        enemy.isAggroed = false;
-        enemy.aggroTarget = undefined;
+    // Reset chase state if target is no longer valid
+    if (enemy.isChasing && (!enemy.chaseTarget || !enemy.chaseTarget.active)) {
+        enemy.isChasing = false;
+        enemy.chaseTarget = undefined;
     }
     
     // Default patrol behavior
@@ -153,8 +169,8 @@ export function updateEnemyAI(enemy: Enemy): void {
     updateEnemyHealthBar(enemy);
 }
 
-function updateAggroAI(enemy: Enemy): void {
-    if (!enemy.aggroTarget) return;
+function updateChaseAI(enemy: Enemy): void {
+    if (!enemy.chaseTarget) return;
     
     const config = ENEMY_CONFIG[enemy.enemyType];
     
@@ -164,19 +180,19 @@ function updateAggroAI(enemy: Enemy): void {
         return;
     }
     
-    const aggroSpeed = enemy.speed * config.aggroSpeedMultiplier;
+    const chaseSpeed = enemy.speed * config.chaseSpeedMultiplier;
     
     // Calculate direction to player
     const angleToPlayer = Math.atan2(
-        enemy.aggroTarget.y - enemy.y,
-        enemy.aggroTarget.x - enemy.x
+        enemy.chaseTarget.y - enemy.y,
+        enemy.chaseTarget.x - enemy.x
     );
     
     // Different behavior for swimming vs ground enemies
     if (isSwimmingEnemy(enemy.enemyType)) {
         // Swimming enemies can move freely in all directions
-        const velocityX = Math.cos(angleToPlayer) * aggroSpeed;
-        const velocityY = Math.sin(angleToPlayer) * aggroSpeed;
+        const velocityX = Math.cos(angleToPlayer) * chaseSpeed;
+        const velocityY = Math.sin(angleToPlayer) * chaseSpeed;
         
         enemy.body.setVelocityX(velocityX);
         enemy.body.setVelocityY(velocityY);
@@ -194,13 +210,13 @@ function updateAggroAI(enemy: Enemy): void {
         }
     } else {
         // Ground enemies (crab, generic) - respect gravity and jump
-        const horizontalDirection = Math.sign(enemy.aggroTarget.x - enemy.x);
-        enemy.body.setVelocityX(aggroSpeed * horizontalDirection);
+        const horizontalDirection = Math.sign(enemy.chaseTarget.x - enemy.x);
+        enemy.body.setVelocityX(chaseSpeed * horizontalDirection);
         enemy.setFlipX(horizontalDirection === -1);
         
         // Jump if player is above and enemy is on ground
-        const verticalDistance = enemy.y - enemy.aggroTarget.y;
-        const horizontalDistance = Math.abs(enemy.x - enemy.aggroTarget.x);
+        const verticalDistance = enemy.y - enemy.chaseTarget.y;
+        const horizontalDistance = Math.abs(enemy.x - enemy.chaseTarget.x);
         
         if (enemy.body.touching.down && 
             verticalDistance > PHYSICS_CONFIG.enemy.aggroJump.verticalThreshold && 
