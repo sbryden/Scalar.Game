@@ -5,10 +5,12 @@
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import { BUILD_NUMBER } from '../buildInfo';
 
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
     selectedEnvironment!: string;
+    bossMode!: boolean;
     dropdownOpen!: boolean;
     environmentDropdownOpen!: boolean;
     dropdownContainer!: Phaser.GameObjects.Container;
@@ -28,6 +30,7 @@ export default class MenuScene extends Phaser.Scene {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
         this.selectedEnvironment = 'land';
+        this.bossMode = false;
         this.dropdownOpen = false;
         this.environmentDropdownOpen = false;
     }
@@ -36,8 +39,9 @@ export default class MenuScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
-        // Background
-        this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
+        // Background with version-based color
+        const versionColor = this.getVersionColor(BUILD_NUMBER);
+        this.add.rectangle(width / 2, height / 2, width, height, versionColor);
         
         // Add secure robot image on the right side
         const robot = this.add.image(width * 0.8, height / 2, 'secure_robot');
@@ -88,8 +92,11 @@ export default class MenuScene extends Phaser.Scene {
         // Create environment dropdown
         this.createEnvironmentDropdown(width / 2, 465);
         
+        // Boss Mode checkbox
+        this.createBossModeCheckbox(width / 2, 530);
+        
         // Start button
-        this.createStartButton(width / 2, 560);
+        this.createStartButton(width / 2, 590);
         
         // Instructions
         const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
@@ -99,6 +106,56 @@ export default class MenuScene extends Phaser.Scene {
         });
         instructions.setOrigin(0.5);
         instructions.setAlpha(0.6);
+        
+        // Build number
+        const buildNumber = this.add.text(width / 2, 680, `Build: ${BUILD_NUMBER}`, {
+            fontSize: '12px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#888888'
+        });
+        buildNumber.setOrigin(0.5);
+        buildNumber.setAlpha(0.5);
+    }
+    
+    /**
+     * Generate a subtle color tint based on version string
+     * Returns a color with reduced saturation for subtle background effect
+     */
+    getVersionColor(version: string): number {
+        // Create a simple hash from the version string
+        let hash = 0;
+        for (let i = 0; i < version.length; i++) {
+            hash = ((hash << 5) - hash) + version.charCodeAt(i);
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        
+        // Use hash to generate hue (0-360 degrees)
+        const hue = Math.abs(hash) % 360;
+        
+        // Low saturation (15-25%) and dark value (20-30%) for subtle tint
+        const saturation = 15 + (Math.abs(hash >> 8) % 10);
+        const value = 20 + (Math.abs(hash >> 16) % 10);
+        
+        // Convert HSV to RGB
+        const c = (value / 100) * (saturation / 100);
+        const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+        const m = (value / 100) - c;
+        
+        let r = 0, g = 0, b = 0;
+        if (hue >= 0 && hue < 60) { r = c; g = x; b = 0; }
+        else if (hue >= 60 && hue < 120) { r = x; g = c; b = 0; }
+        else if (hue >= 120 && hue < 180) { r = 0; g = c; b = x; }
+        else if (hue >= 180 && hue < 240) { r = 0; g = x; b = c; }
+        else if (hue >= 240 && hue < 300) { r = x; g = 0; b = c; }
+        else { r = c; g = 0; b = x; }
+        
+        // Convert to 0-255 range
+        const red = Math.round((r + m) * 255);
+        const green = Math.round((g + m) * 255);
+        const blue = Math.round((b + m) * 255);
+        
+        // Return as hex color
+        return (red << 16) | (green << 8) | blue;
     }
     
     createDifficultyDropdown(centerX: number, y: number): void {
@@ -314,6 +371,45 @@ export default class MenuScene extends Phaser.Scene {
         this.toggleEnvironmentDropdown();
     }
 
+    createBossModeCheckbox(centerX: number, y: number): void {
+        const checkboxSize = 24;
+        const spacing = 10;
+        
+        // Checkbox background
+        const checkbox = this.add.rectangle(centerX - 80, y, checkboxSize, checkboxSize, 0x2c3e50);
+        checkbox.setStrokeStyle(2, 0x3498db);
+        checkbox.setInteractive({ useHandCursor: true });
+        
+        // Checkmark (initially hidden)
+        const checkmark = this.add.text(centerX - 80, y, '✓', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#00ff88',
+            fontStyle: 'bold'
+        });
+        checkmark.setOrigin(0.5);
+        checkmark.setVisible(false);
+        
+        // Label
+        const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'Boss Mode (Testing)', {
+            fontSize: '18px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff'
+        });
+        label.setOrigin(0, 0.5);
+        
+        // Toggle functionality
+        checkbox.on('pointerover', () => {
+            checkbox.setStrokeStyle(2, 0x5dade2);
+        });
+        checkbox.on('pointerout', () => {
+            checkbox.setStrokeStyle(2, 0x3498db);
+        });
+        checkbox.on('pointerdown', () => {
+            this.bossMode = !this.bossMode;
+            checkmark.setVisible(this.bossMode);
+        });
+    }
     
     createStartButton(centerX: number, y: number): void {
         const buttonWidth = 200;
@@ -340,9 +436,10 @@ export default class MenuScene extends Phaser.Scene {
             startText.setScale(1);
         });
         startButton.on('pointerdown', () => {
-            // Store difficulty and environment in registry for access by other scenes
+            // Store difficulty, environment, and boss mode in registry for access by other scenes
             this.registry.set('difficulty', this.selectedDifficulty);
             this.registry.set('gameEnvironment', this.selectedEnvironment);
+            this.registry.set('bossMode', this.bossMode);
             
             // Reset to level 1 when starting a new game
             levelProgressionSystem.resetToLevel1();

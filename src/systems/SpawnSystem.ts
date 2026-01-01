@@ -8,7 +8,7 @@ import playerStatsSystem from './PlayerStatsSystem';
 import levelProgressionSystem from './LevelProgressionSystem';
 import { gainXP } from '../xpOrbs';
 import { getStaminaSystem } from './StaminaSystem';
-import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG } from '../config';
+import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
 import type { XPOrb } from '../types/game';
 
 /**
@@ -125,6 +125,65 @@ export class SpawnSystem {
     }
 
     /**
+     * Generate boss-only spawn points for boss mode
+     * @param baseY - Base Y coordinate for spawning
+     * @param allowYVariance - Whether to add Y variance (true for swimming enemies)
+     * @returns Array of boss spawn points
+     */
+    generateBossOnlySpawnPoints(
+        baseY: number = SPAWN_CONFIG.defaults.groundY,
+        allowYVariance: boolean = false
+    ): SpawnPoint[] {
+        const spawnPoints: SpawnPoint[] = [];
+        const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
+        
+        // Determine which biome we're in based on current scene
+        const currentScene = gameState.currentSceneKey;
+        let bossSegments: number[] = [];
+        
+        switch (currentScene) {
+            case 'MainGameScene':
+                bossSegments = BOSS_MODE_CONFIG.bossSegments.land;
+                break;
+            case 'MicroScene':
+                bossSegments = BOSS_MODE_CONFIG.bossSegments.micro;
+                break;
+            case 'UnderwaterScene':
+                bossSegments = BOSS_MODE_CONFIG.bossSegments.water;
+                break;
+            case 'UnderwaterMicroScene':
+                bossSegments = BOSS_MODE_CONFIG.bossSegments.waterMicro;
+                break;
+            default:
+                console.warn(`Unknown scene for boss mode: ${currentScene}`);
+                return spawnPoints;
+        }
+        
+        // Place one boss in the center of each designated segment
+        bossSegments.forEach(segmentIndex => {
+            const segmentStart = segmentIndex * segmentWidth;
+            const segmentEnd = (segmentIndex + 1) * segmentWidth;
+            const bossX = segmentStart + (segmentEnd - segmentStart) * 0.5;
+            
+            let bossY: number;
+            if (allowYVariance) {
+                // Swimming bosses - use baseY with variance
+                const rawBossY = baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y;
+                const minSpawnY = SPAWN_CONFIG.defaults.minSpawnY;
+                const maxSpawnY = SPAWN_CONFIG.defaults.maxSpawnY;
+                bossY = Math.max(minSpawnY, Math.min(maxSpawnY, rawBossY));
+            } else {
+                // Ground bosses - spawn at top of map
+                bossY = SPAWN_CONFIG.defaults.minSpawnY + 50;
+            }
+            
+            spawnPoints.push({ x: bossX, y: bossY, isBoss: true });
+        });
+        
+        return spawnPoints;
+    }
+
+    /**
      * Generate dynamic enemy spawn points with 16-segment system
      * @param baseInterval - Base spawn interval in pixels (default from SPAWN_CONFIG)
      * @param baseY - Base Y coordinate for spawning (default from SPAWN_CONFIG)
@@ -136,6 +195,12 @@ export class SpawnSystem {
         baseY: number = SPAWN_CONFIG.defaults.groundY,
         allowYVariance: boolean = false
     ): SpawnPoint[] {
+        // Check if boss mode is active
+        const bossMode = gameState.scene?.registry.get('bossMode') === true;
+        if (bossMode) {
+            return this.generateBossOnlySpawnPoints(baseY, allowYVariance);
+        }
+        
         const spawnPoints: SpawnPoint[] = [];
         
         // Apply hard mode multiplier
@@ -205,6 +270,55 @@ export class SpawnSystem {
     }
 
     /**
+     * Generate boss-only mixed spawn points for underwater boss mode
+     * @returns Object with fish and crab boss spawn points
+     */
+    generateBossMixedSpawnPoints(): {
+        fishSpawns: SpawnPoint[];
+        crabSpawns: SpawnPoint[];
+    } {
+        const fishSpawns: SpawnPoint[] = [];
+        const crabSpawns: SpawnPoint[] = [];
+        const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
+        
+        // Get boss segments for current scene
+        const currentScene = gameState.currentSceneKey;
+        let bossSegments: number[] = [];
+        
+        if (currentScene === 'UnderwaterScene') {
+            bossSegments = BOSS_MODE_CONFIG.bossSegments.water;
+        } else if (currentScene === 'UnderwaterMicroScene') {
+            bossSegments = BOSS_MODE_CONFIG.bossSegments.waterMicro;
+        }
+        
+        // Place bosses: first half as swimming, second half as crabs
+        bossSegments.forEach((segmentIndex, index) => {
+            const segmentStart = segmentIndex * segmentWidth;
+            const segmentEnd = (segmentIndex + 1) * segmentWidth;
+            const bossX = segmentStart + (segmentEnd - segmentStart) * 0.5;
+            
+            if (index === 0) {
+                // First boss: swimming (SharkBoss or MicroSwimBoss)
+                const baseY = currentScene === 'UnderwaterScene' 
+                    ? SPAWN_CONFIG.defaults.midWaterY 
+                    : SPAWN_CONFIG.defaults.microWaterY;
+                const rawBossY = baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y;
+                const bossY = Math.max(
+                    SPAWN_CONFIG.defaults.minSpawnY,
+                    Math.min(SPAWN_CONFIG.defaults.maxSpawnY, rawBossY)
+                );
+                fishSpawns.push({ x: bossX, y: bossY, isBoss: true });
+            } else {
+                // Second boss: crab (CrabBoss or MicroCrabBoss)
+                const bossY = SPAWN_CONFIG.defaults.bossCrabY;
+                crabSpawns.push({ x: bossX, y: bossY, isBoss: true });
+            }
+        });
+        
+        return { fishSpawns, crabSpawns };
+    }
+
+    /**
      * Generate mixed spawn points for underwater scenes (fish + crabs)
      * @param fishRatio - Ratio of fish to total enemies (e.g., 0.8 for 80% fish)
      * @returns Object with fish and crab spawn points
@@ -213,6 +327,12 @@ export class SpawnSystem {
         fishSpawns: SpawnPoint[];
         crabSpawns: SpawnPoint[];
     } {
+        // Check if boss mode is active
+        const bossMode = gameState.scene?.registry.get('bossMode') === true;
+        if (bossMode) {
+            return this.generateBossMixedSpawnPoints();
+        }
+        
         // Generate base spawn points with Y variance for fish
         const baseSpawnPoints = this.generateDynamicSpawnPoints(
             SPAWN_CONFIG.defaults.baseInterval,

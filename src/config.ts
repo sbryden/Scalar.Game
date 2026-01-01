@@ -113,7 +113,7 @@ export const ENEMY_CONFIG: Record<string, {
         speed: 80,
         health: 150,  // Boss health - will spawn 4 minions with ~37.5 health each
         damage: 15,
-        xpReward: 150,
+        xpReward: 230, // Total XP including minions (150 base + 4*20 minion rewards)
         patrolDistance: 400,
         knockbackResistance: 2.0,
         lineOfSightMultiplier: 8.0,
@@ -126,7 +126,7 @@ export const ENEMY_CONFIG: Record<string, {
         speed: 90,  // Faster than regular enemies
         health: 37.5,  // 4 minions = 150 total health
         damage: 8,
-        xpReward: 20,
+        xpReward: 0, // XP handled by parent spawner boss
         patrolDistance: 250,
         knockbackResistance: 0.8,
         lineOfSightMultiplier: 5.0,
@@ -493,4 +493,16 @@ export const LEVEL_SYSTEM_CONFIG = {
     enemySpeedBase: 1.0,             // Base enemy speed multiplier (level 1)
     enemySpeedIncreasePerLevel: 0.05, // +5% enemy speed per level
     maxLevel: 99                     // Maximum level (for UI display purposes)
+};
+
+// Boss Mode configuration
+export const BOSS_MODE_CONFIG = {
+    // Segments where bosses spawn (avoiding first 2 segments for starting area)
+    // Distributes bosses evenly across remaining segments (2-14)
+    bossSegments: {
+        land: [3, 10],              // 2 bosses: SnakeBoss, RockCarSpawner
+        micro: [7],                  // 1 boss: MicroBoss
+        water: [4, 11],              // 2 bosses: SharkBoss, CrabBoss
+        waterMicro: [5, 12]          // 2 bosses: MicroSwimBoss, MicroCrabBoss
+    }
 };

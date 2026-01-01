@@ -16,10 +16,28 @@ import type { Player, Enemy, Projectile } from '../types/game';
  */
 type DamageEntity = Player | Enemy | Projectile;
 
+/**
+ * Spawner boss group tracking interface
+ * Tracks the state of a spawner boss and its minions
+ * Note: Stores position data instead of enemy reference to avoid memory leaks
+ */
+interface SpawnerBossGroup {
+    bossId: string;
+    bossX: number;  // Position where XP orb should spawn
+    bossY: number;  // Position where XP orb should spawn
+    bossScene: Phaser.Scene; // Scene reference for spawning XP orb
+    bossKilled: boolean;
+    totalMinions: number;
+    deadMinions: number;
+    xpReward: number; // Total XP to be awarded when fully defeated
+}
+
 export class CombatSystem {
     private onBossDefeat: (() => void) | null = null;
-    private spawnerBossKilled: boolean = false;
-    private minionsToKill: number = 0;
+    private spawnerBossGroups: Map<string, SpawnerBossGroup> = new Map();
+    private bossesDefeated: number = 0;
+    private totalBosses: number = 1; // Default to 1 for normal mode
+    private nextSpawnerBossId: number = 0;
 
     /**
      * Set callback for when a boss is defeated
@@ -29,11 +47,38 @@ export class CombatSystem {
     }
 
     /**
+     * Set total number of bosses for level (used in boss mode)
+     */
+    setTotalBosses(count: number): void {
+        this.totalBosses = count;
+        this.bossesDefeated = 0;
+    }
+
+    /**
+     * Get current boss defeat progress (used for HUD display)
+     */
+    getBossProgress(): { defeated: number; total: number } {
+        return {
+            defeated: this.bossesDefeated,
+            total: this.totalBosses
+        };
+    }
+
+    /**
      * Reset spawner boss tracking (call when starting a new level)
      */
     resetSpawnerTracking(): void {
-        this.spawnerBossKilled = false;
-        this.minionsToKill = 0;
+        this.spawnerBossGroups.clear();
+        this.bossesDefeated = 0;
+        this.totalBosses = 1;
+        this.nextSpawnerBossId = 0;
+    }
+    
+    /**
+     * Generate unique ID for spawner boss
+     */
+    private generateSpawnerBossId(): string {
+        return `spawner_${this.nextSpawnerBossId++}`;
     }
 
     /**
@@ -335,7 +380,7 @@ export class CombatSystem {
      * Handles both ground-based (x-axis spread) and swimming (full circle) spawns
      */
     private spawnMinionsOnDeath(boss: Enemy): void {
-        if (!boss.scene || !boss.minionType || !boss.minionCount) return;
+        if (!boss.scene || !boss.minionType || !boss.minionCount || !boss.spawnerBossId) return;
         
         const minionCount = boss.minionCount;
         const spawnRadius = boss.spawnRadius || 100; // Default 100 pixel radius
@@ -364,6 +409,9 @@ export class CombatSystem {
             if (gameState.spawnEnemyFunc) {
                 const minion = gameState.spawnEnemyFunc(boss.scene, minionX, minionY, boss.minionType);
                 
+                // Link minion to parent spawner boss
+                minion.parentSpawnerBossId = boss.spawnerBossId;
+                
                 // Make minion immediately chase player
                 if (gameState.player) {
                     minion.isChasing = true;
@@ -383,6 +431,9 @@ export class CombatSystem {
         // Check if this is a spawner boss
         const isSpawnerBoss = enemy.isSpawnerBoss === true;
         
+        // Check if this is a minion of a spawner boss
+        const isMinion = !!enemy.parentSpawnerBossId;
+        
         // Track enemy destruction with enemy type for scoring
         levelStatsTracker.recordEnemyDestroyed(enemy.enemyType, isBoss);
         
@@ -398,27 +449,108 @@ export class CombatSystem {
         
         // Handle spawner boss death
         if (isSpawnerBoss && enemy.minionType && enemy.minionCount) {
-            // Mark that a spawner boss was killed
-            this.spawnerBossKilled = true;
-            this.minionsToKill = enemy.minionCount;
+            // Generate unique ID for this spawner boss if not already set
+            if (!enemy.spawnerBossId) {
+                enemy.spawnerBossId = this.generateSpawnerBossId();
+            }
             
-            // Spawn minions
+            // Create spawner boss group tracking
+            // Store position and scene, not enemy reference (to avoid memory leak)
+            const group: SpawnerBossGroup = {
+                bossId: enemy.spawnerBossId,
+                bossX: enemy.x,
+                bossY: enemy.y,
+                bossScene: enemy.scene,
+                bossKilled: true,
+                totalMinions: enemy.minionCount,
+                deadMinions: 0,
+                xpReward: enemy.xpReward || 0
+            };
+            this.spawnerBossGroups.set(enemy.spawnerBossId, group);
+            
+            console.log(`Spawner boss ${enemy.spawnerBossId} defeated, spawning ${enemy.minionCount} minions`);
+            
+            // Spawn minions (they will be linked to this boss)
             this.spawnMinionsOnDeath(enemy);
-        } else if (this.spawnerBossKilled && !isBoss) {
-            // This is a minion being killed, decrement counter
-            this.minionsToKill--;
-        }
-        
-        // Spawn XP orb immediately at enemy location
-        if (enemy.scene && enemy.xpReward) {
-            spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
             
-            // Set depth for XP orbs to ensure they appear above dying enemies
-            if (gameState.xpOrbs) {
-                gameState.xpOrbs.children.entries.forEach((obj) => {
-                    const orb = obj as Phaser.GameObjects.Arc;
-                    orb.setDepth(100);
-                });
+            // Don't spawn XP orb yet - wait for all minions to die
+        } else if (isMinion && enemy.parentSpawnerBossId) {
+            // This is a minion - check if parent spawner boss group exists
+            const group = this.spawnerBossGroups.get(enemy.parentSpawnerBossId);
+            
+            if (group) {
+                group.deadMinions++;
+                console.log(`Minion killed (${group.deadMinions}/${group.totalMinions}) for spawner boss ${group.bossId}`);
+                
+                // Check if all minions are dead
+                if (group.deadMinions >= group.totalMinions) {
+                    console.log(`All minions destroyed for spawner boss ${group.bossId}, spawning XP orb`);
+                    
+                    // All minions dead - spawn XP orb at the original boss location
+                    if (group.bossScene && group.xpReward) {
+                        spawnSystem.spawnXPOrb(group.bossScene, group.bossX, group.bossY, group.xpReward);
+                        
+                        // Set depth for XP orbs to ensure they appear above dying enemies
+                        if (gameState.xpOrbs) {
+                            gameState.xpOrbs.children.entries.forEach((obj) => {
+                                const orb = obj as Phaser.GameObjects.Arc;
+                                orb.setDepth(100);
+                            });
+                        }
+                    }
+                    
+                    // Clean up group tracking
+                    this.spawnerBossGroups.delete(group.bossId);
+                    
+                    // Count this spawner boss (with all minions) as defeated
+                    if (this.onBossDefeat) {
+                        this.bossesDefeated++;
+                        console.log(`Spawner boss fully defeated (${this.bossesDefeated}/${this.totalBosses})`);
+                        
+                        // Check if all bosses are defeated
+                        if (this.bossesDefeated >= this.totalBosses) {
+                            console.log('All bosses defeated, level complete!');
+                            this.onBossDefeat();
+                        }
+                    }
+                }
+                
+                // Don't spawn XP orb for individual minions
+            } else {
+                // Minion without parent group (shouldn't happen, but handle gracefully)
+                console.warn(`Minion killed but no parent spawner boss group found: ${enemy.parentSpawnerBossId}`);
+                
+                // Spawn XP orb anyway as fallback
+                if (enemy.scene && enemy.xpReward) {
+                    spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
+                }
+            }
+        } else {
+            // Regular enemy or regular boss (non-spawner)
+            
+            // Spawn XP orb immediately at enemy location
+            if (enemy.scene && enemy.xpReward) {
+                spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
+                
+                // Set depth for XP orbs to ensure they appear above dying enemies
+                if (gameState.xpOrbs) {
+                    gameState.xpOrbs.children.entries.forEach((obj) => {
+                        const orb = obj as Phaser.GameObjects.Arc;
+                        orb.setDepth(100);
+                    });
+                }
+            }
+            
+            // Handle regular boss defeat
+            if (isBoss && this.onBossDefeat) {
+                this.bossesDefeated++;
+                console.log(`Boss defeated (${this.bossesDefeated}/${this.totalBosses})`);
+                
+                // Check if all bosses are defeated
+                if (this.bossesDefeated >= this.totalBosses) {
+                    console.log('All bosses defeated, level complete!');
+                    this.onBossDefeat();
+                }
             }
         }
         
@@ -453,23 +585,6 @@ export class CombatSystem {
                 enemy.destroy();
             }
         });
-        
-        // Trigger boss defeat callback logic
-        if (isBoss && this.onBossDefeat) {
-            if (isSpawnerBoss) {
-                // For spawner bosses, don't trigger level complete yet
-                console.log('Spawner boss defeated, waiting for minions to be destroyed');
-            } else {
-                // Regular boss defeated, trigger level complete immediately
-                this.onBossDefeat();
-            }
-        } else if (this.spawnerBossKilled && this.minionsToKill === 0 && this.onBossDefeat) {
-            // All minions from spawner boss are destroyed, trigger level complete
-            console.log('All minions destroyed, level complete!');
-            this.onBossDefeat();
-            // Reset tracking
-            this.resetSpawnerTracking();
-        }
     }
     
     /**
