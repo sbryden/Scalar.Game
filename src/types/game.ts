@@ -8,6 +8,7 @@ import Phaser from 'phaser';
  * Player sprite with custom properties
  */
 export interface Player extends Phaser.Physics.Arcade.Sprite {
+    body: Phaser.Physics.Arcade.Body;
     stunnedUntil?: number;
     stunVelocity?: { x: number; y: number };
     isMeleeMode?: boolean;
@@ -100,6 +101,10 @@ export interface SavedEnemy {
     y: number;
     health: number;
     enemyType: string;
+    startX: number;
+    startY: number;
+    direction: number;
+    floatAngle?: number;
 }
 
 /**
