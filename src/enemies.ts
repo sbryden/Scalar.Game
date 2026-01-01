@@ -2,6 +2,7 @@ import { ENEMY_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG } from "./config";
 import gameState from "./utils/gameState";
 import combatSystem from "./systems/CombatSystem";
 import type { Enemy, Projectile } from './types/game';
+import playerStatsSystem from './systems/PlayerStatsSystem';
 
 /**
  * Helper function to check if an enemy type is a swimming enemy
@@ -9,26 +10,41 @@ import type { Enemy, Projectile } from './types/game';
  */
 function isSwimmingEnemy(enemyType: string): boolean {
     return enemyType === "micro" || enemyType === "fish" || enemyType === "plankton" ||
-           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton";
+           enemyType === "boss_micro" || enemyType === "boss_fish" || enemyType === "boss_plankton" ||
+           enemyType === "boss_shark";
 }
 
 export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType: string = "generic"): Enemy {
     const config = ENEMY_CONFIG[enemyType];
     
+    // Guard against unknown enemy types
+    if (!config) {
+        console.error(`Unknown enemy type: ${enemyType}`);
+        throw new Error(`Unknown enemy type: ${enemyType}`);
+    }
+    
     // Check if this is a boss enemy
     const isBoss = enemyType.startsWith('boss_');
+    
+    // Apply hard mode multipliers if in hard mode
+    const isHardMode = playerStatsSystem.difficulty === 'hard';
+    const healthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
+    const speedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
+    const aggroRangeMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyAggroRangeMultiplier : 1;
     
     // Select appropriate texture based on enemy type
     let texture = "enemy";
     if (enemyType === "micro" || enemyType === "boss_micro") {
         texture = "bacteria";
     } else if (enemyType === "fish" || enemyType === "boss_fish") {
-        // Configurable chance for water_enemy_fish_1.png vs water_enemy_needle_fish_1.png
-        texture = Math.random() < VISUAL_CONFIG.fishSpawn.fishTextureThreshold ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+        // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
+        texture = Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
+    } else if (enemyType === "boss_shark") {
+        texture = "sharkboss";
     } else if (enemyType === "plankton" || enemyType === "boss_plankton") {
         texture = "bacteria"; // Use bacteria as placeholder for plankton
-    } else if (enemyType === "crab") {
-        texture = "water_enemy_crab_1";
+    } else if (enemyType === "crab" || enemyType === "boss_crab") {
+        texture = enemyType === "boss_crab" ? "crabboss" : "water_enemy_crab_1";
     }
     
     const enemy = scene.add.sprite(x, y, texture);
@@ -41,14 +57,14 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
 
     // Swimming enemies don't have gravity
     if (isSwimmingEnemy(enemyType)) {
-        enemy.body.setAllowGravity(false);
+        body.setAllowGravity(false);
     }
 
-    enemy.health = config.health;
-    enemy.maxHealth = config.health;
+    enemy.health = config.health * healthMultiplier;
+    enemy.maxHealth = config.health * healthMultiplier;
     enemy.damage = config.damage;
     enemy.xpReward = config.xpReward;
-    enemy.speed = config.speed;
+    enemy.speed = config.speed * speedMultiplier;
     enemy.patrolDistance = config.patrolDistance;
     enemy.knockbackResistance = config.knockbackResistance;
     enemy.startX = x;
@@ -61,7 +77,7 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     
     // Initialize aggro system properties
     enemy.isAggroed = false;
-    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier;
+    enemy.aggroRange = enemy.displayHeight * config.aggroRangeMultiplier * aggroRangeMultiplier;
     enemy.aggroTarget = undefined;
 
     const barWidth = VISUAL_CONFIG.healthBar.width;
@@ -85,6 +101,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     enemy.healthBarBg.setDepth(VISUAL_CONFIG.healthBar.depth);
     enemy.healthBarOffsetY = healthBarOffsetY;
 
+    if (!gameState.enemies) {
+        console.error('gameState.enemies is not initialized');
+        throw new Error('gameState.enemies is not initialized');
+    }
+    
     gameState.enemies.add(enemy);
     return enemy;
 }
@@ -136,6 +157,13 @@ function updateAggroAI(enemy: Enemy): void {
     if (!enemy.aggroTarget) return;
     
     const config = ENEMY_CONFIG[enemy.enemyType];
+    
+    // Guard against unknown enemy types
+    if (!config) {
+        console.error(`Unknown enemy type: ${enemy.enemyType}`);
+        return;
+    }
+    
     const aggroSpeed = enemy.speed * config.aggroSpeedMultiplier;
     
     // Calculate direction to player

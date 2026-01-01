@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -208,12 +209,14 @@ export default class MicroScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial bacteria enemies
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            const spawnInterval = getEnemySpawnInterval();
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 spawnEnemy(this, x, 680, 'micro');
             }
             
-            // Spawn boss enemy toward the end of the level
-            spawnEnemy(this, 7500, 400, 'boss_micro');
+            // Spawn boss enemy toward the end of the level (adjusted for 3x scale)
+            spawnEnemy(this, 7500, 500, 'boss_micro');
         }
     }
     
@@ -325,7 +328,10 @@ export default class MicroScene extends Phaser.Scene {
         this.startImmunityFlash(this.player);
         
         // Disable collisions with enemies temporarily
-        this.physics.world.removeCollider(this.collisionManager.playerEnemyCollider);
+        const collider = this.collisionManager.playerEnemyCollider;
+        if (collider) {
+            this.physics.world.removeCollider(collider);
+        }
         
         // Re-enable collisions after immunity ends
         this.time.delayedCall(2000, () => {
@@ -385,16 +391,19 @@ export default class MicroScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.MicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map((enemy: Enemy) => ({
-                x: enemy.x,
-                y: enemy.y,
-                health: enemy.health,
-                startX: enemy.startX,
-                startY: enemy.startY,
-                direction: enemy.direction,
-                enemyType: enemy.enemyType,
-                floatAngle: enemy.floatAngle
-            }));
+            .map((enemy) => {
+                const e = enemy as Enemy;
+                return {
+                    x: e.x,
+                    y: e.y,
+                    health: e.health,
+                    startX: e.startX,
+                    startY: e.startY,
+                    direction: e.direction,
+                    enemyType: e.enemyType,
+                    floatAngle: e.floatAngle
+                };
+            });
         
         // Save player position
         if (this.player) {

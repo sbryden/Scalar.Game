@@ -33,6 +33,10 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('water_enemy_fish_1', '/Scalar.Game/water_enemy_fish_1.png');
         this.load.image('water_enemy_needle_fish_1', '/Scalar.Game/water_enemy_needle_fish_1.png');
         
+        // Load boss images
+        this.load.image('sharkboss', '/Scalar.Game/sharkboss.png');
+        this.load.image('crabboss', '/Scalar.Game/crabboss.png');
+        
         // Load projectile images
         this.load.image('torpedo', '/Scalar.Game/torpedo.png');
         this.load.image('beam', '/Scalar.Game/beam.png');
@@ -65,7 +69,7 @@ export default class BootScene extends Phaser.Scene {
         progressBox.fillRect(width / 2 - 160, height / 2, 320, 50);
         
         // Update progress
-        this.load.on('progress', (value) => {
+        this.load.on('progress', (value: number) => {
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
             progressBar.fillRect(width / 2 - 150, height / 2 + 10, 300 * value, 30);
