@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
 import { generateDynamicSpawnPoints } from '../utils/spawnHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -188,13 +188,17 @@ export default class MainGameScene extends Phaser.Scene {
             });
         } else {
             // Generate dynamic spawn points with density gradients
-            const spawnPoints = generateDynamicSpawnPoints(300, 680, false);
+            const spawnPoints = generateDynamicSpawnPoints(
+                SPAWN_CONFIG.defaults.baseInterval,
+                SPAWN_CONFIG.defaults.groundY,
+                false
+            );
             
             // Spawn enemies at generated points
             spawnPoints.forEach(point => {
                 if (point.isBoss) {
                     // Spawn boss enemy
-                    spawnEnemy(this, point.x, point.y, 'boss_generic');
+                    spawnEnemy(this, point.x, SPAWN_CONFIG.defaults.bossGroundY, 'boss_generic');
                 } else {
                     // Spawn regular enemy
                     spawnEnemy(this, point.x, point.y, 'generic');

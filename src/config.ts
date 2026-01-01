@@ -50,6 +50,18 @@ export const SPAWN_CONFIG = {
         minDistanceFromEnd: 200,  // Minimum distance from world end
         maxDistanceFromEnd: 600,  // Maximum distance from world end
         spawnLast: true           // Ensure boss spawns last
+    },
+    // Default spawn parameters per scene type
+    defaults: {
+        baseInterval: 300,        // Base spawn interval in pixels
+        groundY: 680,             // Y position for ground enemies
+        midWaterY: 400,           // Y position for mid-water swimming enemies
+        microWaterY: 350,         // Y position for micro underwater enemies
+        bossGroundY: 550,         // Y position for ground bosses
+        bossCrabY: 600,           // Y position for crab bosses
+        minSpawnX: 300,           // Minimum X spawn boundary
+        minSpawnY: 100,           // Minimum Y spawn boundary
+        maxSpawnY: 700            // Maximum Y spawn boundary
     }
 };
 
