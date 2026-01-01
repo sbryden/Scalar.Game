@@ -25,7 +25,7 @@ export class SpawnSystem {
         scene.physics.add.existing(orb);
         orb.body.setVelocity(
             Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xRange, XP_CONFIG.orb.spawnVelocity.xRange),
-            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.yMin, XP_CONFIG.orb.spawnVelocity.yMax)
+            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.yRangeMin, XP_CONFIG.orb.spawnVelocity.yRangeMax)
         );
         orb.body.setCollideWorldBounds(true);
         orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
