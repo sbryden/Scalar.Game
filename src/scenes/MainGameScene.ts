@@ -46,6 +46,9 @@ export default class MainGameScene extends Phaser.Scene {
             gameState.difficultyInitialized = true;
         }
         
+        // Reset spawner boss tracking
+        combatSystem.resetSpawnerTracking();
+        
         // Start tracking level stats
         levelStatsTracker.startLevel(this.time.now);
         
