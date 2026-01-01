@@ -15,10 +15,10 @@ import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
-import type { Enemy } from '../types/game';
+import type { Enemy, Player } from '../types/game';
 
 export default class MicroScene extends Phaser.Scene {
-    player!: Phaser.Physics.Arcade.Sprite;
+    player!: Player;
     platforms!: Phaser.Physics.Arcade.StaticGroup;
     enemies!: Phaser.Physics.Arcade.Group;
     projectiles!: Phaser.Physics.Arcade.Group;
@@ -116,7 +116,7 @@ export default class MicroScene extends Phaser.Scene {
         const savedPos = gameState.savedPositions.MicroScene;
         
         // Create player (car)
-        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1');
+        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1') as Player;
         this.player.setScale(0.15);
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);

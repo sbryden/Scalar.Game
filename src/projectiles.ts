@@ -57,10 +57,10 @@ export function fireProjectile(scene: Phaser.Scene): void {
     
     gameState.projectiles!.add(projectile);
     scene.physics.add.existing(projectile);
-    (projectile.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-    (projectile.body as Phaser.Physics.Arcade.Body).setBounce(0, 0);
-    (projectile.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
-    (projectile.body as Phaser.Physics.Arcade.Body).setVelocity(velocityX, 0);
+    projectile.body.setAllowGravity(false);
+    projectile.body.setBounce(0, 0);
+    projectile.body.setCollideWorldBounds(true);
+    projectile.body.setVelocity(velocityX, 0);
     projectile.damage = config.damage;
     
     // Track projectile spawn position and max range (1.5x screen width)

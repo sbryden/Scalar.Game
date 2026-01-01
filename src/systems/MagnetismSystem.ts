@@ -33,7 +33,7 @@ export class MagnetismSystem {
                     gameState.player!.y
                 );
                 
-                (orb.body as Phaser.Physics.Arcade.Body).setVelocity(
+                orb.body.setVelocity(
                     Math.cos(angle) * MAGNETISM_SPEED,
                     Math.sin(angle) * MAGNETISM_SPEED
                 );

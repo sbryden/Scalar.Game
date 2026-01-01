@@ -181,8 +181,7 @@ export class CombatSystem {
         if (player.stunnedUntil && now < player.stunnedUntil) {
             // Player is stunned, reduce movement
             if (player.body) {
-                const body = player.body as Phaser.Physics.Arcade.Body;
-                body.setVelocityX(body.velocity.x * 0.95);
+                player.body.setVelocityX(player.body.velocity.x * 0.95);
             }
         }
         
@@ -192,8 +191,7 @@ export class CombatSystem {
             if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
                 // Enemy is stunned, freeze AI movement
                 if (enemy.body) {
-                    const body = enemy.body as Phaser.Physics.Arcade.Body;
-                    body.setVelocityX(body.velocity.x * 0.95);
+                    enemy.body.setVelocityX(enemy.body.velocity.x * 0.95);
                 }
             }
         });
@@ -234,10 +232,9 @@ export class CombatSystem {
         
         // Apply velocity to player body
         if (player.body) {
-            const body = player.body as Phaser.Physics.Arcade.Body;
-            body.setVelocity(
-                body.velocity.x + knockbackX,
-                body.velocity.y + knockbackY
+            player.body.setVelocity(
+                player.body.velocity.x + knockbackX,
+                player.body.velocity.y + knockbackY
             );
         }
     }
