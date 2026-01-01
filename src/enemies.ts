@@ -74,10 +74,10 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
     const levelDamageMultiplier = levelProgressionSystem.getEnemyDamageMultiplier();
     const levelSpeedMultiplier = levelProgressionSystem.getEnemySpeedMultiplier();
     
-    // Combine all multipliers
+    // Combine all multipliers (damage not affected by difficulty, only by level)
     const finalHealthMultiplier = difficultyHealthMultiplier * levelHealthMultiplier;
     const finalSpeedMultiplier = difficultySpeedMultiplier * levelSpeedMultiplier;
-    const finalDamageMultiplier = levelDamageMultiplier; // Damage only affected by level, not difficulty
+    const finalDamageMultiplier = levelDamageMultiplier;
     
     // Select appropriate texture based on enemy type
     const texture = selectEnemyTexture(enemyType);
