@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -187,7 +188,9 @@ export default class MainGameScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial enemies
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            const spawnInterval = getEnemySpawnInterval();
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 spawnEnemy(this, x, 680, 'generic');
             }
             
