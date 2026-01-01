@@ -96,7 +96,7 @@ export class StaminaSystem {
             this.state.needsReset = false;
             this.state.depletionPauseRemaining = 0;
         }
-        // Note: When disabled, stamina values remain as-is (caller should restore normal values)
+        // Note: When disabling, caller should call reset() to restore normal starting values
     }
 
     /**

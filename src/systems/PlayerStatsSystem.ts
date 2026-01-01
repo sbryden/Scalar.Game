@@ -58,9 +58,9 @@ export class PlayerStatsSystem {
             this.stats.health = XP_CONFIG.progression.startingHealth;
             
             // Disable god mode for stamina and restore normal values
+            // Note: reset() also sets godModeEnabled = false internally
             const staminaSystem = getStaminaSystem();
-            staminaSystem.setGodMode(false);
-            staminaSystem.reset(); // Reset to normal starting stamina values
+            staminaSystem.reset(); // Reset to normal starting stamina values and disable god mode
             this.stats.stamina = STAMINA_CONFIG.startingStamina;
             this.stats.maxStamina = STAMINA_CONFIG.startingMaxStamina;
         }
