@@ -232,7 +232,7 @@ export const PHYSICS_CONFIG = {
 
 // Visual configuration
 export const VISUAL_CONFIG = {
-    screenWidth: 1024, // Reference screen width for calculations
+    viewportWidth: 1024, // Reference viewport/screen width (not world width)
     healthBar: {
         width: 30, // Width of enemy health bars
         height: 4, // Height of enemy health bars
