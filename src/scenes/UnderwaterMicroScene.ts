@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { getEnemySpawnInterval } from '../utils/difficultyHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
@@ -236,7 +237,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
             });
         } else {
             // Spawn initial micro enemies (all floating plankton-like)
-            for (let x = 300; x < WORLD_WIDTH; x += 300) {
+            const spawnInterval = getEnemySpawnInterval();
+            
+            for (let x = 300; x < WORLD_WIDTH; x += spawnInterval) {
                 spawnEnemy(this, x, 300 + Math.random() * 200, 'plankton');
             }
             
@@ -353,7 +356,10 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         this.startImmunityFlash(this.player);
         
         // Disable collisions with enemies temporarily
-        this.physics.world.removeCollider(this.collisionManager.playerEnemyCollider);
+        const collider = this.collisionManager.playerEnemyCollider;
+        if (collider) {
+            this.physics.world.removeCollider(collider);
+        }
         
         // Re-enable collisions after immunity ends
         this.time.delayedCall(2000, () => {
@@ -413,15 +419,18 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         // Save enemy states before leaving scene
         gameState.savedEnemies.UnderwaterMicroScene = this.enemies.children.entries
             .filter(enemy => enemy.active)
-            .map((enemy: Enemy) => ({
-                x: enemy.x,
-                y: enemy.y,
-                health: enemy.health,
-                startX: enemy.startX,
-                startY: enemy.startY,
-                direction: enemy.direction,
-                enemyType: enemy.enemyType
-            }));
+            .map((enemy) => {
+                const e = enemy as Enemy;
+                return {
+                    x: e.x,
+                    y: e.y,
+                    health: e.health,
+                    startX: e.startX,
+                    startY: e.startY,
+                    direction: e.direction,
+                    enemyType: e.enemyType
+                };
+            });
         
         // Save player position
         if (this.player) {
