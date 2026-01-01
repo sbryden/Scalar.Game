@@ -30,8 +30,6 @@ export const SIZE_CHANGE_COOLDOWN = 500;
 export const SPAWN_CONFIG = {
     // Segment-based spawning (world divided into 16 segments)
     segmentCount: 16,
-    // Target total enemy count per level (excluding boss)
-    targetEnemyCount: 25,
     // Density range for random assignment (multipliers)
     densityRange: {
         min: 0.3,    // Minimum density multiplier
