@@ -2,7 +2,7 @@
  * Combat System
  * Handles damage calculations and combat logic
  */
-import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG } from '../config';
+import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/gameState';
@@ -69,7 +69,7 @@ export class CombatSystem {
         
         // Visual feedback: flash enemy red
         enemy.setTint(0xff0000);
-        enemy.scene.time.delayedCall(100, () => {
+        enemy.scene.time.delayedCall(COMBAT_CONFIG.visual.enemyFlashDuration, () => {
             if (enemy.active) {
                 enemy.clearTint();
             }
@@ -148,17 +148,17 @@ export class CombatSystem {
             }
             
             // Camera shake effect (more intense if taking full damage)
-            const shakeIntensity = player.isMeleeMode ? 0.003 : 0.005;
-            enemy.scene.cameras.main.shake(100, shakeIntensity);
+            const shakeIntensity = player.isMeleeMode ? COMBAT_CONFIG.visual.cameraShakeIntensityMelee : COMBAT_CONFIG.visual.cameraShakeIntensityNormal;
+            enemy.scene.cameras.main.shake(COMBAT_CONFIG.visual.cameraShakeDuration, shakeIntensity);
         }
         
         // Check if player can damage enemy (cooldown per enemy)
         if (!enemy.lastPlayerDamageTime || now - enemy.lastPlayerDamageTime >= PLAYER_COMBAT_CONFIG.playerToEnemyCooldown) {
             let playerDamage = 0;
             
-            // God mode deals 1000 damage on collision
+            // God mode deals configured damage on collision
             if (playerStatsSystem.isGodMode()) {
-                playerDamage = 1000;
+                playerDamage = COMBAT_CONFIG.godMode.damage;
             } else if (player.isMeleeMode) {
                 // Player in melee mode - deals full melee damage
                 playerDamage = PLAYER_COMBAT_CONFIG.meleeModePlayerDamage;
@@ -174,7 +174,7 @@ export class CombatSystem {
                 
                 // Visual feedback: flash enemy white (different from projectile red)
                 enemy.setTint(0xffffff);
-                enemy.scene.time.delayedCall(100, () => {
+                enemy.scene.time.delayedCall(COMBAT_CONFIG.visual.enemyFlashDuration, () => {
                     if (enemy.active) {
                         enemy.clearTint();
                     }
@@ -199,7 +199,7 @@ export class CombatSystem {
         if (player.stunnedUntil && now < player.stunnedUntil) {
             // Player is stunned, reduce movement
             if (player.body) {
-                player.body.setVelocityX(player.body.velocity.x * 0.95);
+                player.body.setVelocityX(player.body.velocity.x * COMBAT_CONFIG.stun.velocityDecay);
             }
         }
         
@@ -209,7 +209,7 @@ export class CombatSystem {
             if (enemy.stunnedUntil && now < enemy.stunnedUntil) {
                 // Enemy is stunned, freeze AI movement
                 if (enemy.body) {
-                    enemy.body.setVelocityX(enemy.body.velocity.x * 0.95);
+                    enemy.body.setVelocityX(enemy.body.velocity.x * COMBAT_CONFIG.stun.velocityDecay);
                 }
             }
         });
@@ -243,10 +243,10 @@ export class CombatSystem {
         // Calculate direction from enemy to player (opposite of enemy knockback)
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         
-        // Reduced knockback velocity for ~100px displacement
-        const knockbackForce = 250;
+        // Apply configured knockback force
+        const knockbackForce = COMBAT_CONFIG.playerKnockback.force;
         const knockbackX = Math.cos(angle) * knockbackForce;
-        const knockbackY = Math.sin(angle) * knockbackForce * 0.5; // Less vertical knockback
+        const knockbackY = Math.sin(angle) * knockbackForce * COMBAT_CONFIG.playerKnockback.verticalMultiplier;
         
         // Apply velocity to player body
         if (player.body) {

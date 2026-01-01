@@ -1,4 +1,4 @@
-import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG } from './config';
+import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, ENEMY_CONFIG, PHYSICS_CONFIG } from './config';
 import gameState from './utils/gameState';
 import type { PlayerSize, Enemy } from './types/game';
 
@@ -79,15 +79,15 @@ export function changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
     gameState.playerSize = newSize;
     const config = SIZE_CONFIG[newSize];
     
-    // Base scale for the tank sprite (0.25 to make it ~100px)
-    const baseDisplayScale = 0.25;
+    // Base scale for the tank sprite
+    const baseDisplayScale = PHYSICS_CONFIG.player.baseDisplayScale;
     
     // Apply new scale
     gameState.player!.setScale(baseDisplayScale * config.scale);
     gameState.player!.body.updateFromGameObject();
     
     // Small jump to account for size change
-    gameState.player.body.setVelocityY(-200);
+    gameState.player.body.setVelocityY(PHYSICS_CONFIG.player.sizeChangeJumpVelocity);
     
     // Reset cooldown timer
     gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
