@@ -3,7 +3,7 @@
  * Cellular-level gameplay scene with bacteria enemies
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
 import { generateDynamicSpawnPoints } from '../utils/spawnHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -210,7 +210,11 @@ export default class MicroScene extends Phaser.Scene {
         } else {
             // Generate dynamic spawn points with density gradients
             // Micro enemies can swim, so allow Y variance
-            const spawnPoints = generateDynamicSpawnPoints(300, 400, true);
+            const spawnPoints = generateDynamicSpawnPoints(
+                SPAWN_CONFIG.defaults.baseInterval,
+                SPAWN_CONFIG.defaults.midWaterY,
+                true
+            );
             
             // Spawn enemies at generated points
             spawnPoints.forEach(point => {

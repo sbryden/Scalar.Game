@@ -3,7 +3,7 @@
  * Microscopic underwater scene with plankton and microorganisms
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG } from '../config';
 import { generateDynamicSpawnPoints } from '../utils/spawnHelpers';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import { updateProjectiles } from '../projectiles';
@@ -238,7 +238,11 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
         } else {
             // Generate dynamic spawn points with density gradients
             // Plankton are floating enemies, so allow Y variance
-            const spawnPoints = generateDynamicSpawnPoints(300, 350, true);
+            const spawnPoints = generateDynamicSpawnPoints(
+                SPAWN_CONFIG.defaults.baseInterval,
+                SPAWN_CONFIG.defaults.microWaterY,
+                true
+            );
             
             // Spawn plankton enemies at generated points
             spawnPoints.forEach(point => {

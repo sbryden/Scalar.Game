@@ -17,14 +17,14 @@ export interface SpawnPoint {
 
 /**
  * Generate dynamic spawn points with density gradients
- * @param baseInterval - Base spawn interval in pixels (default: 300)
- * @param baseY - Base Y coordinate for spawning (e.g., 680 for ground, 400 for mid-water)
+ * @param baseInterval - Base spawn interval in pixels (default from SPAWN_CONFIG)
+ * @param baseY - Base Y coordinate for spawning (default from SPAWN_CONFIG)
  * @param allowYVariance - Whether to add Y variance (true for swimming enemies)
  * @returns Array of spawn points
  */
 export function generateDynamicSpawnPoints(
-    baseInterval: number = 300,
-    baseY: number = 680,
+    baseInterval: number = SPAWN_CONFIG.defaults.baseInterval,
+    baseY: number = SPAWN_CONFIG.defaults.groundY,
     allowYVariance: boolean = false
 ): SpawnPoint[] {
     const spawnPoints: SpawnPoint[] = [];
@@ -96,13 +96,19 @@ function generateSpawnPointsInZone(
     for (let x = startX; x < endX; x += interval) {
         // Add random variance to X position
         const xVariance = (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.x;
-        const spawnX = Math.max(300, Math.min(WORLD_WIDTH - 300, x + xVariance));
+        const spawnX = Math.max(
+            SPAWN_CONFIG.defaults.minSpawnX, 
+            Math.min(WORLD_WIDTH - SPAWN_CONFIG.defaults.minSpawnX, x + xVariance)
+        );
         
         // Add random variance to Y position if allowed (for swimming enemies)
         let spawnY = baseY;
         if (allowYVariance) {
             const yVariance = (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y;
-            spawnY = Math.max(100, Math.min(700, baseY + yVariance));
+            spawnY = Math.max(
+                SPAWN_CONFIG.defaults.minSpawnY, 
+                Math.min(SPAWN_CONFIG.defaults.maxSpawnY, baseY + yVariance)
+            );
         }
         
         spawnPoints.push({ x: spawnX, y: spawnY, isBoss: false });
@@ -119,7 +125,11 @@ export function generateMixedSpawnPoints(fishRatio: number = 0.8): {
     crabSpawns: SpawnPoint[];
 } {
     // Generate base spawn points with Y variance for fish
-    const baseSpawnPoints = generateDynamicSpawnPoints(300, 400, true);
+    const baseSpawnPoints = generateDynamicSpawnPoints(
+        SPAWN_CONFIG.defaults.baseInterval,
+        SPAWN_CONFIG.defaults.midWaterY,
+        true
+    );
     
     const fishSpawns: SpawnPoint[] = [];
     const crabSpawns: SpawnPoint[] = [];
@@ -134,7 +144,11 @@ export function generateMixedSpawnPoints(fishRatio: number = 0.8): {
             fishSpawns.push(point);
         } else {
             // Crabs spawn on ground
-            crabSpawns.push({ x: point.x, y: 680, isBoss: false });
+            crabSpawns.push({ 
+                x: point.x, 
+                y: SPAWN_CONFIG.defaults.groundY, 
+                isBoss: false 
+            });
         }
     });
     
@@ -145,7 +159,11 @@ export function generateMixedSpawnPoints(fishRatio: number = 0.8): {
             fishSpawns.push(bossPoint);
         } else {
             // Boss crab (ground)
-            crabSpawns.push({ x: bossPoint.x, y: 600, isBoss: true });
+            crabSpawns.push({ 
+                x: bossPoint.x, 
+                y: SPAWN_CONFIG.defaults.bossCrabY, 
+                isBoss: true 
+            });
         }
     }
     
