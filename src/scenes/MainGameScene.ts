@@ -130,6 +130,9 @@ export default class MainGameScene extends Phaser.Scene {
         gameState.scene = this;
         gameState.currentSceneKey = 'MainGameScene';
         gameState.spawnEnemyFunc = spawnEnemy;
+        
+        // Apply correct vehicle texture based on player level
+        spawnSystem.upgradePlayerCar();
     }
     
     createUI() {

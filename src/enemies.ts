@@ -151,6 +151,11 @@ export function spawnEnemy(scene: Phaser.Scene, x: number, y: number, enemyType:
 }
 
 export function updateEnemyAI(enemy: Enemy, gameTime: number): void {
+    // Skip AI updates for dead enemies
+    if (enemy.isDead) {
+        return;
+    }
+    
     // Check if enemy is stunned
     if (enemy.stunnedUntil && gameTime < enemy.stunnedUntil) {
         // Enemy is stunned, don't update AI
@@ -351,6 +356,11 @@ function updatePatrolAI(enemy: Enemy): void {
 }
 
 function updateEnemyHealthBar(enemy: Enemy): void {
+    // Skip health bar updates for dead enemies
+    if (enemy.isDead) {
+        return;
+    }
+    
     // Update health bar for all enemies
     if (enemy.healthBar && enemy.healthBarBg) {
         const barWidth = VISUAL_CONFIG.healthBar.width;
