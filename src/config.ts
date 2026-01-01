@@ -39,8 +39,8 @@ export const SPAWN_CONFIG = {
     },
     // Random variance in spawn positions
     positionVariance: {
-        x: 50,         // +/- 50 pixels in X
-        y: 100         // +/- 100 pixels in Y (for swimming enemies)
+        x: 50,         // +/- 25 pixels in X
+        y: 100         // +/- 50 pixels in Y (for swimming enemies)
     },
     // Default spawn parameters per scene type
     defaults: {
