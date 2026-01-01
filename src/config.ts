@@ -28,28 +28,19 @@ export const SIZE_CHANGE_COOLDOWN = 500;
 
 // Dynamic spawn configuration
 export const SPAWN_CONFIG = {
-    // Zone definitions (as percentage of world width)
-    zones: {
-        start: { begin: 0, end: 0.2 },      // First 20% - sparse
-        middle: { begin: 0.2, end: 0.7 },   // Middle 50% - dense
-        end: { begin: 0.7, end: 0.95 }      // Last 25% (before boss) - sparse
-    },
-    // Density multipliers for each zone
-    densityMultipliers: {
-        start: 0.6,    // 40% fewer enemies
-        middle: 1.4,   // 40% more enemies
-        end: 0.7       // 30% fewer enemies
+    // Segment-based spawning (world divided into 16 segments)
+    segmentCount: 16,
+    // Target total enemy count per level (excluding boss)
+    targetEnemyCount: 25,
+    // Density range for random assignment (multipliers)
+    densityRange: {
+        min: 0.3,    // Minimum density multiplier
+        max: 1.8     // Maximum density multiplier
     },
     // Random variance in spawn positions
     positionVariance: {
         x: 50,         // +/- 50 pixels in X
         y: 100         // +/- 100 pixels in Y (for swimming enemies)
-    },
-    // Boss spawn configuration
-    boss: {
-        minDistanceFromEnd: 200,  // Minimum distance from world end
-        maxDistanceFromEnd: 600,  // Maximum distance from world end
-        spawnLast: true           // Ensure boss spawns last
     },
     // Default spawn parameters per scene type
     defaults: {
