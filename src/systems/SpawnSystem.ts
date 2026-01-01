@@ -175,8 +175,8 @@ export class SpawnSystem {
         const rawBossY = allowYVariance
             ? baseY + (Math.random() - 0.5) * SPAWN_CONFIG.positionVariance.y
             : baseY;
-        const minSpawnY = SPAWN_CONFIG.minSpawnY;
-        const maxSpawnY = SPAWN_CONFIG.maxSpawnY;
+        const minSpawnY = SPAWN_CONFIG.defaults.minSpawnY;
+        const maxSpawnY = SPAWN_CONFIG.defaults.maxSpawnY;
         const bossY = Math.max(minSpawnY, Math.min(maxSpawnY, rawBossY));
         
         spawnPoints.push({ x: bossX, y: bossY, isBoss: true });
