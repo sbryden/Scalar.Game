@@ -1,5 +1,6 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH } from './config';
 import gameState from './utils/gameState';
+import playerStatsSystem from './systems/PlayerStatsSystem';
 import type { WASDKeys } from './types/game';
 
 let lastProjectileTime = 0;
@@ -61,7 +62,9 @@ export function fireProjectile(scene: Phaser.Scene): void {
     projectile.body.setBounce(0, 0);
     projectile.body.setCollideWorldBounds(true);
     projectile.body.setVelocity(velocityX, 0);
-    projectile.damage = config.damage;
+    
+    // Set damage (1000 in god mode, normal otherwise)
+    projectile.damage = playerStatsSystem.isGodMode() ? 1000 : config.damage;
     
     // Track projectile spawn position and max range (1.5x screen width)
     projectile.spawnX = projectileX;

@@ -148,6 +148,13 @@ export class PlayerStatsSystem {
     setGameOverCallback(callback: GameOverCallback): void {
         this.onGameOver = callback;
     }
+    
+    /**
+     * Check if player is in god mode
+     */
+    isGodMode(): boolean {
+        return this.difficulty === 'godMode';
+    }
 }
 
 // Export singleton instance

@@ -156,7 +156,10 @@ export class CombatSystem {
         if (!enemy.lastPlayerDamageTime || now - enemy.lastPlayerDamageTime >= PLAYER_COMBAT_CONFIG.playerToEnemyCooldown) {
             let playerDamage = 0;
             
-            if (player.isMeleeMode) {
+            // God mode deals 1000 damage on collision
+            if (playerStatsSystem.isGodMode()) {
+                playerDamage = 1000;
+            } else if (player.isMeleeMode) {
                 // Player in melee mode - deals full melee damage
                 playerDamage = PLAYER_COMBAT_CONFIG.meleeModePlayerDamage;
             } else if (this.isPlayerMovingTowardEnemy(player, enemy)) {
