@@ -4,10 +4,8 @@
  */
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
+import { XP_CONFIG } from '../config';
 import type { XPOrb } from '../types/game';
-
-const MAGNETISM_RANGE = 150; // Distance to start pulling orbs
-const MAGNETISM_SPEED = 250; // Speed to pull orbs
 
 export class MagnetismSystem {
     /**
@@ -25,7 +23,7 @@ export class MagnetismSystem {
                 orb.y
             );
             
-            if (distance < MAGNETISM_RANGE) {
+            if (distance < XP_CONFIG.magnetism.range) {
                 const angle = Phaser.Math.Angle.Between(
                     orb.x, 
                     orb.y, 
@@ -34,8 +32,8 @@ export class MagnetismSystem {
                 );
                 
                 orb.body.setVelocity(
-                    Math.cos(angle) * MAGNETISM_SPEED,
-                    Math.sin(angle) * MAGNETISM_SPEED
+                    Math.cos(angle) * XP_CONFIG.magnetism.speed,
+                    Math.sin(angle) * XP_CONFIG.magnetism.speed
                 );
             }
         });
