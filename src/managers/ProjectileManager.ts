@@ -17,18 +17,6 @@ class ProjectileManager {
     }
 
     /**
-     * Set the input references for projectile firing.
-     * Stores cursor keys and WASD keys in gameState for direction detection.
-     * 
-     * @param c - The cursor keys from Phaser input
-     * @param w - The WASD keys from Phaser input
-     */
-    setInputs(c: Phaser.Types.Input.Keyboard.CursorKeys, w: WASDKeys): void {
-        gameState.cursors = c;
-        gameState.wasdKeys = w;
-    }
-
-    /**
      * Fire a projectile from the player.
      * Handles cooldown, direction detection, underwater behavior, and stats tracking.
      * 
