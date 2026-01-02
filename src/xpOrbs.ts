@@ -1,31 +1,76 @@
-import { PROJECTILE_CONFIG, ENEMY_CONFIG } from './config';
-import gameState from './utils/gameState';
-import playerStatsSystem from './systems/PlayerStatsSystem';
-import spawnSystem from './systems/SpawnSystem';
-import magnetismSystem from './systems/MagnetismSystem';
+/**
+ * XP Orb Module - Re-export of XPOrbManager
+ * Provides backward-compatible function exports for the class-based XPOrbManager.
+ * 
+ * @deprecated This file maintains backward compatibility. Prefer importing from './managers/XPOrbManager'
+ */
+import xpOrbManager from './managers/XPOrbManager';
 import type { PlayerStats } from './types/game';
 
-export function getPlayerStats(): PlayerStats { return playerStatsSystem.getStats(); }
-export function updatePlayerStats(stats: PlayerStats): void { playerStatsSystem.setStats(stats); }
+/**
+ * Get the current player stats.
+ * 
+ * @returns The current player stats including level, health, XP, and stamina
+ */
+export function getPlayerStats(): PlayerStats {
+    return xpOrbManager.getPlayerStats();
+}
 
-// Re-export spawn functions for backwards compatibility
+/**
+ * Update player stats.
+ * 
+ * @param stats - Partial player stats to update
+ */
+export function updatePlayerStats(stats: PlayerStats): void {
+    xpOrbManager.updatePlayerStats(stats);
+}
+
+/**
+ * Spawn an XP orb at the specified location.
+ * 
+ * @param scene - The Phaser scene to spawn the orb in
+ * @param x - The x-coordinate for the orb spawn position
+ * @param y - The y-coordinate for the orb spawn position
+ * @param xpValue - The XP value of the orb
+ */
 export function spawnXPOrb(scene: Phaser.Scene, x: number, y: number, xpValue: number): void {
-    spawnSystem.spawnXPOrb(scene, x, y, xpValue);
+    xpOrbManager.spawnXPOrb(scene, x, y, xpValue);
 }
 
+/**
+ * Update XP orb magnetism - attract orbs to player if in range.
+ */
 export function updateXPOrbMagnetism(): void {
-    magnetismSystem.update();
+    xpOrbManager.updateXPOrbMagnetism();
 }
 
+/**
+ * Add XP to the player.
+ * 
+ * @param amount - The amount of XP to add
+ */
 export function gainXP(amount: number): void {
-    playerStatsSystem.gainXP(amount);
+    xpOrbManager.gainXP(amount);
 }
 
+/**
+ * Check if player should level up.
+ * 
+ * @deprecated This method is kept for backwards compatibility but does nothing.
+ * Level up checking is now handled automatically by PlayerStatsSystem.
+ */
 export function checkLevelUp(): void {
-    // Deprecated - now handled by PlayerStatsSystem
-    // Kept for backwards compatibility but does nothing
+    xpOrbManager.checkLevelUp();
 }
 
+/**
+ * Apply damage to the player.
+ * 
+ * @param damage - The amount of damage to apply
+ */
 export function damagePlayer(damage: number): void {
-    playerStatsSystem.takeDamage(damage);
+    xpOrbManager.damagePlayer(damage);
 }
+
+// Export the singleton instance as default for direct class access
+export default xpOrbManager;
