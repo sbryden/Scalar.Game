@@ -434,8 +434,8 @@ export class CombatSystem {
         // Check if this is a minion of a spawner boss
         const isMinion = !!enemy.parentSpawnerBossId;
         
-        // Track enemy destruction
-        levelStatsTracker.recordEnemyDestroyed(isBoss);
+        // Track enemy destruction with enemy type for scoring
+        levelStatsTracker.recordEnemyDestroyed(enemy.enemyType, isBoss);
         
         // Mark enemy as dead to prevent further AI/damage processing
         enemy.health = 0;

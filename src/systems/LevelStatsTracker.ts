@@ -3,6 +3,14 @@
  * Tracks player performance statistics throughout a level
  */
 
+// Base point values for scoring
+export const SCORING_CONFIG = {
+    regularBossPoints: 20,
+    regularEnemyPoints: 5,
+    microBossPoints: 10,
+    microEnemyPoints: 2.5
+} as const;
+
 export interface LevelStats {
     levelStartTime: number;
     levelEndTime: number | null;
@@ -12,6 +20,11 @@ export interface LevelStats {
     bossesDestroyed: number;
     damageDealt: number;
     damageTaken: number;
+    // Scoring breakdown
+    regularEnemiesDestroyed: number;
+    regularBossesDestroyed: number;
+    microEnemiesDestroyed: number;
+    microBossesDestroyed: number;
 }
 
 export class LevelStatsTracker {
@@ -35,7 +48,11 @@ export class LevelStatsTracker {
             enemiesDestroyed: 0,
             bossesDestroyed: 0,
             damageDealt: 0,
-            damageTaken: 0
+            damageTaken: 0,
+            regularEnemiesDestroyed: 0,
+            regularBossesDestroyed: 0,
+            microEnemiesDestroyed: 0,
+            microBossesDestroyed: 0
         };
     }
 
@@ -75,13 +92,43 @@ export class LevelStatsTracker {
     }
 
     /**
-     * Track an enemy being destroyed
+     * Check if an enemy type is a micro-world enemy
      */
-    recordEnemyDestroyed(isBoss: boolean = false): void {
+    private isMicroEnemy(enemyType: string): boolean {
+        return enemyType === 'micro' || 
+               enemyType === 'water_swimming_micro' ||
+               enemyType === 'boss_land_micro' ||
+               enemyType === 'boss_water_swimming_micro' ||
+               enemyType === 'boss_water_crab_micro';
+    }
+
+    /**
+     * Track an enemy being destroyed
+     * @param enemyType - Type of enemy destroyed (e.g., 'boss_land', 'micro', 'fish')
+     * @param isBoss - Whether this enemy is a boss
+     */
+    recordEnemyDestroyed(enemyType: string, isBoss: boolean = false): void {
         if (this.isLevelActive) {
             this.stats.enemiesDestroyed++;
             if (isBoss) {
                 this.stats.bossesDestroyed++;
+            }
+            
+            // Track by category for scoring
+            const isMicro = this.isMicroEnemy(enemyType);
+            
+            if (isBoss) {
+                if (isMicro) {
+                    this.stats.microBossesDestroyed++;
+                } else {
+                    this.stats.regularBossesDestroyed++;
+                }
+            } else {
+                if (isMicro) {
+                    this.stats.microEnemiesDestroyed++;
+                } else {
+                    this.stats.regularEnemiesDestroyed++;
+                }
             }
         }
     }
@@ -144,6 +191,56 @@ export class LevelStatsTracker {
     reset(): void {
         this.stats = this.createEmptyStats();
         this.isLevelActive = false;
+    }
+
+    /**
+     * Calculate score based on enemy kills with level-based scaling
+     * Base point values are defined in SCORING_CONFIG constant
+     * Points scale linearly with map level
+     */
+    calculateScore(currentLevel: number): {
+        regularBossPoints: number;
+        regularEnemyPoints: number;
+        microBossPoints: number;
+        microEnemyPoints: number;
+        totalScore: number;
+        baseValues: typeof SCORING_CONFIG;
+        scaledValues: {
+            regularBoss: number;
+            regularEnemy: number;
+            microBoss: number;
+            microEnemy: number;
+        };
+    } {
+        // Level scaling multiplier (increases linearly with level)
+        const levelMultiplier = currentLevel;
+        
+        // Calculate scaled point values per enemy
+        const scaledRegularBoss = SCORING_CONFIG.regularBossPoints * levelMultiplier;
+        const scaledRegularEnemy = SCORING_CONFIG.regularEnemyPoints * levelMultiplier;
+        const scaledMicroBoss = SCORING_CONFIG.microBossPoints * levelMultiplier;
+        const scaledMicroEnemy = SCORING_CONFIG.microEnemyPoints * levelMultiplier;
+        
+        // Calculate points for each category
+        const regularBossPoints = this.stats.regularBossesDestroyed * scaledRegularBoss;
+        const regularEnemyPoints = this.stats.regularEnemiesDestroyed * scaledRegularEnemy;
+        const microBossPoints = this.stats.microBossesDestroyed * scaledMicroBoss;
+        const microEnemyPoints = this.stats.microEnemiesDestroyed * scaledMicroEnemy;
+        
+        return {
+            regularBossPoints,
+            regularEnemyPoints,
+            microBossPoints,
+            microEnemyPoints,
+            totalScore: regularBossPoints + regularEnemyPoints + microBossPoints + microEnemyPoints,
+            baseValues: SCORING_CONFIG,
+            scaledValues: {
+                regularBoss: scaledRegularBoss,
+                regularEnemy: scaledRegularEnemy,
+                microBoss: scaledMicroBoss,
+                microEnemy: scaledMicroEnemy
+            }
+        };
     }
 }
 
