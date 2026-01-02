@@ -151,20 +151,43 @@ export class LevelCompleteScreen {
             const stats = levelStatsTracker.getStats();
             const completionTime = levelStatsTracker.getFormattedCompletionTime();
             
-            // Build stats display text
+            // Calculate score
+            const score = levelStatsTracker.calculateScore(currentLevel);
+            
+            // Build stats display text with score breakdown
             const statsDisplay = [
                 'Level Statistics',
                 '',
                 `Time to Completion: ${completionTime}`,
-                `Projectiles Fired: ${stats.projectilesFired}`,
-                `Deaths: ${stats.deaths}`,
-                `Enemies Destroyed: ${stats.enemiesDestroyed}`,
-                `Bosses Destroyed: ${stats.bossesDestroyed}`,
-                `Damage Dealt: ${Math.round(stats.damageDealt)}`,
-                `Damage Taken: ${Math.round(stats.damageTaken)}`
-            ].join('\n');
+                '',
+                '=== SCORE BREAKDOWN ===',
+                ''
+            ];
             
-            this.statsText.setText(statsDisplay);
+            // Add score breakdown with actual counts using pre-calculated scaled values
+            if (stats.regularBossesDestroyed > 0) {
+                statsDisplay.push(`Regular Bosses: ${stats.regularBossesDestroyed} × ${score.scaledValues.regularBoss} = ${Math.round(score.regularBossPoints)} pts`);
+            }
+            if (stats.regularEnemiesDestroyed > 0) {
+                statsDisplay.push(`Regular Enemies: ${stats.regularEnemiesDestroyed} × ${score.scaledValues.regularEnemy} = ${Math.round(score.regularEnemyPoints)} pts`);
+            }
+            if (stats.microBossesDestroyed > 0) {
+                statsDisplay.push(`Micro-World Bosses: ${stats.microBossesDestroyed} × ${score.scaledValues.microBoss} = ${Math.round(score.microBossPoints)} pts`);
+            }
+            if (stats.microEnemiesDestroyed > 0) {
+                statsDisplay.push(`Micro-World Enemies: ${stats.microEnemiesDestroyed} × ${score.scaledValues.microEnemy} = ${Math.round(score.microEnemyPoints)} pts`);
+            }
+            
+            statsDisplay.push('');
+            statsDisplay.push(`TOTAL SCORE: ${Math.round(score.totalScore)}`);
+            statsDisplay.push('');
+            statsDisplay.push('--- Other Stats ---');
+            statsDisplay.push(`Projectiles Fired: ${stats.projectilesFired}`);
+            statsDisplay.push(`Deaths: ${stats.deaths}`);
+            statsDisplay.push(`Damage Dealt: ${Math.round(stats.damageDealt)}`);
+            statsDisplay.push(`Damage Taken: ${Math.round(stats.damageTaken)}`);
+            
+            this.statsText.setText(statsDisplay.join('\n'));
             
             this.overlay.setVisible(true);
             this.titleText.setVisible(true);
