@@ -58,7 +58,7 @@ class PlayerManager {
         const sizeOrder: PlayerSize[] = ['small', 'normal'];
         const currentIndex = sizeOrder.indexOf(currentSize);
         
-        let newSize: string;
+        let newSize: PlayerSize;
         if (direction === 'smaller') {
             // Can't go smaller than small
             if (currentIndex <= 0) return;
@@ -76,9 +76,6 @@ class PlayerManager {
         if (newSize === currentSize) {
             return;
         }
-        
-        // Check for scene transitions
-        const oldSize = currentSize;
         
         // Land environment transitions
         // Transition to MicroScene when going to small from MainGameScene
@@ -115,7 +112,7 @@ class PlayerManager {
         }
         
         // Apply new size (simplified - no complex scaling needed)
-        gameState.playerSize = newSize as PlayerSize;
+        gameState.playerSize = newSize;
         const config = SIZE_CONFIG[newSize];
         if (!config) return;
         
