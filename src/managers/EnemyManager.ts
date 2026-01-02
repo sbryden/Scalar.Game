@@ -12,7 +12,8 @@ import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { fireEnemyProjectile } from '../projectiles';
 
 class EnemyManager {
-    constructor() {
+    private constructor() {
+        // Private constructor to enforce singleton pattern
         // No state to initialize - all enemy data is managed through gameState.enemies group
     }
 
@@ -481,7 +482,17 @@ class EnemyManager {
             enemy.healthBarBg.y = healthBarY;
         }
     }
+
+    /**
+     * Singleton instance accessor.
+     * Provides the single instance of EnemyManager.
+     */
+    private static instance: EnemyManager = new EnemyManager();
+    
+    static getInstance(): EnemyManager {
+        return EnemyManager.instance;
+    }
 }
 
-// Export singleton instance
-export default new EnemyManager();
+// Export singleton instance for convenient access
+export default EnemyManager.getInstance();
