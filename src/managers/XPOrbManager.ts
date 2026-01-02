@@ -30,7 +30,7 @@ class XPOrbManager {
      * 
      * @param stats - Partial player stats to update
      */
-    updatePlayerStats(stats: PlayerStats): void {
+    updatePlayerStats(stats: Partial<PlayerStats>): void {
         playerStatsSystem.setStats(stats);
     }
 
