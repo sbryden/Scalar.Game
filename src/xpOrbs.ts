@@ -21,7 +21,7 @@ export function getPlayerStats(): PlayerStats {
  * 
  * @param stats - Partial player stats to update
  */
-export function updatePlayerStats(stats: PlayerStats): void {
+export function updatePlayerStats(stats: Partial<PlayerStats>): void {
     xpOrbManager.updatePlayerStats(stats);
 }
 
