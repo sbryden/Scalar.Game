@@ -13,8 +13,7 @@ class ProjectileManager {
     private lastProjectileTime: number = 0;
 
     constructor() {
-        // Initialize state
-        this.lastProjectileTime = 0;
+        // No state to initialize - projectile data is managed through gameState.projectiles group
     }
 
     /**
