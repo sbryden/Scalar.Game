@@ -7,7 +7,7 @@ import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/gameState';
-import { isSwimmingEnemy } from '../enemies';
+import enemyManager from '../managers/EnemyManager';
 import type { Player, Enemy, Projectile } from '../types/game';
 
 /**
@@ -386,7 +386,7 @@ export class CombatSystem {
         const spawnRadius = boss.spawnRadius || 100; // Default 100 pixel radius
         
         // Check if minions are swimming enemies (need full circle spawn)
-        const isSwimmingMinion = isSwimmingEnemy(boss.minionType);
+        const isSwimmingMinion = enemyManager.isSwimmingEnemy(boss.minionType);
         
         for (let i = 0; i < minionCount; i++) {
             let minionX: number;
