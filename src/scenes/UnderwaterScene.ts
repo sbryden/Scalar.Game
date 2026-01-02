@@ -6,7 +6,7 @@ import Phaser from 'phaser';
 import { WORLD_WIDTH, WORLD_HEIGHT, BOSS_MODE_CONFIG } from '../config';
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
-import { updateProjectiles } from '../projectiles';
+import projectileManager from '../managers/ProjectileManager';
 import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
 import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
@@ -370,7 +370,7 @@ export default class UnderwaterScene extends Phaser.Scene {
         combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
         
         // Update projectiles
-        updateProjectiles();
+        projectileManager.updateProjectiles();
         
         // Update XP orb magnetism
         updateXPOrbMagnetism();

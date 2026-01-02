@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
-import { fireProjectile } from '../projectiles';
+import projectileManager from './ProjectileManager';
 import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
@@ -62,7 +62,7 @@ export class InputManager {
         // Attack
         this.scene.input.keyboard?.on('keydown-F', () => {
             if (gameState.player) {
-                fireProjectile(gameState.player.scene);
+                projectileManager.fireProjectile(gameState.player.scene);
             }
         });
     }
