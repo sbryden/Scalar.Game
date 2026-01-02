@@ -3,7 +3,7 @@ import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../co
 import spawnSystem from '../systems/SpawnSystem';
 import { spawnEnemy, updateEnemyAI } from '../enemies';
 import projectileManager from '../managers/ProjectileManager';
-import { getPlayerStats, updateXPOrbMagnetism } from '../xpOrbs';
+import xpOrbManager from '../managers/XPOrbManager';
 import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
 import gameState from '../utils/gameState';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
@@ -261,7 +261,7 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     update() {
-        const playerStats = getPlayerStats();
+        const playerStats = xpOrbManager.getPlayerStats();
         
         // Update stamina system
         const staminaSystem = getStaminaSystem();
@@ -310,7 +310,7 @@ export default class MainGameScene extends Phaser.Scene {
         projectileManager.updateProjectiles();
         
         // Update XP orb magnetism
-        updateXPOrbMagnetism();
+        xpOrbManager.updateXPOrbMagnetism();
         
         // Update camera
         this.cameraManager.update();
