@@ -12,8 +12,7 @@ import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { fireEnemyProjectile } from '../projectiles';
 
 class EnemyManager {
-    private constructor() {
-        // Private constructor to enforce singleton pattern
+    constructor() {
         // No state to initialize - all enemy data is managed through gameState.enemies group
     }
 
