@@ -482,17 +482,7 @@ class EnemyManager {
             enemy.healthBarBg.y = healthBarY;
         }
     }
-
-    /**
-     * Singleton instance accessor.
-     * Provides the single instance of EnemyManager.
-     */
-    private static instance: EnemyManager = new EnemyManager();
-    
-    static getInstance(): EnemyManager {
-        return EnemyManager.instance;
-    }
 }
 
-// Export singleton instance for convenient access
-export default EnemyManager.getInstance();
+// Export singleton instance
+export default new EnemyManager();
