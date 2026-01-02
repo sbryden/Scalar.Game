@@ -9,7 +9,7 @@ import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
-import { fireEnemyProjectile } from '../projectiles';
+import projectileManager from './ProjectileManager';
 
 class EnemyManager {
     constructor() {
@@ -307,7 +307,7 @@ class EnemyManager {
         // Fire projectile if enemy has ranged ability
         if (enemy.hasRangedAbility && enemy.scene) {
             const gameTime = enemy.scene.time.now;
-            fireEnemyProjectile(enemy.scene, enemy, gameTime);
+            projectileManager.fireEnemyProjectile(enemy.scene, enemy, gameTime);
         }
         
         // Different behavior for swimming vs ground enemies
