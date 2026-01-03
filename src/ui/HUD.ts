@@ -156,12 +156,12 @@ export class HUD {
         }
         
         // Update fuel bar
-        const fuelPercent = playerStats.fuel / playerStats.maxFuel;
+        const fuelSystem = getFuelSystem();
+        const fuelPercent = fuelSystem.getFuelPercent();
         this.fuelBar?.setDisplayOrigin(barWidth / 2, 4);
         this.fuelBar?.setScale(fuelPercent, 1);
         
         // Get fuel system state for cooldown display
-        const fuelSystem = getFuelSystem();
         const fuelState = fuelSystem.getState();
         
         // Show cooldown text if in initial cooldown
@@ -177,7 +177,7 @@ export class HUD {
         if (fuelPercent <= 0) {
             // Depleted - red
             this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.depleted);
-        } else if (fuelPercent <= 0.25) {
+        } else if (fuelPercent > 0 && fuelPercent <= 0.25) {
             // Low fuel threshold - orange
             this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.lowFuel);
         } else {

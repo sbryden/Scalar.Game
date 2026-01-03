@@ -80,8 +80,8 @@ export class FuelSystem {
         if (this.state.initialCooldownRemaining > 0) {
             return false;
         }
-        // Cannot transform if fuel is depleted
-        return !this.state.isDepleted;
+        // Require sufficient fuel for a transformation
+        return this.state.current >= this.state.consumptionAmount;
     }
 
     /**
@@ -125,9 +125,16 @@ export class FuelSystem {
      * Rate increases with player level
      */
     private regenerateFuel(baseAmount: number): void {
-        // Calculate level-based regeneration bonus
-        const levelBonus = (this.currentPlayerLevel - 1) * this.config.regenerationRatePerLevel;
-        const totalAmount = baseAmount + (levelBonus * (1000 / 60) / 1000); // Convert per-second to per-frame
+        // baseAmount is already this.state.regenerationRate * deltaSeconds
+        // Infer deltaSeconds so we can apply the per-second level bonus correctly.
+        let totalAmount = baseAmount;
+
+        if (this.state.regenerationRate > 0) {
+            const deltaSeconds = baseAmount / this.state.regenerationRate;
+            const levelBonusPerSecond = (this.currentPlayerLevel - 1) * this.config.regenerationRatePerLevel;
+            const levelBonus = levelBonusPerSecond * deltaSeconds;
+            totalAmount += levelBonus;
+        }
         
         this.state.current = Math.min(this.state.max, this.state.current + totalAmount);
     }
@@ -139,7 +146,6 @@ export class FuelSystem {
     consumeFuel(): boolean {
         // Check if we have enough fuel
         if (this.state.current < this.state.consumptionAmount) {
-            this.state.isDepleted = true;
             if (this.onFuelDepleted) {
                 this.onFuelDepleted();
             }
@@ -227,6 +233,9 @@ export class FuelSystem {
         this.state.max = this.config.startingMaxFuel;
         this.state.isLowFuel = false;
         this.state.isDepleted = !skipCooldown; // Start depleted unless skipping cooldown
+        this.state.regenerationRate = this.config.regenerationRate;
+        this.state.consumptionAmount = this.config.consumptionAmount;
+        this.state.lowFuelThreshold = this.config.lowFuelThreshold;
         this.lastUpdateTime = gameTime ?? 0;
         this.currentPlayerLevel = 1;
     }
