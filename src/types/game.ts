@@ -94,6 +94,8 @@ export interface PlayerStats {
     xpToLevel: number;
     stamina: number;
     maxStamina: number;
+    fuel: number;
+    maxFuel: number;
 }
 
 /**
