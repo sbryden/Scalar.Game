@@ -22,6 +22,11 @@ export class HUD {
     levelText: Phaser.GameObjects.Text | null;
     mapLevelText: Phaser.GameObjects.Text | null;
     bossCountText: Phaser.GameObjects.Text | null;
+    pauseButton: Phaser.GameObjects.Text | null;
+    pauseOverlay: Phaser.GameObjects.Rectangle | null;
+    resumeButton: Phaser.GameObjects.Text | null;
+    menuButton: Phaser.GameObjects.Text | null;
+    isPaused: boolean = false;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -37,14 +42,20 @@ export class HUD {
         this.levelText = null;
         this.mapLevelText = null;
         this.bossCountText = null;
+        this.pauseButton = null;
+        this.pauseOverlay = null;
+        this.resumeButton = null;
+        this.menuButton = null;
         
         this.create();
     }
     
     create(): void {
+        const cameraWidth = this.scene.cameras.main.width;
+        const cameraHeight = this.scene.cameras.main.height;
         const barWidth = 100;
         const barHeight = 8;
-        const barCenterX = 512;
+        const barCenterX = cameraWidth / 2;
         const healthBarY = 30;
         const xpBarY = 50;
         const staminaBarY = 70;
@@ -120,6 +131,51 @@ export class HUD {
         this.bossCountText.setDepth(1000);
         this.bossCountText.setScrollFactor(0);
         this.bossCountText.setVisible(false);
+        
+        // Pause button (top-right corner)
+        this.pauseButton = this.scene.add.text(cameraWidth - 50, 20, '⏸️', {
+            fontSize: '32px',
+            color: '#FFFFFF'
+        });
+        this.pauseButton.setDepth(1000);
+        this.pauseButton.setScrollFactor(0);
+        this.pauseButton.setInteractive();
+        this.pauseButton.on('pointerdown', () => this.togglePause());
+        
+        // Pause overlay (semi-transparent background)
+        this.pauseOverlay = this.scene.add.rectangle(cameraWidth / 2, cameraHeight / 2, cameraWidth, cameraHeight, 0x000000, 0.7);
+        this.pauseOverlay.setDepth(1500);
+        this.pauseOverlay.setScrollFactor(0);
+        this.pauseOverlay.setVisible(false);
+        
+        // Resume button
+        this.resumeButton = this.scene.add.text(cameraWidth / 2, cameraHeight / 2 - 50, 'RESUME', {
+            fontSize: '36px',
+            color: '#FFFFFF',
+            fontStyle: 'bold'
+        });
+        this.resumeButton.setDepth(1500);
+        this.resumeButton.setScrollFactor(0);
+        this.resumeButton.setOrigin(0.5);
+        this.resumeButton.setInteractive();
+        this.resumeButton.on('pointerdown', () => this.togglePause());
+        this.resumeButton.setVisible(false);
+        
+        // Back to menu button
+        this.menuButton = this.scene.add.text(cameraWidth / 2, cameraHeight / 2 + 50, 'MAIN MENU', {
+            fontSize: '36px',
+            color: '#FFFFFF',
+            fontStyle: 'bold'
+        });
+        this.menuButton.setDepth(1500);
+        this.menuButton.setScrollFactor(0);
+        this.menuButton.setOrigin(0.5);
+        this.menuButton.setInteractive();
+        this.menuButton.on('pointerdown', () => this.goToMainMenu());
+        this.menuButton.setVisible(false);
+        
+        // Add ESC key for pause
+        this.scene.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     }
     
     /**
@@ -223,5 +279,47 @@ export class HUD {
         if (this.levelText) this.levelText.destroy();
         if (this.mapLevelText) this.mapLevelText.destroy();
         if (this.bossCountText) this.bossCountText.destroy();
+        if (this.pauseButton) this.pauseButton.destroy();
+        if (this.pauseOverlay) this.pauseOverlay.destroy();
+        if (this.resumeButton) this.resumeButton.destroy();
+        if (this.menuButton) this.menuButton.destroy();
+    }
+    
+    /**
+     * Toggle pause state
+     */
+    togglePause(): void {
+        this.isPaused = !this.isPaused;
+        
+        if (this.isPaused) {
+            // Pause the game physics and time
+            this.scene.physics.pause();
+            this.scene.time.paused = true;
+            this.pauseOverlay?.setVisible(true);
+            this.resumeButton?.setVisible(true);
+            this.menuButton?.setVisible(true);
+        } else {
+            // Resume the game
+            this.scene.physics.resume();
+            this.scene.time.paused = false;
+            this.pauseOverlay?.setVisible(false);
+            this.resumeButton?.setVisible(false);
+            this.menuButton?.setVisible(false);
+        }
+    }
+    
+    /**
+     * Go back to main menu
+     */
+    goToMainMenu(): void {
+        // Resume physics and time first
+        this.scene.physics.resume();
+        this.scene.time.paused = false;
+        // Stop all game scenes and start menu
+        this.scene.scene.stop('MainGameScene');
+        this.scene.scene.stop('MicroScene');
+        this.scene.scene.stop('UnderwaterScene');
+        this.scene.scene.stop('UnderwaterMicroScene');
+        this.scene.scene.start('MenuScene');
     }
 }
