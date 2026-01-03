@@ -40,6 +40,10 @@ export class PlayerStatsSystem {
         this.difficulty = 'normal';
         this.onLevelUp = null;
         this.onGameOver = null;
+        
+        // Sync fuel system with starting player level
+        const fuelSystem = getFuelSystem();
+        fuelSystem.setPlayerLevel(this.stats.level);
     }
     
     /**
