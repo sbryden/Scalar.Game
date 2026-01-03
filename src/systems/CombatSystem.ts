@@ -38,6 +38,9 @@ export class CombatSystem {
     private bossesDefeated: number = 0;
     private totalBosses: number = 1; // Default to 1 for normal mode
     private nextSpawnerBossId: number = 0;
+    
+    // Cached angle calculation for positioning detection
+    private readonly flankingAngleThresholdRad: number = (PLAYER_COMBAT_CONFIG.flankingAngleThreshold * Math.PI) / 180;
 
     /**
      * Set callback for when a boss is defeated
@@ -157,15 +160,13 @@ export class CombatSystem {
         const perpDot = Math.abs(pteDirX * pvDirY - pteDirY * pvDirX);
         
         // Determine attack type based on angle
-        const angleThresholdRad = (PLAYER_COMBAT_CONFIG.flankingAngleThreshold * Math.PI) / 180;
-        
         // Head-on attack: moving directly toward enemy (high dot product, low perpendicular)
         if (dotProduct > PLAYER_COMBAT_CONFIG.headOnDetectionThreshold) {
             return PLAYER_COMBAT_CONFIG.headOnBonusMultiplier;
         }
         
         // Flanking attack: hitting from the side (perpendicular approach)
-        if (perpDot > Math.sin(angleThresholdRad) && dotProduct > 0) {
+        if (perpDot > Math.sin(this.flankingAngleThresholdRad) && dotProduct > 0) {
             return PLAYER_COMBAT_CONFIG.flankingBonusMultiplier;
         }
         
@@ -182,9 +183,8 @@ export class CombatSystem {
      * Calculate size-based damage multiplier
      */
     private getSizeMultiplier(playerScale: number, enemyWidth: number): number {
-        // Approximate enemy scale based on width (30 is standard enemy width)
-        const standardEnemyWidth = 30;
-        const enemyScale = enemyWidth / standardEnemyWidth;
+        // Approximate enemy scale based on width
+        const enemyScale = enemyWidth / PLAYER_COMBAT_CONFIG.standardEnemyWidth;
         
         // Compare player scale to enemy scale
         if (playerScale > enemyScale * 1.2) {
@@ -393,8 +393,8 @@ export class CombatSystem {
                 // Apply minimal momentum bonus for passive mode
                 const velocity = this.getPlayerVelocityMagnitude(player);
                 const velocityBonus = Math.min(
-                    velocity * PLAYER_COMBAT_CONFIG.velocityDamageMultiplier * 0.5,
-                    PLAYER_COMBAT_CONFIG.maxVelocityBonus * 0.5
+                    velocity * PLAYER_COMBAT_CONFIG.velocityDamageMultiplier * PLAYER_COMBAT_CONFIG.passiveModeVelocityBonusMultiplier,
+                    PLAYER_COMBAT_CONFIG.maxVelocityBonus * PLAYER_COMBAT_CONFIG.passiveModeVelocityBonusMultiplier
                 );
                 playerDamage += velocityBonus;
             }
@@ -490,7 +490,7 @@ export class CombatSystem {
         if (player.isMeleeMode && player.body) {
             const velocity = this.getPlayerVelocityMagnitude(player);
             const velocityMultiplier = 1 + (velocity / PLAYER_COMBAT_CONFIG.knockbackVelocityScaleFactor);
-            knockbackForce *= Math.min(velocityMultiplier, 2.0); // Cap at 2x
+            knockbackForce *= Math.min(velocityMultiplier, PLAYER_COMBAT_CONFIG.maxKnockbackMultiplier);
         }
         
         const knockbackX = Math.cos(angle) * knockbackForce;
