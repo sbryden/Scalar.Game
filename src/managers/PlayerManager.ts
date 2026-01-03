@@ -5,6 +5,7 @@
  */
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, PHYSICS_CONFIG } from '../config';
 import gameState from '../utils/gameState';
+import { getFuelSystem } from '../systems/FuelSystem';
 import type { PlayerSize } from '../types/game';
 
 class PlayerManager {
@@ -51,6 +52,14 @@ class PlayerManager {
             return; // Can't change size yet
         }
         
+        // Check fuel system
+        const fuelSystem = getFuelSystem();
+        if (!fuelSystem.canTransform()) {
+            // Show warning or feedback that fuel is depleted
+            console.log('Cannot transform: insufficient fuel or cooldown active');
+            return;
+        }
+        
         const currentSize = gameState.playerSize;
         const currentScene = gameState.currentSceneKey;
         
@@ -74,6 +83,12 @@ class PlayerManager {
         
         // Don't change if already that size
         if (newSize === currentSize) {
+            return;
+        }
+        
+        // Consume fuel for the transformation
+        if (!fuelSystem.consumeFuel()) {
+            console.log('Cannot transform: insufficient fuel');
             return;
         }
         
