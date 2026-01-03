@@ -199,7 +199,7 @@ export const ENEMY_CONFIG: Record<string, {
         // Ranged ability configuration
         hasRangedAbility: true,
         projectileTexture: 'sharkpedo',
-        projectileDamage: 15,
+        projectileDamage: 50,
         projectileSpeed: 300,
         projectileCooldown: 3000
     },
