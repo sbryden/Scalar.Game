@@ -79,15 +79,15 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Enhance scale transition with Ant-Man style scaling animations (player shrinks, enemies appear to grow)
   - Add size-appropriate obstacles and terrain features per scale
 
-### Level Progression Enhancement
-- **Level-Up Choice System** (Far Future - Rough Concept)
+### Level Progression Enhancement (Far Future - Rough Concept)
+- **Level-Up Choice System**
+  - This is a far future item and not well defined yet
   - Implement branching upgrade choices at level-up
   - Add "grow OR shrink" upgrade path selection
   - Create upgrade tree UI for size transformation capabilities
   - Track player's chosen upgrade path for builds
   - Balance different upgrade paths for viability
   - Consider other upgrade choices (health, speed, damage)
-  - This is a far future item and not well defined yet
 
 ---
 
@@ -145,7 +145,7 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Specific to each biome (land, water, air)
   - Only one champion active at a time
   - Design companion AI and follow behavior
-  - Implement companion slot selection (TBD: at start or unlocked during gameplay)
+  - Implement companion slot selection (details to be determined: at start or unlocked during gameplay)
   - Add companion attack behaviors and cooldowns
   - Create companion stat bonus system
 
@@ -216,7 +216,7 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Add wind gust system affecting movement
   - Implement altitude-based physics
   - Create stall mechanic when out of fuel
-  - This is a major feature with multiple sub-features (TBD)
+  - This is a major feature with multiple sub-features requiring further design
 
 - **Aerial Combat**
   - Add dragonfly-like bugs at micro scale
@@ -308,11 +308,14 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 
 ### Progression & Unlocks
 - **High Score Tracking**
-  - Implement local high score storage (browser localStorage)
-  - Track high scores per difficulty and biome
-  - Display personal best on menu and level complete screen
-  - Add high score leaderboard UI
-  - Future: Cloud-based high score storage and global leaderboards
+  - **Phase 1 (Local)**: Implement browser localStorage for high scores
+    - Track high scores per difficulty and biome
+    - Display personal best on menu and level complete screen
+    - Add high score leaderboard UI
+  - **Phase 2 (Cloud)**: Migrate to cloud-based storage
+    - Global leaderboards across all players
+    - Persistent high scores across devices
+    - Social features and comparisons
   
 - **Meta-Progression**
   - Persistent upgrades between gameplay sessions
