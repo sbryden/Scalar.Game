@@ -1,6 +1,6 @@
 # Scalar Game - Development Roadmap
 
-This roadmap outlines future development for Scalar. For current features and implementation status, see [README.md](README.md).
+This roadmap outlines the future development for Scalar. For current features and implementation status, see [README.md](README.md).
 
 The roadmap is organized by feature area rather than timeline, allowing for flexible prioritization based on gameplay testing and community feedback.
 
