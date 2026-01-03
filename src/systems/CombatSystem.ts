@@ -38,9 +38,6 @@ export class CombatSystem {
     private bossesDefeated: number = 0;
     private totalBosses: number = 1; // Default to 1 for normal mode
     private nextSpawnerBossId: number = 0;
-    
-    // Cached angle calculation for positioning detection
-    private readonly flankingAngleThresholdRad: number = (PLAYER_COMBAT_CONFIG.flankingAngleThreshold * Math.PI) / 180;
 
     /**
      * Set callback for when a boss is defeated
@@ -124,50 +121,45 @@ export class CombatSystem {
     }
     
     /**
-     * Calculate attack angle and determine positioning bonus
-     * Returns multiplier based on attack angle (flanking, head-on, rear)
+     * Calculate attack angle and determine positioning bonus.
+     *
+     * This looks at the player's movement direction relative to the enemy and
+     * applies a damage multiplier based on the "attack type":
+     * - Head-on: the player is moving directly toward the enemy's position
+     *   (velocity is strongly aligned with the vector from player to enemy).
+     * - Rear: the player's velocity points away from the enemy
+     *   (they are retreating from or have already passed by the enemy).
+     *
+     * Returns the positioning multiplier for the current attack.
+     * @param velocityMagnitude - Pre-calculated velocity magnitude to avoid redundant calculation
      */
-    private getPositioningMultiplier(player: Player, enemy: Enemy): number {
-        if (!player.body) return 1.0;
+    private getPositioningMultiplier(player: Player, enemy: Enemy, velocityMagnitude: number): number {
+        if (!player.body || velocityMagnitude === 0) return 1.0;
         
-        // Calculate direction vectors
+        // Calculate direction vector from player to enemy
         const playerToEnemy = {
             x: enemy.x - player.x,
             y: enemy.y - player.y
         };
         
-        // Get player velocity (attack direction)
-        const playerVelocity = {
-            x: player.body.velocity.x,
-            y: player.body.velocity.y
-        };
-        
-        // Normalize vectors
         const pteLen = Math.sqrt(playerToEnemy.x * playerToEnemy.x + playerToEnemy.y * playerToEnemy.y);
-        const pvLen = Math.sqrt(playerVelocity.x * playerVelocity.x + playerVelocity.y * playerVelocity.y);
+        if (pteLen === 0) return 1.0;
         
-        if (pteLen === 0 || pvLen === 0) return 1.0;
-        
+        // Normalize direction vector
         const pteDirX = playerToEnemy.x / pteLen;
         const pteDirY = playerToEnemy.y / pteLen;
-        const pvDirX = playerVelocity.x / pvLen;
-        const pvDirY = playerVelocity.y / pvLen;
+        
+        // Normalize velocity vector (using pre-calculated magnitude)
+        const pvDirX = player.body.velocity.x / velocityMagnitude;
+        const pvDirY = player.body.velocity.y / velocityMagnitude;
         
         // Calculate dot product to get angle alignment
         const dotProduct = pteDirX * pvDirX + pteDirY * pvDirY;
         
-        // Calculate perpendicular component (for flanking detection)
-        const perpDot = Math.abs(pteDirX * pvDirY - pteDirY * pvDirX);
-        
         // Determine attack type based on angle
-        // Head-on attack: moving directly toward enemy (high dot product, low perpendicular)
+        // Head-on attack: moving directly toward enemy (high dot product)
         if (dotProduct > PLAYER_COMBAT_CONFIG.headOnDetectionThreshold) {
             return PLAYER_COMBAT_CONFIG.headOnBonusMultiplier;
-        }
-        
-        // Flanking attack: hitting from the side (perpendicular approach)
-        if (perpDot > Math.sin(this.flankingAngleThresholdRad) && dotProduct > 0) {
-            return PLAYER_COMBAT_CONFIG.flankingBonusMultiplier;
         }
         
         // Rear attack: moving away or very oblique angle (less effective but safer)
@@ -183,6 +175,11 @@ export class CombatSystem {
      * Calculate size-based damage multiplier
      */
     private getSizeMultiplier(playerScale: number, enemyWidth: number): number {
+        // Guard against invalid or zero-width enemies
+        if (enemyWidth <= 0) {
+            return 1.0;
+        }
+        
         // Approximate enemy scale based on width
         const enemyScale = enemyWidth / PLAYER_COMBAT_CONFIG.standardEnemyWidth;
         
@@ -360,16 +357,18 @@ export class CombatSystem {
                 // Player in melee mode - deals full melee damage with enhancements
                 playerDamage = PLAYER_COMBAT_CONFIG.meleeModePlayerDamage;
                 
-                // Apply momentum bonus
+                // Calculate velocity once for reuse
                 const velocity = this.getPlayerVelocityMagnitude(player);
+                
+                // Apply momentum bonus
                 const velocityBonus = Math.min(
                     velocity * PLAYER_COMBAT_CONFIG.velocityDamageMultiplier,
                     PLAYER_COMBAT_CONFIG.maxVelocityBonus
                 );
                 playerDamage += velocityBonus;
                 
-                // Apply positioning multiplier
-                const positioningMult = this.getPositioningMultiplier(player, enemy);
+                // Apply positioning multiplier (pass velocity to avoid recalculation)
+                const positioningMult = this.getPositioningMultiplier(player, enemy, velocity);
                 playerDamage *= positioningMult;
                 
                 // Apply size multiplier
@@ -397,6 +396,12 @@ export class CombatSystem {
                     PLAYER_COMBAT_CONFIG.maxVelocityBonus * PLAYER_COMBAT_CONFIG.passiveModeVelocityBonusMultiplier
                 );
                 playerDamage += velocityBonus;
+                
+                // Update combo timer on passive hits to keep combo alive
+                // (but don't apply combo damage bonus in passive mode)
+                if (player.lastComboHitTime && gameTime - player.lastComboHitTime <= PLAYER_COMBAT_CONFIG.comboTimeWindow) {
+                    player.lastComboHitTime = gameTime;
+                }
             }
             // else: Player moving away or stationary - deals no damage
             
