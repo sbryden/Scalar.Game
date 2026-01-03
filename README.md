@@ -2,6 +2,8 @@
 
 A 2D side-scrolling action game built with **Phaser 3** and **TypeScript**. Master dynamic size-shifting mechanics to battle scale-specific enemies across land and underwater environments!
 
+🎮 **[Play the Game](https://sbryden.github.io/Scalar.Game/)** 🎮
+
 ## Overview
 
 Scalar is a physics-based side-scroller where you control a vehicle with the unique ability to shrink and grow. Navigate through two distinct biomes (Land and Underwater), each with normal and micro scale variants. Face off against intelligent enemies that patrol, chase, and attack using line-of-sight detection. Progress through map levels, defeat bosses, collect XP orbs, and level up your character in this evolving adventure!

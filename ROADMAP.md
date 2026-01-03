@@ -249,8 +249,39 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Footstep/movement sounds
 - UI sound effects
 
+### Minimap System
+**Priority: Medium**
+- **Core Display**:
+  - Minimap in corner of screen (configurable position)
+  - Real-time map of nearby area
+  - Player position indicator (centered or tracked)
+  - Terrain/environment representation
+- **Enemy Tracking**:
+  - Show nearby enemies as colored dots/icons
+  - Different colors for enemy types (normal, elite, boss)
+  - Enemy health indicators on minimap
+  - Aggro radius visualization
+- **Objectives & Points of Interest**:
+  - Mark objectives and goals
+  - XP orb clusters highlighted
+  - Boss locations when active
+  - Safe zones or landmarks
+- **Scale Awareness**:
+  - Minimap zoom adjusts based on player scale (micro/normal/macro)
+  - Show scale transition zones
+  - Different visual style per biome
+- **Interactive Features**:
+  - Toggle minimap visibility
+  - Expand to full-screen map
+  - Ping system for marking locations
+  - Fog of war for unexplored areas (optional)
+- **Visual Customization**:
+  - Opacity settings
+  - Size adjustment
+  - Corner position selection
+  - Color scheme options
+
 ### UI/UX Improvements
-- Minimap showing nearby enemies and objectives
 - Enhanced health/stamina/fuel bar styling with animations
 - Damage numbers floating from enemies
 - Combo counter
