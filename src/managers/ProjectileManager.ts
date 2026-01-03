@@ -111,6 +111,7 @@ class ProjectileManager {
     /**
      * Fire an enemy projectile from an enemy toward the player.
      * Handles range checking, cooldown, and direction calculation.
+     * Special handling for boss_water_crab which fires in a cone.
      * 
      * @param scene - The Phaser scene to spawn the projectile in
      * @param enemy - The enemy firing the projectile
@@ -144,6 +145,13 @@ class ProjectileManager {
         
         enemy.lastProjectileTime = gameTime;
         
+        // Special handling for boss_water_crab - fires in a cone
+        if (enemy.enemyType === 'boss_water_crab') {
+            this.fireCrabBossCone(scene, enemy);
+            return;
+        }
+        
+        // Default single projectile firing
         // Calculate direction to player
         const angleToPlayer = Math.atan2(
             player.y - enemy.y,
@@ -185,6 +193,73 @@ class ProjectileManager {
         projectile.spawnX = enemy.x;
         // Use config range if available, otherwise fallback to 800
         projectile.maxRange = PROJECTILE_CONFIG.enemy.sharkpedo?.range || 800;
+    }
+
+    /**
+     * Fire a cone of projectiles from the crab boss toward the player.
+     * Fires 5-7 projectiles at random angles within a 45-degree cone centered on the player.
+     * 
+     * @param scene - The Phaser scene to spawn projectiles in
+     * @param enemy - The crab boss enemy
+     */
+    private fireCrabBossCone(scene: Phaser.Scene, enemy: Enemy): void {
+        const player = gameState.player;
+        if (!player || !player.active) {
+            return;
+        }
+
+        // Calculate base angle to player
+        const baseAngleToPlayer = Math.atan2(
+            player.y - enemy.y,
+            player.x - enemy.x
+        );
+
+        // Cone spread: 45 degrees total (±22.5 degrees from center)
+        const coneHalfAngle = Math.PI / 8; // 22.5 degrees in radians
+
+        // Fire 5-7 projectiles in the burst
+        const projectileCount = Phaser.Math.Between(5, 7);
+        const speed = enemy.projectileSpeed || 200;
+
+        for (let i = 0; i < projectileCount; i++) {
+            // Random angle within the cone
+            const randomOffset = (Math.random() - 0.5) * 2 * coneHalfAngle; // Random between -coneHalfAngle and +coneHalfAngle
+            const projectileAngle = baseAngleToPlayer + randomOffset;
+
+            const velocityX = Math.cos(projectileAngle) * speed;
+            const velocityY = Math.sin(projectileAngle) * speed;
+
+            // Spawn projectile from enemy position
+            const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture!) as Projectile;
+            projectile.setOrigin(0.5, 0.5);
+            projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
+
+            // Scale projectile based on enemy scale
+            const enemyScale = enemy.scaleX || 1;
+            projectile.setScale(enemyScale * 0.3); // Smaller bubbles
+
+            // Rotate projectile to face direction
+            projectile.setRotation(projectileAngle);
+
+            gameState.projectiles?.add(projectile);
+            scene.physics.add.existing(projectile);
+
+            const body = projectile.body as Phaser.Physics.Arcade.Body;
+            body.setAllowGravity(false);
+            body.setBounce(0, 0);
+            body.setCollideWorldBounds(true);
+            body.setVelocity(velocityX, velocityY);
+
+            // Set damage
+            projectile.damage = enemy.projectileDamage || 10;
+
+            // Mark as enemy projectile
+            projectile.isEnemyProjectile = true;
+
+            // Track spawn position and max range
+            projectile.spawnX = enemy.x;
+            projectile.maxRange = PROJECTILE_CONFIG.enemy.sharkpedo?.range || 600; // Shorter range for bubbles
+        }
     }
 }
 

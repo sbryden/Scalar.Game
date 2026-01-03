@@ -53,6 +53,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('torpedo', '/Scalar.Game/torpedo.png');
         this.load.image('beam', '/Scalar.Game/beam.png');
         this.load.image('sharkpedo', '/Scalar.Game/sharkpedo.png');
+        this.load.image('bubble', '/Scalar.Game/bubble.png');
         
         // Load menu assets
         this.load.image('secure_robot', '/Scalar.Game/secure_robot.png');
