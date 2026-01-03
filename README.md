@@ -158,4 +158,4 @@ This project is open source. Check repository for license details.
 
 ---
 
-**Made with ❤️ using Phaser 3 and TypeScript**
+Made with passion using Phaser 3 and TypeScript
