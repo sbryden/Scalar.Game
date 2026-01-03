@@ -1,11 +1,12 @@
 /**
  * Player Stats System
- * Manages player health, XP, stamina, and leveling progression
+ * Manages player health, XP, stamina, fuel, and leveling progression
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/gameState';
-import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
+import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import type { PlayerStats, Difficulty } from '../types/game';
 
@@ -22,6 +23,9 @@ export class PlayerStatsSystem {
         // Initialize stamina system
         initializeStaminaSystem(STAMINA_CONFIG);
         
+        // Initialize fuel system
+        initializeFuelSystem(FUEL_CONFIG);
+        
         this.stats = {
             level: XP_CONFIG.progression.startingLevel,
             maxHealth: XP_CONFIG.progression.startingMaxHealth,
@@ -29,7 +33,9 @@ export class PlayerStatsSystem {
             xp: XP_CONFIG.progression.startingXP,
             xpToLevel: XP_CONFIG.progression.startingXPToLevel,
             stamina: STAMINA_CONFIG.startingStamina,
-            maxStamina: STAMINA_CONFIG.startingMaxStamina
+            maxStamina: STAMINA_CONFIG.startingMaxStamina,
+            fuel: FUEL_CONFIG.startingFuel,
+            maxFuel: FUEL_CONFIG.startingMaxFuel
         };
         this.difficulty = 'normal';
         this.onLevelUp = null;
@@ -81,6 +87,13 @@ export class PlayerStatsSystem {
         const staminaState = staminaSystem.getState();
         this.stats.stamina = staminaState.current;
         this.stats.maxStamina = staminaState.max;
+        
+        // Sync fuel values from fuel system
+        const fuelSystem = getFuelSystem();
+        const fuelState = fuelSystem.getState();
+        this.stats.fuel = fuelState.current;
+        this.stats.maxFuel = fuelState.max;
+        
         return this.stats;
     }
     
@@ -114,6 +127,10 @@ export class PlayerStatsSystem {
             // Increase max stamina on level up
             const staminaSystem = getStaminaSystem();
             staminaSystem.increaseMaxStamina(staminaSystem.getStaminaIncreasePerLevel());
+            
+            // Update fuel system player level for regeneration rate scaling
+            const fuelSystem = getFuelSystem();
+            fuelSystem.setPlayerLevel(this.stats.level);
             
             // Update level text UI
             if (gameState.levelText) {
@@ -174,12 +191,18 @@ export class PlayerStatsSystem {
             xp: XP_CONFIG.progression.startingXP,
             xpToLevel: XP_CONFIG.progression.startingXPToLevel,
             stamina: STAMINA_CONFIG.startingStamina,
-            maxStamina: STAMINA_CONFIG.startingMaxStamina
+            maxStamina: STAMINA_CONFIG.startingMaxStamina,
+            fuel: FUEL_CONFIG.startingFuel,
+            maxFuel: FUEL_CONFIG.startingMaxFuel
         };
         
         // Reset stamina system
         const staminaSystem = getStaminaSystem();
         staminaSystem.reset();
+        
+        // Reset fuel system
+        const fuelSystem = getFuelSystem();
+        fuelSystem.reset();
     }
     
     /**

@@ -11,6 +11,7 @@ import combatSystem from '../systems/CombatSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
+import { getFuelSystem } from '../systems/FuelSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
@@ -267,6 +268,10 @@ export default class MainGameScene extends Phaser.Scene {
         const staminaSystem = getStaminaSystem();
         const isMeleeActive = this.player?.isMeleeMode || false;
         staminaSystem.update(isMeleeActive, this.time.now);
+        
+        // Update fuel system
+        const fuelSystem = getFuelSystem();
+        fuelSystem.update(this.time.now);
         
         // Update debug display (only if enabled)
         if (this.debugDisplay?.enabled) {
