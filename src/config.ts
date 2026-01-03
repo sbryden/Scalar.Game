@@ -313,12 +313,14 @@ export const PLAYER_COMBAT_CONFIG = {
     // Melee attack mode configuration
     meleeModePlayerDamage: 15,        // Damage dealt to enemy in melee mode (3x base)
     passiveModePlayerDamage: 3,       // Damage dealt when moving toward enemy without melee mode
+    passiveModeVelocityBonusMultiplier: 0.5, // Passive mode gets 50% of velocity bonus compared to melee
     meleeModeDamageReduction: 0.25,   // Player takes 25% damage in melee mode
     requiredApproachSpeed: 50,        // Minimum velocity toward enemy for passive damage
     // Momentum-based damage
     velocityDamageMultiplier: 0.01,   // Damage bonus per unit of velocity (0.01 = +1 damage per 100 velocity)
     maxVelocityBonus: 10,             // Maximum bonus damage from velocity
     // Size/mass considerations
+    standardEnemyWidth: 30,           // Standard enemy width for size comparison calculations
     sizeAdvantageMultiplier: 1.3,     // Damage multiplier when attacking smaller enemies
     sizeDisadvantageMultiplier: 0.8,  // Damage multiplier when attacking larger enemies
     // Positioning bonuses
@@ -335,7 +337,8 @@ export const PLAYER_COMBAT_CONFIG = {
     microScaleMultiplier: 0.9,        // Slightly reduced ramming effectiveness at micro scale
     normalScaleMultiplier: 1.0,       // Normal ramming effectiveness
     // Knockback scaling
-    knockbackVelocityScaleFactor: 500 // Velocity at which knockback force doubles
+    knockbackVelocityScaleFactor: 500, // Velocity at which knockback force doubles
+    maxKnockbackMultiplier: 2.0       // Maximum knockback multiplier from velocity
 };
 
 // Projectile configuration
