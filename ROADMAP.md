@@ -1,415 +1,342 @@
 # Scalar Game - Development Roadmap
 
-This roadmap outlines the planned features and improvements for Scalar, a 2D side-scrolling game with dynamic size-shifting mechanics. The roadmap is organized into phases, with earlier phases being more concrete and later phases allowing for evolution based on gameplay testing and community feedback.
+This roadmap outlines future development for Scalar. For current features and implementation status, see [README.md](README.md).
+
+The roadmap is organized by feature area rather than timeline, allowing for flexible prioritization based on gameplay testing and community feedback.
 
 ---
 
-## ✅ Completed Features
+## 🎯 Core Mechanics Enhancements
 
-### Core Gameplay Foundation
-- ✅ Basic vehicle character movement and controls (land and underwater)
-- ✅ Physics-based gravity and collisions with Arcade physics
-- ✅ Camera system following the player with dynamic scaling
-- ✅ Size transformation mechanics (shrink/grow with Q/E keys)
-- ✅ Multiple environments: Land and Underwater levels with micro variants
-  - MainGameScene (land, normal scale)
-  - MicroScene (land, micro scale)
-  - UnderwaterScene (water, normal scale)
-  - UnderwaterMicroScene (water, micro scale)
-- ✅ Environment-specific mechanics (submarine vertical thrust with W/S controls)
-- ✅ Combat system with projectiles (F key to shoot)
-- ✅ Enemy AI with patrol and chase behaviors
-- ✅ Line of sight detection system with configurable ranges
-- ✅ Health and damage systems with visual feedback
-- ✅ XP orb collection with magnetization system
-- ✅ TypeScript architecture with modular managers and systems
+### Fuel System for Size Transformations
+**Priority: High**
+- Implement separate fuel system (distinct from stamina which is for melee)
+- 20-second cooldown for size transformations to start
+- Fuel regenerates over time (faster at higher levels)
+- Visual fuel bar in HUD
+- Prevent size changes when fuel depleted
+- Add warning indicators when fuel is low
 
-### Advanced Features Already Implemented
-- ✅ **Stamina System**: Full stamina management with recharge, consumption, exhaustion mechanics (currently used for melee mode - Shift key)
-- ✅ **Level Progression System**: Player leveling with XP requirements and stat increases
-- ✅ **Map Level System**: Progressive difficulty with level-based enemy scaling
-- ✅ **Difficulty Modes**: Normal, Hard, and God Mode with stat multipliers
-- ✅ **Main Menu**: Environment selection (Land/Water), difficulty dropdown, boss mode toggle
-- ✅ **HUD Display**: Health bar, XP bar, stamina bar, player level, map level indicators
-- ✅ **Boss Enemies**: Multiple boss types per environment with enhanced stats and abilities
-  - Land: boss_land, spawner_boss_land (spawns rock minions)
-  - Water: boss_water_swimming, boss_water_shark (ranged attacks), boss_water_crab
-  - Micro: boss_land_micro, boss_water_swimming_micro
-- ✅ **Enemy Variety by Scale**:
-  - Normal scale: generic land enemies, fish, crabs
-  - Micro scale: bacteria-like enemies, plankton, micro fish
-  - Boss variants for each scale and environment
-- ✅ **Scale-Based Scene Transitions**: Seamless transitions between normal and micro worlds
-- ✅ **Combat Feedback**: Camera shake, color flashes, health bars above enemies
-- ✅ **Level Stats Tracking**: Tracks enemies destroyed, bosses defeated, score calculation
-- ✅ **Level Complete Screen**: End-of-level summary with detailed statistics
+### 3-Tier Scale System (Macro Scale)
+**Priority: High**
+- Add macro (large) scale to existing micro/normal scales
+- Progressive scaling: micro → normal → macro (E key advances, Q key reverses)
+- Create 2 new scenes per biome:
+  - MainGameMacroScene (land, macro scale)
+  - UnderwaterMacroScene (water, macro scale)
+- Macro-scale enemies:
+  - Land: Giant golems, rock animals, massive wolves/bears
+  - Water: Whales, giant sharks, mythological sea creatures
+- Camera scaling adjustments for macro perspective
+- Visual continuity: use prior scale's ground texture as background
+- Ant-Man style transition animations (player shrinks, enemies appear to grow)
 
----
+### Vehicle Visual Progression
+**Priority: Medium**
+- Vehicle sprite variations based on player level
+- Start rusty and slow, evolve to high-tech and sleek
+- Visual upgrades at level milestones (5, 10, 15, 20, etc.)
+- Tie speed improvements to visual upgrades
+- Particle effects during transformation animations
+- Distinct visual states per upgrade tier
 
-## 🚀 Phase 1: Core Mechanics Enhancement (Near-Term)
-
-### Vehicle Transformation System
-- **Fuel System for Size Changes** (Separate from Stamina)
-  - ✅ Stamina system exists for melee mode
-  - Implement separate fuel system for size transformations
-  - Start with 20-second cooldown for size changes
-  - Add visual feedback when fuel is too low to transform
-  - Fuel regenerates over time (faster at higher levels)
-  - Display fuel bar in HUD alongside health/XP/stamina
-
-- **Visual Progression**
-  - Add vehicle sprite variations based on player level
-  - Transform from rusty, slow appearance to high-tech, sleek design
-  - Tie visual upgrades to level milestones (levels 5, 10, 15, etc.)
-  - Create distinct visual states for different upgrade tiers
-  - Add particle effects during transformation animations
-
-### Scale-Based World Interaction
-- **Macro Scale Implementation** (3-Tier System)
-  - Add macro (large) scale scenes for land and water environments
-  - Implement large-scale enemies (golems, whales, rock animals, mythological creatures)
-  - Create appropriate visual scaling when player is macro-sized
-  - Progressive scaling: micro → normal → macro (one stage at a time with E key)
-  - Add transition mechanics between all three scale tiers
-
-- **Scale Isolation Enhancement**
-  - ✅ Micro/normal scales already isolated via separate scenes
-  - ✅ Complete scene separation approach confirmed
-  - Add visual continuity: use prior scale's ground texture as background when shrinking
-  - Enhance scale transition with Ant-Man style scaling animations (player shrinks, enemies appear to grow)
-  - Add size-appropriate obstacles and terrain features per scale
-
-### Level Progression Enhancement (Far Future - Rough Concept)
-- **Level-Up Choice System**
-  - This is a far future item and not well defined yet
-  - Implement branching upgrade choices at level-up
-  - Add "grow OR shrink" upgrade path selection
-  - Create upgrade tree UI for size transformation capabilities
-  - Track player's chosen upgrade path for builds
-  - Balance different upgrade paths for viability
-  - Consider other upgrade choices (health, speed, damage)
+### Ramming/Melee Enhancements
+**Priority: High** (Core mechanic mostly implemented, needs polish)
+- Add vehicle-specific ramming abilities
+- Enhanced visual feedback for collision damage
+- Fine-tune damage balance
+- Momentum-based damage calculation
+- Better risk/reward mechanics
+- Polish melee mode visual effects
 
 ---
 
-## 🎮 Phase 2: Content Expansion (Mid-Term)
+## 🗺️ New Biome: Air Environment
 
-### Main Menu System
-- **Biome/Environment Selection**
-  - ✅ Environment selection exists (Land/Water)
-  - Environment/biome selection is the primary menu feature
-  - Vehicle types are tied to their respective biomes
-  - Save player's environment preference between sessions
+### Air Biome Foundation
+**Priority: High** - Major feature with multiple sub-features
+- Create 3 new scenes:
+  - AirScene (normal scale)
+  - AirMicroScene (micro scale)  
+  - AirMacroScene (macro scale)
+- Full X and Y directional movement (true flight)
+- Cloud-filled skybox with parallax layers
+- Rare glimpses of land (only at start)
+- Wind gust system affecting movement
+- Altitude-based physics
+- Fuel stall mechanic (plane drifts on wind when fuel depleted)
 
-- **Menu Features**
-  - ✅ Difficulty selection dropdown (Normal/Hard/God Mode)
-  - Add Easy and Brutal difficulty modes
-  - Rebalance Normal and Hard difficulties (currently too difficult)
-  - Add enemy density as key difficulty factor
-  - ✅ Boss Mode toggle checkbox
-  - Add "FIND" section (glossary/dictionary for game mechanics)
-  - Implement settings menu with sound/music volume controls
-  - Add key binding customization options
-  - God Mode will be hidden/removed in future (debug only)
+### Air Enemies
+- **Micro Scale**: Dragonfly-like bugs, small flying insects
+- **Normal Scale**: Eagles, hawks, large birds
+- **Macro Scale**: Dragons, phoenixes, wyverns, mythological flying creatures
+- Aerial boss encounters with dogfight mechanics
+- Vertical combat dynamics
 
-### Enemy Variety & Scale-Based Spawning
-- **Macro Scale Enemies** (Large/Giant) - *Requires Macro Scenes*
-  - Rock animals and geological creatures
-  - Mythological beasts (dragons, phoenixes, kraken)
-  - Large predators: whales, giant sharks, eagles
-  - Giant golems, bears, and wolves
-
-- **Normal Scale Enemies**
-  - ✅ Generic land enemies implemented
-  - ✅ Fish and crabs in underwater environments
-  - Add gunners with ranged attacks
-  - Add flying/aerial enemies for land scenes
-  - Add security/robot enemies with varied attack patterns
-
-- **Micro Scale Enemies**
-  - ✅ Bacteria-like enemies (micro, water_swimming_micro)
-  - ✅ Plankton in underwater micro
-  - Add ants and small insects for land micro
-  - Add various microorganism types with different behaviors
-  - Add cell-like enemies with division mechanics
-
-- **Boss Enhancements**
-  - ✅ Multiple boss types per environment
-  - ✅ Spawner boss that creates minions
-  - ✅ Shark boss with ranged torpedo attacks
-  - Add multi-phase boss fights
-  - Add boss-specific mechanics and attack patterns
-
-### Champion/Companion System
-- **Base Implementation**
-  - Champions are companions/buddies that fight alongside the player
-  - Specific to each biome (land, water, air)
-  - Only one champion active at a time
-  - Design companion AI and follow behavior
-  - Implement companion slot selection (details to be determined: at start or unlocked during gameplay)
-  - Add companion attack behaviors and cooldowns
-  - Create companion stat bonus system
-
-- **Land Champion: Mechanical Wolf**
-  - Create wolf sprite and animations
-  - Implement melee attack behavior
-  - Add digging mechanic for mounds of dirt/gravel
-  - Implement XP orb and parts discovery system
-  - Add defensive support abilities
-
-- **Water Champion: Mechanical Fish**
-  - Create mechanical fish sprite and animations
-  - Implement speed and oxygen/HP bonuses
-  - Add ranged attack behavior underwater
-  - Create critical hit spot highlighting system
-  - Add enhanced underwater maneuverability
-
-- **Air Champion: Mechanical Hawk**
-  - Design hawk sprite and aerial animations
-  - Implement fire rate and agility multipliers
-  - Create dive bomb attack mechanic
-  - Add aerial combat support behaviors
+### Air Environment Challenges
+- Wind current navigation
+- Altitude management
+- Fuel management specific to air biome
+- Aerial obstacle courses through clouds
+- Dive and climb mechanics
 
 ---
 
-## 🌍 Phase 3: Environment & Vehicle Expansion (Long-Term)
+## 🤖 Companion System (Champions)
 
-### Submarine/Underwater Environment Enhancements
-- **Deep Sea Mechanics**
-  - ✅ Vertical thrust controls (W/S) implemented
-  - ✅ Lighter gravity for underwater feel
-  - Add gradual downward drift mechanic
-  - Implement depth-based pressure system
-  - Create depth zones with varying difficulty
-  - Add oxygen/air bubble collection mechanics
+### Base Champion System
+**Priority: Medium**
+- Champions are AI companions that fight alongside player
+- Biome-specific (can't use water champion on land)
+- Only one champion active at a time
+- Champion AI: follow player, auto-attack enemies
+- Champion health and revival mechanics
+- Selection system (details to be determined: at start, unlocked, or collected)
 
-- **Underwater Obstacles & Navigation**
-  - ✅ Kelp and coral decorations exist
-  - Make kelp forests interactive (slow movement)
-  - Implement cave systems for micro-scale exploration
-  - Create underwater currents affecting movement
-  - Add submarine-specific hazards (mines, whirlpools)
-  - Improve vertical level design with depth layers
+### Land Champion: Mechanical Wolf
+- Wolf sprite and animations
+- Melee attack behavior
+- Digging mechanic: periodically digs mounds of dirt/gravel
+- Occasionally uncovers XP orbs or upgrade parts
+- Defensive support abilities
+- Howl ability to stun nearby enemies
 
-### Tank/Car Land Environment Enhancements
-- **Scale-Based Terrain**
-  - ✅ Basic platform navigation exists
-  - Add massive dirt and gravel mountains for micro scale
-  - Create climbable surfaces when small
-  - Add destructible terrain elements
-  - Implement terrain that changes with scale
-  - Add interactive environmental objects
+### Water Champion: Mechanical Fish
+- Mechanical fish sprite and animations
+- Stat bonuses: +speed, +oxygen/HP
+- Ranged attack behavior underwater
+- Highlights enemy weak points (critical hit system integration)
+- Enhanced maneuverability bonus in water
+- School mechanic: creates duplicate decoys
 
-- **Ramming/Melee Mechanic** (High Priority - Mostly Implemented)
-  - ✅ Ramming/melee mode implemented (Shift key)
-  - ✅ Uses stamina system
-  - Enhance vehicle-specific ramming abilities
-  - Add more visual feedback for collision damage
-  - Fine-tune damage balance for both player and enemy
-  - Add momentum-based damage calculation
-  - Create risk/reward for aggressive driving
-
-### Plane/Air Environment (New - Major Feature)
-- **Flight Mechanics**
-  - Create AirScene and AirMicroScene (and AirMacroScene for 3-tier system)
-  - Implement full X and Y directional movement
-  - Design cloud-filled skybox with parallax
-  - Add wind gust system affecting movement
-  - Implement altitude-based physics
-  - Create stall mechanic when out of fuel
-  - This is a major feature with multiple sub-features requiring further design
-
-- **Aerial Combat**
-  - Add dragonfly-like bugs at micro scale
-  - Create eagles and large birds at normal scale
-  - Design mythological flying creatures at macro scale (dragons, phoenixes, wyverns)
-  - Implement aerial boss encounters
-  - Add dogfight-style combat mechanics
-  - Create vertical combat dynamics
-
-- **Fuel Management**
-  - Separate fuel system for size transformations (shared across all biomes)
-  - Implement fuel depletion over time during flight (air-specific)
-  - Add stall state when fuel depleted
-  - Create wind drift mechanic when stalled
-  - Add fuel pickups or regeneration zones
-  - Balance fuel consumption with gameplay flow
+### Air Champion: Mechanical Hawk
+- Hawk sprite and aerial animations
+- Fire rate multiplier passive ability
+- Agility bonus for player
+- Dive bomb attack (massive damage on cooldown)
+- Scout ability: reveals nearby enemies
+- Wind riding: reduces fuel consumption
 
 ---
 
-## ⚙️ Phase 4: Systems & Polish (Future)
+## 🎮 Menu & Settings Enhancements
 
-### Advanced Combat Systems
-- **Critical Hit System**
-  - Implement weak point detection on enemies
-  - Add critical hit damage multipliers
-  - Visual feedback for critical strikes
-  - Champion abilities to highlight weak points
-  - Enemy-specific vulnerable zones
+### Difficulty System Overhaul
+**Priority: Medium**
+- Add Easy and Brutal difficulty modes (currently only Normal/Hard/God Mode)
+- Rebalance Normal and Hard (currently too difficult)
+- Enemy density as key difficulty factor
+- Difficulty-specific stat multipliers:
+  - Easy: One-shot most enemies, player advantages
+  - Normal: Balanced gameplay
+  - Hard: Fewer resources, tougher enemies
+  - Brutal: Extreme challenge, high risk/high reward
+- Hide/remove God Mode in production (keep for debugging)
 
-### Visual & Audio Enhancements
-- **Sound Design**
-  - Background music for each environment
-  - Sound effects for weapons and transformations
-  - Enemy-specific audio cues
-  - Ambient environmental sounds (waves, wind, etc.)
-  - Volume controls in settings menu
-  - Dynamic music that responds to combat intensity
-
-- **Visual Effects**
-  - ✅ Camera shake on combat impacts
-  - ✅ Color flash effects on damage
-  - Particle effects for size transformations
-  - Enhanced combat impact effects
-  - Environmental particle systems (dust, bubbles, clouds)
-  - Lighting and atmospheric effects
-  - Trail effects for projectiles and movement
-
-### User Interface Improvements
-- **HUD Enhancements**
-  - ✅ Health, XP, and stamina bars exist
-  - ✅ Level and map level display
-  - Add minimap showing nearby enemies and objectives
-  - Improve bar styling with gradients and animations
-  - Add active companion status indicator
-  - Display current environment and scale
-  - Add combo counter and damage numbers
-
-- **Progression Feedback**
-  - ✅ Level complete screen with statistics
-  - Add level-up animations and notifications
-  - Create upgrade selection screen UI
-  - Add stats comparison when choosing upgrades
-  - Implement achievement system with unlocks
-  - Add tutorial tips and hints system
+### Menu System Additions
+- **FIND Section**: Glossary/dictionary explaining game mechanics
+- **Settings Menu**: 
+  - Sound effects volume control
+  - Music volume control
+  - Key binding customization
+  - Graphics quality settings
+- **Stats Screen**: View overall player statistics
+- **Tutorial System**: Optional tutorial for new players
 
 ---
 
-## 🎯 Phase 5: Advanced Features (Aspirational)
+## 🏆 Progression & Meta-Game
 
-### Procedural Generation & Replayability
-- **Dynamic World Generation**
-  - ✅ Random segment density for enemy spawns
-  - Expand to procedurally generated terrain layouts
-  - Add randomized platform configurations
-  - Implement biome variety within environments
-  - Create unique runs with seed-based generation
-  - Add challenge modifiers and mutators
+### High Score System
+**Priority: Medium**
+- **Phase 1 - Local Storage**:
+  - Browser localStorage for high scores
+  - Track per difficulty and biome
+  - Display personal best on menu
+  - High score table in level complete screen
+  - Score breakdown by category
+- **Phase 2 - Cloud Integration**:
+  - Cloud-based storage
+  - Global leaderboards
+  - Friends leaderboards
+  - Cross-device persistence
+  - Social features
 
-### Boss Battles Enhancement
-- **Scale-Specific Bosses**
-  - ✅ Boss variants for land, water, and micro scales
-  - ✅ Spawner boss with minion mechanics
-  - ✅ Shark boss with ranged attacks
-  - Add macro bosses with massive health pools
-  - Create multi-phase boss transformations
-  - Add unique boss abilities per environment
-  - Implement boss-specific arena mechanics
-  - Create memorable boss encounters with patterns
+### Level Progression Choice System
+**Priority: Low** (Far future, rough concept)
+- Branching upgrade choices at level-up
+- "Grow path" vs "Shrink path" specializations
+- Upgrade tree UI
+- Persistent build tracking
+- Alternative: health/speed/damage upgrades
+- Requires significant design work
 
-### Progression & Unlocks
-- **High Score Tracking**
-  - **Phase 1 (Local)**: Implement browser localStorage for high scores
-    - Track high scores per difficulty and biome
-    - Display personal best on menu and level complete screen
-    - Add high score leaderboard UI
-  - **Phase 2 (Cloud)**: Migrate to cloud-based storage
-    - Global leaderboards across all players
-    - Persistent high scores across devices
-    - Social features and comparisons
-  
-- **Meta-Progression**
-  - Persistent upgrades between gameplay sessions
-  - Unlockable vehicles and champions
-  - Collectible parts for vehicle customization
-  - Achievement system with rewards
-  - Stat tracking across all runs
-  - Daily/weekly challenges
+### Meta-Progression
+**Priority: Low**
+- Persistent upgrades between runs
+- Unlockable vehicles and champions
+- Collectible vehicle parts for customization
+- Achievement system with rewards
+- Overall stat tracking across all sessions
+- Daily/weekly challenges
 
-### Multiplayer Considerations (Exploration)
-- **Cooperative Elements** (Potential)
+---
+
+## 💎 Content Expansion
+
+### Enemy Variety
+**Normal Scale:**
+- Gunners with ranged attacks
+- Flying enemies for land biome
+- Security robots with varied attack patterns
+- Elemental-themed enemies
+
+**Micro Scale:**
+- Ants and small insects for land
+- Various microorganism types
+- Cell-like enemies with division mechanics
+- Parasites that latch onto player
+
+**Macro Scale:**
+- All new enemy types for macro tier
+- Scale-appropriate behaviors
+- Massive hitboxes and health pools
+
+### Boss Battle Enhancements
+- Multi-phase boss transformations
+- Boss-specific arena mechanics  
+- Unique abilities per environment
+- Memorable attack patterns
+- Environmental interaction in boss fights
+- Mid-boss encounters
+
+### Environmental Features
+**Land Enhancements:**
+- Massive dirt/gravel mountains at micro scale
+- Climbable surfaces when small
+- Destructible terrain
+- Interactive environmental objects
+- Weather effects
+
+**Water Enhancements:**
+- Interactive kelp forests (slow movement)
+- Cave systems for micro exploration
+- Underwater currents
+- Depth-based pressure/darkness
+- Oxygen bubble collection
+- Submarine-specific hazards
+
+---
+
+## 🎨 Polish & Quality of Life
+
+### Visual Effects
+- Enhanced particle effects for size transformations
+- Combat impact effects
+- Environmental particles (dust, bubbles, clouds)
+- Improved screen shake and camera effects
+- Lighting and atmospheric effects
+- Weather systems per biome
+- Trail effects for projectiles
+
+### Audio System
+**Priority: Medium**
+- Background music for each biome
+- Dynamic music (combat vs exploration)
+- Sound effects for weapons and transformations
+- Enemy-specific audio
+- Ambient environmental sounds
+- Footstep/movement sounds
+- UI sound effects
+
+### UI/UX Improvements
+- Minimap showing nearby enemies and objectives
+- Enhanced health/stamina/fuel bar styling with animations
+- Damage numbers floating from enemies
+- Combo counter
+- Active champion status indicator
+- Environment and scale indicators
+- Better level-up notifications
+- Upgrade selection screen
+- Smooth transitions between screens
+
+### Critical Hit System
+- Implement weak point detection
+- Critical damage multipliers
+- Visual feedback for crits
+- Champion abilities to highlight weak points
+- Enemy-specific vulnerable zones
+
+---
+
+## 🌍 Advanced Features
+
+### Procedural Generation
+**Priority: Low**
+- Procedurally generated terrain layouts
+- Randomized platform configurations
+- Biome variety within environments
+- Seed-based generation for sharing
+- Challenge modifiers and mutators
+- Roguelike mode option
+
+### World Design
+- Multiple distinct levels per biome
+- Themed zones within biomes
+- Secret areas and hidden paths
+- Environmental storytelling
+- Boss arenas
+- Safe zones/checkpoints
+
+### Multiplayer (Exploration Phase)
+**Priority: Very Low** - Conceptual only
+- Co-op possibilities:
   - Shared world exploration
-  - Team-based size puzzles (one player micro, one macro)
+  - One player micro, one macro (size puzzles)
   - Combined champion abilities
-  - Competitive leaderboards and time trials
-  - Co-op boss battles
-  - PvP arena modes
+  - Boss raid encounters
+- Competitive modes:
+  - Time trials
+  - Score attack
+  - PvP arena
+  - Global leaderboards
 
 ---
 
-## 🔧 Technical Improvements (Ongoing)
+## 🔧 Technical Improvements
 
-### Code Architecture
-- Continued TypeScript type safety improvements
-- Performance optimization for large-scale battles
-- Better state management for complex interactions
-- Improved asset loading and management
+### Performance Optimization
+- Large-scale battle optimization
+- Asset loading improvements
+- Memory management
+- Sprite pooling
+- Efficient collision detection
 
-### Testing & Quality
-- Implement automated testing for core mechanics
-- Balance testing across difficulty modes
-- Cross-browser compatibility verification
-- Mobile control exploration
+### Code Quality
+- Expanded TypeScript typing
+- Better state management
+- Improved error handling
+- Code documentation
+- Unit tests for core mechanics
 
-### Documentation
-- Expand developer documentation
-- Create modding guidelines
-- Maintain updated CHANGELOG
-- Community contribution guidelines
+### Testing & Balance
+- Automated testing framework
+- Balance testing across difficulties
+- Cross-browser compatibility
+- Mobile control exploration (potential)
+- Playtesting feedback integration
 
 ---
 
 ## 📝 Notes
 
-- **Flexibility**: This roadmap is subject to change based on playtesting, technical constraints, and community feedback
-- **Prioritization**: Earlier phases are more concrete, later phases allow for creative evolution
-- **Iteration**: Features may be refined, combined, or reprioritized as development progresses
-- **Community**: We welcome feedback and suggestions for improving the game experience
-
----
-
-## ❓ Open Questions & Conflicts to Resolve
-
-This section identifies areas where the original design notes, current implementation, and roadmap have conflicts or ambiguities that need clarification:
-
-### 1. ✅ RESOLVED: Stamina System vs. Size Transformation
-**Resolution**: Separate fuel system for size transformations. Stamina remains for melee mode. Start with 20-second cooldown for size changes.
-
-### 2. ✅ RESOLVED: Vehicle Types vs. Environment Selection
-**Resolution**: Biome/environment selection is the key feature. Vehicles are tied to their respective biomes (tank for land, submarine for water, plane for air).
-
-### 3. ✅ RESOLVED: Macro Scale Implementation
-**Resolution**: Add third scale tier with progressive scaling: micro → normal → macro (one stage at a time). Current "normal" is the middle tier.
-
-### 4. ✅ RESOLVED: Scale Isolation vs. Visual Rendering
-**Resolution**: Complete scene separation is confirmed as the approach. Add visual continuity by using prior scale's ground texture as background. Future enhancement: Ant-Man style scaling animations.
-
-### 5. ✅ RESOLVED: Planet/World Size
-**Resolution**: Ignore "small planet" design notes. Continue with linear side-scrolling world design.
-
-### 6. ✅ RESOLVED: Champions
-**Resolution**: Champions are companions/buddies specific to each biome. Only one active at a time. Selection method TBD (at start or unlocked during gameplay).
-
-### 7. ✅ RESOLVED: Difficulty Settings
-**Resolution**: Implement Easy, Normal, Hard, Brutal, and God Mode. God Mode will be hidden/removed in future (debug only). Rebalance Normal and Hard (currently too difficult). Enemy density should be a key difficulty factor.
-
-### 8. Level Progression Choice System
-**Status**: Far future feature, not well defined yet. Rough concept for branching upgrade choices at level-up.
-
-**Remaining Questions**:
-- Should level-up present a choice between "improve grow ability" vs "improve shrink ability"?
-- Or should it be: "increase max size" vs "decrease min size" to expand range?
-- What specific benefits does each choice provide?
-- Should there be other upgrade choices (health, speed, damage)?
-
-### 9. ✅ RESOLVED: Ramming Mechanic
-**Resolution**: Ramming/melee mechanic is mostly implemented (Shift key with stamina). High priority to enhance with vehicle-specific abilities and better visual feedback.
-
-### 10. ✅ RESOLVED: Air Environment Priority
-**Resolution**: Air environment is a major feature with sub-features (TBD). Will have normal and micro scales (and macro once 3-tier system is implemented).
+- **Flexibility**: Priorities may shift based on playtesting and feedback
+- **Iteration**: Features may be refined or combined during development  
+- **Community**: Player feedback will influence feature prioritization
+- **Scope**: Some features (especially in Advanced) are aspirational
 
 ---
 
 **Last Updated**: January 2026
 
-For current development status, see the [README.md](README.md) file.
-For contribution guidelines, check the repository's contribution documentation.
+For current game features, see [README.md](README.md)
