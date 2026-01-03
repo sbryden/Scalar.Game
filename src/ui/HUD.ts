@@ -1,10 +1,11 @@
 /**
  * HUD (Heads-Up Display)
- * Manages health bar, XP bar, stamina bar, and level display
+ * Manages health bar, XP bar, stamina bar, fuel bar, and level display
  */
 import Phaser from 'phaser';
-import { STAMINA_UI_CONFIG } from '../config';
+import { STAMINA_UI_CONFIG, FUEL_UI_CONFIG } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import { getFuelSystem } from '../systems/FuelSystem';
 import type { PlayerStats } from '../types/game';
 
 export class HUD {
@@ -15,6 +16,9 @@ export class HUD {
     xpBarBackground: Phaser.GameObjects.Rectangle | null;
     staminaBar: Phaser.GameObjects.Rectangle | null;
     staminaBarBackground: Phaser.GameObjects.Rectangle | null;
+    fuelBar: Phaser.GameObjects.Rectangle | null;
+    fuelBarBackground: Phaser.GameObjects.Rectangle | null;
+    fuelCooldownText: Phaser.GameObjects.Text | null;
     levelText: Phaser.GameObjects.Text | null;
     mapLevelText: Phaser.GameObjects.Text | null;
     bossCountText: Phaser.GameObjects.Text | null;
@@ -27,6 +31,9 @@ export class HUD {
         this.xpBarBackground = null;
         this.staminaBar = null;
         this.staminaBarBackground = null;
+        this.fuelBar = null;
+        this.fuelBarBackground = null;
+        this.fuelCooldownText = null;
         this.levelText = null;
         this.mapLevelText = null;
         this.bossCountText = null;
@@ -41,6 +48,7 @@ export class HUD {
         const healthBarY = 30;
         const xpBarY = 50;
         const staminaBarY = 70;
+        const fuelBarY = 90;
         
         // Health bar
         this.healthBarBackground = this.scene.add.rectangle(barCenterX, healthBarY, barWidth, barHeight, 0x333333);
@@ -65,6 +73,24 @@ export class HUD {
         this.staminaBar.setDepth(1000);
         this.staminaBarBackground.setScrollFactor(0);
         this.staminaBar.setScrollFactor(0);
+        
+        // Fuel bar
+        this.fuelBarBackground = this.scene.add.rectangle(barCenterX, fuelBarY, barWidth, barHeight, 0x333333);
+        this.fuelBar = this.scene.add.rectangle(barCenterX, fuelBarY, barWidth, barHeight, FUEL_UI_CONFIG.colors.normal);
+        this.fuelBarBackground.setDepth(1000);
+        this.fuelBar.setDepth(1000);
+        this.fuelBarBackground.setScrollFactor(0);
+        this.fuelBar.setScrollFactor(0);
+        
+        // Fuel cooldown text (shown during initial cooldown)
+        this.fuelCooldownText = this.scene.add.text(barCenterX + 60, fuelBarY - 4, '', {
+            fontSize: '12px',
+            color: '#FFD700',
+            fontStyle: 'bold'
+        });
+        this.fuelCooldownText.setDepth(1000);
+        this.fuelCooldownText.setScrollFactor(0);
+        this.fuelCooldownText.setVisible(false);
         
         // Level text (player level)
         this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
@@ -97,7 +123,7 @@ export class HUD {
     }
     
     /**
-     * Update health, XP, and stamina bars based on player stats
+     * Update health, XP, stamina, and fuel bars based on player stats
      */
     update(playerStats: PlayerStats): void {
         const barWidth = 100;
@@ -127,6 +153,36 @@ export class HUD {
         } else {
             // Normal - blue
             this.staminaBar?.setFillStyle(STAMINA_UI_CONFIG.colors.normal);
+        }
+        
+        // Update fuel bar
+        const fuelPercent = playerStats.fuel / playerStats.maxFuel;
+        this.fuelBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.fuelBar?.setScale(fuelPercent, 1);
+        
+        // Get fuel system state for cooldown display
+        const fuelSystem = getFuelSystem();
+        const fuelState = fuelSystem.getState();
+        
+        // Show cooldown text if in initial cooldown
+        if (fuelState.initialCooldownRemaining > 0) {
+            const cooldownSeconds = fuelSystem.getInitialCooldownSeconds();
+            this.fuelCooldownText?.setText(`${cooldownSeconds}s`);
+            this.fuelCooldownText?.setVisible(true);
+        } else {
+            this.fuelCooldownText?.setVisible(false);
+        }
+        
+        // Color code fuel bar based on percentage
+        if (fuelPercent <= 0) {
+            // Depleted - red
+            this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.depleted);
+        } else if (fuelPercent <= 0.25) {
+            // Low fuel threshold - orange
+            this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.lowFuel);
+        } else {
+            // Normal - gold
+            this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.normal);
         }
         
         // Update map level text
@@ -161,6 +217,9 @@ export class HUD {
         if (this.xpBarBackground) this.xpBarBackground.destroy();
         if (this.staminaBar) this.staminaBar.destroy();
         if (this.staminaBarBackground) this.staminaBarBackground.destroy();
+        if (this.fuelBar) this.fuelBar.destroy();
+        if (this.fuelBarBackground) this.fuelBarBackground.destroy();
+        if (this.fuelCooldownText) this.fuelCooldownText.destroy();
         if (this.levelText) this.levelText.destroy();
         if (this.mapLevelText) this.mapLevelText.destroy();
         if (this.bossCountText) this.bossCountText.destroy();
