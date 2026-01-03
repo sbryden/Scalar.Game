@@ -4,7 +4,6 @@
  * Singleton pattern for consistent state management across the game.
  * 
  * Note: This module is legacy code. Modern UI is handled by HUD class in src/ui/HUD.ts.
- * This class-based refactor maintains backward compatibility.
  */
 import type { PlayerStats } from './types/game';
 
@@ -101,14 +100,4 @@ class UIManager {
 }
 
 // Export singleton instance
-const uiManager = new UIManager();
-export default uiManager;
-
-// Export legacy function-based API for backward compatibility
-export function createUIElements(scene: Phaser.Scene): UIElements {
-    return uiManager.createUIElements(scene);
-}
-
-export function updateUIBars(playerStats: PlayerStats): void {
-    uiManager.updateUIBars(playerStats);
-}
+export default new UIManager();
