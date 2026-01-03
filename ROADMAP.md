@@ -28,7 +28,7 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 - ✅ **Stamina System**: Full stamina management with recharge, consumption, exhaustion mechanics (currently used for melee mode - Shift key)
 - ✅ **Level Progression System**: Player leveling with XP requirements and stat increases
 - ✅ **Map Level System**: Progressive difficulty with level-based enemy scaling
-- ✅ **Difficulty Modes**: Normal, Hard, and God Mode with stat multipliers (design notes mention Easy/Medium/Hard)
+- ✅ **Difficulty Modes**: Normal, Hard, and God Mode with stat multipliers
 - ✅ **Main Menu**: Environment selection (Land/Water), difficulty dropdown, boss mode toggle
 - ✅ **HUD Display**: Health bar, XP bar, stamina bar, player level, map level indicators
 - ✅ **Boss Enemies**: Multiple boss types per environment with enhanced stats and abilities
@@ -97,7 +97,7 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Save player's vehicle preference between sessions
 
 - **Menu Features**
-  - ✅ Difficulty selection dropdown (Easy/Normal/Hard/God Mode)
+  - ✅ Difficulty selection dropdown (Normal/Hard/God Mode)
   - ✅ Boss Mode toggle checkbox
   - Add "FIND" section (glossary/dictionary for game mechanics)
   - Implement settings menu with sound/music volume controls
