@@ -49,12 +49,13 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 ## 🚀 Phase 1: Core Mechanics Enhancement (Near-Term)
 
 ### Vehicle Transformation System
-- **Stamina Integration with Size Changes**
-  - ✅ Stamina system exists but not yet tied to size transformation
-  - Connect stamina consumption to Q/E size change actions
-  - Scale stamina cost based on size change magnitude
-  - Add visual feedback when stamina is too low to transform
-  - Implement cooldown/penalty when attempting size change without stamina
+- **Fuel System for Size Changes** (Separate from Stamina)
+  - ✅ Stamina system exists for melee mode
+  - Implement separate fuel system for size transformations
+  - Start with 20-second cooldown for size changes
+  - Add visual feedback when fuel is too low to transform
+  - Fuel regenerates over time (faster at higher levels)
+  - Display fuel bar in HUD alongside health/XP/stamina
 
 - **Visual Progression**
   - Add vehicle sprite variations based on player level
@@ -64,44 +65,51 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Add particle effects during transformation animations
 
 ### Scale-Based World Interaction
-- **Macro Scale Implementation**
+- **Macro Scale Implementation** (3-Tier System)
   - Add macro (large) scale scenes for land and water environments
-  - Implement large-scale enemies (golems, whales, mythological creatures)
+  - Implement large-scale enemies (golems, whales, rock animals, mythological creatures)
   - Create appropriate visual scaling when player is macro-sized
-  - Add transition mechanics between normal ↔ macro scales
+  - Progressive scaling: micro → normal → macro (one stage at a time with E key)
+  - Add transition mechanics between all three scale tiers
 
 - **Scale Isolation Enhancement**
   - ✅ Micro/normal scales already isolated via separate scenes
-  - Improve visual distinction (blur/fade distant scale layers)
-  - Add size-appropriate obstacles and terrain features
-  - Enhance scale transition visual effects
+  - ✅ Complete scene separation approach confirmed
+  - Add visual continuity: use prior scale's ground texture as background when shrinking
+  - Enhance scale transition with Ant-Man style scaling animations (player shrinks, enemies appear to grow)
+  - Add size-appropriate obstacles and terrain features per scale
 
 ### Level Progression Enhancement
-- **Level-Up Choice System**
+- **Level-Up Choice System** (Far Future - Rough Concept)
   - Implement branching upgrade choices at level-up
   - Add "grow OR shrink" upgrade path selection
   - Create upgrade tree UI for size transformation capabilities
   - Track player's chosen upgrade path for builds
   - Balance different upgrade paths for viability
+  - Consider other upgrade choices (health, speed, damage)
+  - This is a far future item and not well defined yet
 
 ---
 
 ## 🎮 Phase 2: Content Expansion (Mid-Term)
 
 ### Main Menu System
-- **Vehicle Selection**
+- **Biome/Environment Selection**
   - ✅ Environment selection exists (Land/Water)
-  - Add vehicle type selection: Tank/Car, Submarine, Plane/Air
-  - Create unique starting stats for each vehicle type
-  - Add vehicle preview/description in menu
-  - Save player's vehicle preference between sessions
+  - Environment/biome selection is the primary menu feature
+  - Vehicle types are tied to their respective biomes
+  - Save player's environment preference between sessions
 
 - **Menu Features**
   - ✅ Difficulty selection dropdown (Normal/Hard/God Mode)
+  - Add Easy and Brutal difficulty modes
+  - Rebalance Normal and Hard difficulties (currently too difficult)
+  - Add enemy density as key difficulty factor
   - ✅ Boss Mode toggle checkbox
   - Add "FIND" section (glossary/dictionary for game mechanics)
   - Implement settings menu with sound/music volume controls
   - Add key binding customization options
+  - God Mode will be hidden/removed in future (debug only)
 
 ### Enemy Variety & Scale-Based Spawning
 - **Macro Scale Enemies** (Large/Giant) - *Requires Macro Scenes*
@@ -133,27 +141,29 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 
 ### Champion/Companion System
 - **Base Implementation**
+  - Champions are companions/buddies that fight alongside the player
+  - Specific to each biome (land, water, air)
+  - Only one champion active at a time
   - Design companion AI and follow behavior
-  - Implement companion slot selection UI
+  - Implement companion slot selection (TBD: at start or unlocked during gameplay)
   - Add companion attack behaviors and cooldowns
   - Create companion stat bonus system
-  - Add companion leveling/upgrade mechanics
 
-- **Tank/Car Champion: Mechanical Wolf**
+- **Land Champion: Mechanical Wolf**
   - Create wolf sprite and animations
   - Implement melee attack behavior
   - Add digging mechanic for mounds of dirt/gravel
   - Implement XP orb and parts discovery system
   - Add defensive support abilities
 
-- **Submarine Champion: Mechanical Fish**
+- **Water Champion: Mechanical Fish**
   - Create mechanical fish sprite and animations
   - Implement speed and oxygen/HP bonuses
   - Add ranged attack behavior underwater
   - Create critical hit spot highlighting system
   - Add enhanced underwater maneuverability
 
-- **Plane Champion: Mechanical Hawk**
+- **Air Champion: Mechanical Hawk**
   - Design hawk sprite and aerial animations
   - Implement fire rate and agility multipliers
   - Create dive bomb attack mechanic
@@ -189,34 +199,36 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Implement terrain that changes with scale
   - Add interactive environmental objects
 
-- **Ramming Mechanic**
-  - Implement vehicle collision damage
-  - Deal damage to both player and enemy on ram
+- **Ramming/Melee Mechanic** (High Priority - Mostly Implemented)
+  - ✅ Ramming/melee mode implemented (Shift key)
+  - ✅ Uses stamina system
+  - Enhance vehicle-specific ramming abilities
+  - Add more visual feedback for collision damage
+  - Fine-tune damage balance for both player and enemy
   - Add momentum-based damage calculation
   - Create risk/reward for aggressive driving
-  - Add knockback effects and visual feedback
-  - Integrate with stamina system (cost to ram)
 
-### Plane/Air Environment (New)
+### Plane/Air Environment (New - Major Feature)
 - **Flight Mechanics**
-  - Create AirScene and AirMicroScene
+  - Create AirScene and AirMicroScene (and AirMacroScene for 3-tier system)
   - Implement full X and Y directional movement
   - Design cloud-filled skybox with parallax
   - Add wind gust system affecting movement
   - Implement altitude-based physics
-  - Create stall mechanic when out of fuel/stamina
+  - Create stall mechanic when out of fuel
+  - This is a major feature with multiple sub-features (TBD)
 
 - **Aerial Combat**
   - Add dragonfly-like bugs at micro scale
   - Create eagles and large birds at normal scale
-  - Design mythological flying creatures (dragons, phoenixes, wyverns)
+  - Design mythological flying creatures at macro scale (dragons, phoenixes, wyverns)
   - Implement aerial boss encounters
   - Add dogfight-style combat mechanics
   - Create vertical combat dynamics
 
 - **Fuel Management**
-  - Tie fuel to existing stamina system
-  - Implement fuel depletion over time during flight
+  - Separate fuel system for size transformations (shared across all biomes)
+  - Implement fuel depletion over time during flight (air-specific)
   - Add stall state when fuel depleted
   - Create wind drift mechanic when stalled
   - Add fuel pickups or regeneration zones
@@ -295,13 +307,19 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
   - Create memorable boss encounters with patterns
 
 ### Progression & Unlocks
+- **High Score Tracking**
+  - Implement local high score storage (browser localStorage)
+  - Track high scores per difficulty and biome
+  - Display personal best on menu and level complete screen
+  - Add high score leaderboard UI
+  - Future: Cloud-based high score storage and global leaderboards
+  
 - **Meta-Progression**
   - Persistent upgrades between gameplay sessions
   - Unlockable vehicles and champions
   - Collectible parts for vehicle customization
   - Achievement system with rewards
   - Stat tracking across all runs
-  - Leaderboards for high scores
   - Daily/weekly challenges
 
 ### Multiplayer Considerations (Exploration)
@@ -350,93 +368,41 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 
 This section identifies areas where the original design notes, current implementation, and roadmap have conflicts or ambiguities that need clarification:
 
-### 1. Stamina System vs. Size Transformation
-**Conflict**: The design notes state "When the vehicle transforms (small to big or big to small) some stamina or fuel is depleted." However, the current implementation has a stamina system that manages melee mode (Shift key for close-range combat with blue tint) but is NOT connected to size transformation (Q/E keys work without stamina cost).
+### 1. ✅ RESOLVED: Stamina System vs. Size Transformation
+**Resolution**: Separate fuel system for size transformations. Stamina remains for melee mode. Start with 20-second cooldown for size changes.
 
-**Questions**:
-- Should stamina consumption be added to size transformations in addition to melee mode?
-- Should there be a separate "fuel" system for transformations vs. "stamina" for melee combat?
-- What should be the stamina/fuel cost per transformation? Fixed amount or scale-based?
-- Should melee mode continue to use stamina, or be reworked?
+### 2. ✅ RESOLVED: Vehicle Types vs. Environment Selection
+**Resolution**: Biome/environment selection is the key feature. Vehicles are tied to their respective biomes (tank for land, submarine for water, plane for air).
 
-### 2. Vehicle Types vs. Environment Selection
-**Conflict**: The design notes mention three distinct vehicle types (Tank/Car, Submarine, Plane), but the current implementation has environment selection (Land/Water) where the same player sprite works in all environments.
+### 3. ✅ RESOLVED: Macro Scale Implementation
+**Resolution**: Add third scale tier with progressive scaling: micro → normal → macro (one stage at a time). Current "normal" is the middle tier.
 
-**Questions**:
-- Should vehicle selection replace environment selection, or coexist with it?
-- Should each vehicle be locked to its environment (tank=land only, submarine=water only)?
-- Or should vehicles be cosmetic/stat variants that work in any environment?
-- Does the current tank sprite represent all vehicle types, or should there be distinct sprites?
+### 4. ✅ RESOLVED: Scale Isolation vs. Visual Rendering
+**Resolution**: Complete scene separation is confirmed as the approach. Add visual continuity by using prior scale's ground texture as background. Future enhancement: Ant-Man style scaling animations.
 
-### 3. Macro Scale Implementation
-**Conflict**: The design notes mention macro scale enemies (rock animals, golems, whales) when player is "big", but the current implementation only has "normal" and "micro" scales, no "macro/large" scale.
+### 5. ✅ RESOLVED: Planet/World Size
+**Resolution**: Ignore "small planet" design notes. Continue with linear side-scrolling world design.
 
-**Questions**:
-- Should we add a third scale tier (micro → normal → macro)?
-- Or is "normal" meant to be the "macro" relative to micro?
-- Should growing (E key) go: micro → normal → macro, or just micro ↔ normal?
-- What enemies should exist at each scale tier?
+### 6. ✅ RESOLVED: Champions
+**Resolution**: Champions are companions/buddies specific to each biome. Only one active at a time. Selection method TBD (at start or unlocked during gameplay).
 
-### 4. Scale Isolation vs. Visual Rendering
-**Conflict**: Design notes say "When in macro world you can barely see the micro world. Micro realm is not affected by the Macro sized player or monsters." Current implementation uses separate scenes for scale separation.
-
-**Questions**:
-- Is complete scene separation the right approach, or should scales coexist in one scene with layers?
-- Should there be visual rendering of other scales (blurred/faded) or complete separation?
-- How do we handle the transition between scales visually?
-
-### 5. Planet/World Size
-**Conflict**: Design notes mention "Small planet" but implementation has fixed-width world (8192 pixels) with linear side-scrolling, not a planet.
-
-**Questions**:
-- Should the world wrap around (simulate a small planet)?
-- Or is "small planet" just thematic flavor for the linear level design?
-- Should we add circular/spherical world mechanics in the future?
-
-### 6. Champions vs. Current Implementation
-**Conflict**: Design notes describe champions (Mechanical Wolf, Fish, Hawk) with specific abilities, but none are implemented yet.
-
-**Questions**:
-- Should champions be companions that follow the player, or power-ups?
-- Should each vehicle type have a unique champion, or can any champion work with any vehicle?
-- Are champions selected at start or unlocked/collected during gameplay?
-- Should there be multiple champion slots or just one active companion?
-
-### 7. Difficulty Settings Discrepancy
-**Conflict**: Design notes describe three difficulties (Easy, Medium, Hard), but implementation has three modes: Normal, Hard, and God Mode.
-
-**Questions**:
-- Should "Normal" be renamed to "Medium" to match design notes?
-- Should "Easy" difficulty be added as a fourth option?
-- Or should design notes be updated to reflect Normal/Hard/God Mode as the intended difficulties?
-- Is "God Mode" meant to be a debug/accessibility option or a legitimate difficulty tier?
-- Do the Normal/Hard difficulty multipliers match the intended design (easy = one-shot enemies)?
+### 7. ✅ RESOLVED: Difficulty Settings
+**Resolution**: Implement Easy, Normal, Hard, Brutal, and God Mode. God Mode will be hidden/removed in future (debug only). Rebalance Normal and Hard (currently too difficult). Enemy density should be a key difficulty factor.
 
 ### 8. Level Progression Choice System
-**Conflict**: Design notes say "player levels up and has a choice to grow or shrink more" suggesting a choice at each level-up, but current implementation has automatic stat increases.
+**Status**: Far future feature, not well defined yet. Rough concept for branching upgrade choices at level-up.
 
-**Questions**:
+**Remaining Questions**:
 - Should level-up present a choice between "improve grow ability" vs "improve shrink ability"?
 - Or should it be: "increase max size" vs "decrease min size" to expand range?
 - What specific benefits does each choice provide?
 - Should there be other upgrade choices (health, speed, damage)?
 
-### 9. Ramming Mechanic Scope
-**Conflict**: Design notes mention ramming for Tank/Car specifically: "Can ram/drive through the monster dealing small damage to both the player and the monster." Not implemented yet.
+### 9. ✅ RESOLVED: Ramming Mechanic
+**Resolution**: Ramming/melee mechanic is mostly implemented (Shift key with stamina). High priority to enhance with vehicle-specific abilities and better visual feedback.
 
-**Questions**:
-- Should ramming be exclusive to Tank/Car vehicle type?
-- Or should all vehicles have some form of collision damage?
-- Should ramming be automatic on collision or require a special input/state?
-- How does ramming interact with the stamina system?
-
-### 10. Air Environment Priority
-**Conflict**: Design notes describe Plane/Air environment in detail, but current implementation only has Land and Water. Menu says "Air environment coming soon!"
-
-**Questions**:
-- What's the priority for implementing Air environment (Phase 3)?
-- Should Air environment be added before or after other Phase 2 features?
-- Will Air environment have both normal and micro scales like Land/Water?
+### 10. ✅ RESOLVED: Air Environment Priority
+**Resolution**: Air environment is a major feature with sub-features (TBD). Will have normal and micro scales (and macro once 3-tier system is implemented).
 
 ---
 
