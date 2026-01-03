@@ -110,6 +110,130 @@ export class CombatSystem {
     }
     
     /**
+     * Calculate player velocity magnitude
+     */
+    private getPlayerVelocityMagnitude(player: Player): number {
+        if (!player.body) return 0;
+        
+        const vx = player.body.velocity.x;
+        const vy = player.body.velocity.y;
+        return Math.sqrt(vx * vx + vy * vy);
+    }
+    
+    /**
+     * Calculate attack angle and determine positioning bonus
+     * Returns multiplier based on attack angle (flanking, head-on, rear)
+     */
+    private getPositioningMultiplier(player: Player, enemy: Enemy): number {
+        if (!player.body) return 1.0;
+        
+        // Calculate direction vectors
+        const playerToEnemy = {
+            x: enemy.x - player.x,
+            y: enemy.y - player.y
+        };
+        
+        // Get player velocity (attack direction)
+        const playerVelocity = {
+            x: player.body.velocity.x,
+            y: player.body.velocity.y
+        };
+        
+        // Normalize vectors
+        const pteLen = Math.sqrt(playerToEnemy.x * playerToEnemy.x + playerToEnemy.y * playerToEnemy.y);
+        const pvLen = Math.sqrt(playerVelocity.x * playerVelocity.x + playerVelocity.y * playerVelocity.y);
+        
+        if (pteLen === 0 || pvLen === 0) return 1.0;
+        
+        const pteDirX = playerToEnemy.x / pteLen;
+        const pteDirY = playerToEnemy.y / pteLen;
+        const pvDirX = playerVelocity.x / pvLen;
+        const pvDirY = playerVelocity.y / pvLen;
+        
+        // Calculate dot product to get angle alignment
+        const dotProduct = pteDirX * pvDirX + pteDirY * pvDirY;
+        
+        // Calculate perpendicular component (for flanking detection)
+        const perpDot = Math.abs(pteDirX * pvDirY - pteDirY * pvDirX);
+        
+        // Determine attack type based on angle
+        const angleThresholdRad = (PLAYER_COMBAT_CONFIG.flankingAngleThreshold * Math.PI) / 180;
+        
+        // Head-on attack: moving directly toward enemy (high dot product, low perpendicular)
+        if (dotProduct > 0.8) {
+            return PLAYER_COMBAT_CONFIG.headOnBonusMultiplier;
+        }
+        
+        // Flanking attack: hitting from the side (perpendicular approach)
+        if (perpDot > Math.sin(angleThresholdRad) && dotProduct > 0) {
+            return PLAYER_COMBAT_CONFIG.flankingBonusMultiplier;
+        }
+        
+        // Rear attack: moving away or very oblique angle (less effective but safer)
+        if (dotProduct < 0) {
+            return PLAYER_COMBAT_CONFIG.rearAttackMultiplier;
+        }
+        
+        // Normal attack (no special positioning)
+        return 1.0;
+    }
+    
+    /**
+     * Calculate size-based damage multiplier
+     */
+    private getSizeMultiplier(playerScale: number, enemyWidth: number): number {
+        // Approximate enemy scale based on width (30 is standard enemy width)
+        const standardEnemyWidth = 30;
+        const enemyScale = enemyWidth / standardEnemyWidth;
+        
+        // Compare player scale to enemy scale
+        if (playerScale > enemyScale * 1.2) {
+            // Player significantly larger - size advantage
+            return PLAYER_COMBAT_CONFIG.sizeAdvantageMultiplier;
+        } else if (playerScale < enemyScale * 0.8) {
+            // Player significantly smaller - size disadvantage
+            return PLAYER_COMBAT_CONFIG.sizeDisadvantageMultiplier;
+        }
+        
+        // Similar size - no modifier
+        return 1.0;
+    }
+    
+    /**
+     * Update combo state and get combo multiplier
+     */
+    private getComboMultiplier(player: Player, gameTime: number): number {
+        // Initialize combo tracking if needed
+        if (player.comboCount === undefined) {
+            player.comboCount = 0;
+        }
+        if (player.lastComboHitTime === undefined) {
+            player.lastComboHitTime = 0;
+        }
+        
+        // Check if combo has expired
+        if (gameTime - player.lastComboHitTime > PLAYER_COMBAT_CONFIG.comboTimeWindow) {
+            player.comboCount = 0;
+        }
+        
+        // Increment combo
+        player.comboCount++;
+        player.lastComboHitTime = gameTime;
+        
+        // Calculate combo multiplier (capped at max)
+        const comboBonus = 1 + (player.comboCount - 1) * PLAYER_COMBAT_CONFIG.comboDamageBonus;
+        return Math.min(comboBonus, PLAYER_COMBAT_CONFIG.maxComboMultiplier);
+    }
+    
+    /**
+     * Reset combo when player takes damage
+     */
+    resetCombo(player: Player): void {
+        player.comboCount = 0;
+        player.lastComboHitTime = 0;
+    }
+    
+    /**
      * Apply damage to an enemy from a projectile
      */
     damageEnemy(projectile: Projectile, enemy: Enemy): void {
@@ -206,6 +330,9 @@ export class CombatSystem {
             this.damagePlayer(damageToPlayer);
             enemy.lastDamageTime = gameTime;
             
+            // Reset combo when taking damage
+            this.resetCombo(player);
+            
             // Visual feedback: flash player red and shake camera
             // Don't override melee mode tint if active
             if (!player.isMeleeMode) {
@@ -230,15 +357,53 @@ export class CombatSystem {
             if (playerStatsSystem.isGodMode()) {
                 playerDamage = COMBAT_CONFIG.godMode.damage;
             } else if (player.isMeleeMode) {
-                // Player in melee mode - deals full melee damage
+                // Player in melee mode - deals full melee damage with enhancements
                 playerDamage = PLAYER_COMBAT_CONFIG.meleeModePlayerDamage;
+                
+                // Apply momentum bonus
+                const velocity = this.getPlayerVelocityMagnitude(player);
+                const velocityBonus = Math.min(
+                    velocity * PLAYER_COMBAT_CONFIG.velocityDamageMultiplier,
+                    PLAYER_COMBAT_CONFIG.maxVelocityBonus
+                );
+                playerDamage += velocityBonus;
+                
+                // Apply positioning multiplier
+                const positioningMult = this.getPositioningMultiplier(player, enemy);
+                playerDamage *= positioningMult;
+                
+                // Apply size multiplier
+                const sizeMultiplier = this.getSizeMultiplier(player.scaleX, enemy.width);
+                playerDamage *= sizeMultiplier;
+                
+                // Apply combo multiplier
+                const comboMultiplier = this.getComboMultiplier(player, gameTime);
+                playerDamage *= comboMultiplier;
+                
+                // Apply scale-based multiplier (micro vs normal)
+                const scaleMultiplier = gameState.playerSize === 'small' 
+                    ? PLAYER_COMBAT_CONFIG.microScaleMultiplier 
+                    : PLAYER_COMBAT_CONFIG.normalScaleMultiplier;
+                playerDamage *= scaleMultiplier;
+                
             } else if (this.isPlayerMovingTowardEnemy(player, enemy)) {
                 // Player moving toward enemy without melee mode - deals partial damage
                 playerDamage = PLAYER_COMBAT_CONFIG.passiveModePlayerDamage;
+                
+                // Apply minimal momentum bonus for passive mode
+                const velocity = this.getPlayerVelocityMagnitude(player);
+                const velocityBonus = Math.min(
+                    velocity * PLAYER_COMBAT_CONFIG.velocityDamageMultiplier * 0.5,
+                    PLAYER_COMBAT_CONFIG.maxVelocityBonus * 0.5
+                );
+                playerDamage += velocityBonus;
             }
             // else: Player moving away or stationary - deals no damage
             
             if (playerDamage > 0) {
+                // Round damage for cleaner values
+                playerDamage = Math.round(playerDamage);
+                
                 enemy.health -= playerDamage;
                 enemy.lastPlayerDamageTime = gameTime;
                 
@@ -252,6 +417,27 @@ export class CombatSystem {
                         enemy.clearTint();
                     }
                 });
+                
+                // Enhanced camera shake based on damage dealt
+                const baseShakeIntensity = player.isMeleeMode ? COMBAT_CONFIG.visual.cameraShakeIntensityMelee : COMBAT_CONFIG.visual.cameraShakeIntensityNormal;
+                const damageShakeBonus = playerDamage * COMBAT_CONFIG.visual.cameraShakeIntensityPerDamage;
+                const totalShakeIntensity = Math.min(
+                    baseShakeIntensity + damageShakeBonus,
+                    COMBAT_CONFIG.visual.cameraShakeMaxIntensity
+                );
+                enemy.scene.cameras.main.shake(COMBAT_CONFIG.visual.cameraShakeDuration, totalShakeIntensity);
+                
+                // Impact flash for high damage hits (>= 25 damage)
+                if (playerDamage >= 25) {
+                    player.setTint(COMBAT_CONFIG.visual.impactFlashColor);
+                    enemy.scene.time.delayedCall(COMBAT_CONFIG.visual.impactFlashDuration, () => {
+                        if (player.active && player.isMeleeMode) {
+                            player.setTint(COMBAT_CONFIG.visual.meleeModeTintColor);
+                        } else if (player.active) {
+                            player.clearTint();
+                        }
+                    });
+                }
                 
                 // Check if enemy died from collision
                 if (enemy.health <= 0) {
@@ -288,7 +474,7 @@ export class CombatSystem {
     }
     
     /**
-     * Apply knockback force to enemy based on player position
+     * Apply knockback force to enemy based on player position and momentum
      */
     applyEnemyKnockback(player: Player, enemy: Enemy): void {
         // Calculate direction from player to enemy
@@ -297,8 +483,16 @@ export class CombatSystem {
         // Get knockback resistance (0 = immune, 1 = normal, >1 = more knockback)
         const resistance = enemy.knockbackResistance || 1.0;
         
-        // Apply knockback force
-        const knockbackForce = PLAYER_COMBAT_CONFIG.baseKnockbackForce * resistance;
+        // Base knockback force
+        let knockbackForce = PLAYER_COMBAT_CONFIG.baseKnockbackForce * resistance;
+        
+        // Scale knockback with player velocity in melee mode
+        if (player.isMeleeMode && player.body) {
+            const velocity = this.getPlayerVelocityMagnitude(player);
+            const velocityMultiplier = 1 + (velocity / 500); // +1x force at 500 velocity
+            knockbackForce *= Math.min(velocityMultiplier, 2.0); // Cap at 2x
+        }
+        
         const knockbackX = Math.cos(angle) * knockbackForce;
         const knockbackY = Math.sin(angle) * knockbackForce;
         
@@ -330,7 +524,7 @@ export class CombatSystem {
             player.scene.time.delayedCall(100, () => {
                 if (player.active && player.isMeleeMode) {
                     // Restore melee mode tint
-                    player.setTint(0x00FF00);
+                    player.setTint(COMBAT_CONFIG.visual.meleeModeTintColor);
                 }
             });
             return;

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import projectileManager from './ProjectileManager';
-import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
@@ -119,8 +119,8 @@ export class InputManager {
         
         // Visual feedback when entering/exiting melee mode
         if (gameState.player.isMeleeMode && !wasMeleeMode) {
-            // Entering melee mode - add blue tint
-            gameState.player.setTint(0x88ccff);
+            // Entering melee mode - add enhanced melee tint
+            gameState.player.setTint(COMBAT_CONFIG.visual.meleeModeTintColor);
         } else if (!gameState.player.isMeleeMode && wasMeleeMode) {
             // Exiting melee mode - check if due to exhaustion
             const staminaState = staminaSystem.getState();
