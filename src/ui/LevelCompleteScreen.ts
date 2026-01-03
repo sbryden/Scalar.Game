@@ -97,10 +97,10 @@ export class LevelCompleteScreen {
         // Create message text
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
-            this.scene.cameras.main.height - 120,
+            this.scene.cameras.main.height - 140,
             'Press N for Next Level\nPress R to Replay\nPress E to Exit to Main Menu',
             {
-                fontSize: '28px',
+                fontSize: '26px',
                 color: '#FFFFFF',
                 fontStyle: 'bold',
                 align: 'center',
