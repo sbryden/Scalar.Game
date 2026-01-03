@@ -376,7 +376,7 @@ export const COMBAT_CONFIG = {
         cameraShakeMaxIntensity: 0.015, // Maximum camera shake intensity
         impactFlashDuration: 150, // Duration of impact flash effect (ms)
         impactFlashDamageThreshold: 25, // Minimum damage to trigger impact flash effect
-        meleeModeTintColor: 0x00FF88, // Tint color for melee mode (green-cyan aura)
+        meleeModeTintColor: 0x88ccff, // Tint color for melee mode (blue aura)
         impactFlashColor: 0xFFFFFF // Flash color on high-damage impacts
     },
     stun: {
