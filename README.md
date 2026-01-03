@@ -1,55 +1,47 @@
 # Scalar
 
-A fun, interactive side-scrolling game built with **Phaser 3** and powered by **Vite**. Control a character with size-shifting abilities, navigate platforms, and experience dynamic gravity-based gameplay.
+A 2D side-scrolling action game built with **Phaser 3** and **TypeScript**. Master dynamic size-shifting mechanics to battle scale-specific enemies across land and underwater environments!
 
 ## Overview
 
-Scalar is a classic 2D side-scroller where you control a vehicle navigating through diverse environments. With dynamic size-shifting mechanics, physics-based combat, and intelligent enemy AI, experience evolving gameplay as you explore land and underwater worlds. Enemies patrol their territories but will aggressively chase you when provoked!
+Scalar is a physics-based side-scroller where you control a vehicle with the unique ability to shrink and grow. Navigate through two distinct biomes (Land and Underwater), each with normal and micro scale variants. Face off against intelligent enemies that patrol, chase, and attack using line-of-sight detection. Progress through map levels, defeat bosses, collect XP orbs, and level up your character in this evolving adventure!
 
-## Features
+## ✨ Key Features
 
-✨ **Core Gameplay**
-- Smooth character movement and jumping
-- Physics-based gravity and collisions
-- Responsive camera system that follows the player
-- Static platforms for navigation
-- **Multiple environments**: Land and Underwater levels
-- **Environment-specific mechanics**: Submarine controls with vertical thrust in water
-- **Enemy AI with Chase System**: Enemies patrol areas but will chase and attack when player enters their line of sight
-- **Combat System**: Shoot projectiles to damage enemies and trigger chase behavior
+### 🎮 **Core Gameplay**
+- **Size-Shifting Mechanics**: Shrink and grow between normal and micro scales (Q/E keys)
+- **Two Complete Biomes**: 
+  - 🌳 **Land Environment** with jumping mechanics
+  - 🌊 **Underwater Environment** with submarine-style vertical thrust controls
+- **4 Unique Scenes**: Each biome has normal and micro scale variants with distinct enemies
+- **Melee Combat System**: Hold Shift for close-range attacks with stamina management
+- **Projectile Combat**: Shoot enemies with F key (slower projectiles underwater)
+- **Smooth Physics**: Arcade physics with environment-specific gravity
 
-⚙️ **Technical Stack**
-- Phaser 3 game framework
-- TypeScript for type safety and better architecture
-- Vite build tool for fast development
-- Arcade physics engine
-- Modular architecture with managers and systems
-
-🌊 **Underwater Level**
-- Lighter gravity physics for underwater feel
-- Submarine-style controls with vertical thrust (W/S or Up/Down for depth control)
-- Swimming fish enemies (80%) that float freely
-- Ground-based crab enemies (20%) that walk and jump
-- Slower projectile speed underwater
-- XP orbs float instead of falling
-- Microscopic plankton level when shrinking
-- Blue ocean background with kelp and coral decorations
-
-🤖 **Enemy AI & Chase System**
-- Enemies patrol their designated areas by default
-- **Detection Triggers**: Enemies become aggressive when:
+### 🤖 **Intelligent Enemy AI**
+- **Patrol Behavior**: Enemies guard their territories by default
+- **Chase System**: Enemies detect and pursue players when:
   - Hit by a projectile
-  - Player enters their line of sight (detection range)
-  - Direct collision with player
-- **Line of Sight Calculation**:
-  - Based on larger of enemy width and height
-  - Minimum detection distance for small enemies (100 pixels)
-  - Bosses have enhanced line of sight (60% of screen width)
-- **Intelligent Pathfinding**: Detected enemies chase the player at 1.5× speed
-- **Physics-Aware Movement**:
-  - Swimming enemies (fish, micro, plankton) move freely in 2D space
-  - Ground enemies (crab, generic) run horizontally and jump intelligently to reach player
-- **Combat Feedback**: Visual indicators (color flashes, health bars) and camera shake effects
+  - Player enters line of sight
+  - Direct collision occurs
+- **Smart Pathfinding**: Swimming enemies move in 2D space, ground enemies jump intelligently
+- **7 Boss Types**: Enhanced bosses with special abilities:
+  - Spawner bosses that summon minions
+  - Shark boss with ranged torpedo attacks
+  - Scale-specific variants for land, water, and micro environments
+
+### 📊 **Progression Systems**
+- **Player Leveling**: Collect XP orbs dropped by enemies to level up
+- **Map Levels**: Progressive difficulty scaling across multiple map levels
+- **Difficulty Modes**: Normal, Hard, and God Mode with enemy stat multipliers
+- **Boss Mode**: Toggle for boss-heavy gameplay
+- **Stats Tracking**: Detailed end-of-level statistics and score calculation
+
+### 💪 **Combat & Feedback**
+- **Stamina System**: Manage stamina for melee attacks (recharges over time)
+- **Visual Feedback**: Camera shake, enemy color flashes, health bars
+- **Magnetization**: XP orbs automatically pulled toward player
+- **Dynamic HUD**: Real-time health, XP, stamina, player level, and map level display
 
 ## Quick Start
 
@@ -65,76 +57,105 @@ npm run dev
 
 Open your browser to the URL shown in your terminal (typically `http://localhost:5173`)
 
-## How to Play
+## 🎯 How to Play
 
-Control your character to navigate platforms, defeat enemies, and progress through the game!
+### Getting Started
+1. **Select Your Biome**: Choose between Land or Water environment
+2. **Choose Difficulty**: Normal, Hard, or God Mode
+3. **Toggle Boss Mode**: Enable for boss-heavy gameplay (optional)
+4. **Start Playing**: Battle enemies, collect XP, and progress through map levels!
 
-**Environment Selection:**
-- Choose between **Land** and **Water** environments in the main menu
-- Air environment coming soon!
+### Controls
 
-**Movement & Controls:**
+**Movement Controls:**
 
-*Land Mode:*
-- ⬅️ **Left Arrow / A** - Move left
-- ➡️ **Right Arrow / D** - Move right
+*Land Environment:*
+- ⬅️ **A / Left Arrow** - Move left
+- ➡️ **D / Right Arrow** - Move right  
 - **Space** - Jump
 
-*Underwater Mode (Submarine):*
-- ⬅️ **Left Arrow / A** - Move left
-- ➡️ **Right Arrow / D** - Move right
+*Underwater Environment (Submarine):*
+- ⬅️ **A / Left Arrow** - Move left
+- ➡️ **D / Right Arrow** - Move right
 - **W / Up Arrow / Space** - Thrust upward
-- **S / Down Arrow** - Thrust downward
+- **S / Down Arrow** - Thrust downward (sink slower)
 
-**Size Mechanics:**
-- **Q** - Shrink (transitions between regular ↔ micro levels)
-- **E** - Grow (transitions between regular ↔ micro/large levels)
-- Note: Underwater only allows regular and micro sizes (no large)
+**Combat Controls:**
+- **F** - Shoot projectiles (ranged attack)
+- **Shift** - Melee mode (hold for close-range combat, consumes stamina)
 
-**Combat:**
-- **F** - Shoot projectiles (slower underwater)
-- Hitting enemies with projectiles triggers chase behavior
-- Enemies will chase and attack when detected
+**Size Transformation:**
+- **Q** - Shrink (normal → micro scale)
+- **E** - Grow (micro → normal scale)
+- *Note: Future updates will add macro (large) scale for 3-tier system*
 
-## Scripts
+### Gameplay Tips
+- 💡 Collect glowing XP orbs to level up your character
+- 💡 Manage your stamina - melee attacks drain it, it recharges over time
+- 💡 Enemies chase when they spot you - use size changes strategically
+- 💡 Underwater physics differ - lighter gravity and slower projectiles
+- 💡 Each scale has different enemies - shrink to face bacteria, stay normal for bigger threats
+- 💡 Boss enemies have enhanced detection range and special abilities
+- 💡 Check your stats at level complete screen to track progress
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run preview` - Preview the production build
-
-## Deployment
-
-This project is configured for automatic deployment to GitHub Pages:
-
-1. Push changes to the `main` or `master` branch
-2. GitHub Actions will automatically build and deploy to `https://sbryden.github.io/Scalar.Game/`
-3. The `.github/workflows/gh-pages.yml` handles the deployment process
-
-**Local Preview:**
-After building, test the production build locally:
-```bash
-npm run build
-npm run preview
-```
-Visit `http://localhost:4173/Scalar.Game/` to preview.
-
-## Technologies
+## ⚙️ Technical Stack
 
 - **Phaser 3** - Powerful 2D game framework
 - **TypeScript** - Type-safe development with improved tooling
 - **Vite** - Next-generation build tool with HMR
-- **Arcade Physics** - Built-in physics engine
+- **Arcade Physics** - Built-in physics engine for collisions and movement
+- **Modular Architecture** - Organized managers and systems for maintainability
 
-## Future Roadmap
+## 🚀 Quick Start
 
-This project continues to evolve with planned features:
-- ✅ Enemy chase system with line of sight detection (completed)
-- ✅ TypeScript typing improvements (completed)
-- Enhanced vehicle transformation mechanics
-- Minimap
-- More enemy types and boss battles
-- Collectible items and power-ups
-- Enhanced score and progression system
-- Multiple levels and worlds
-- Sound effects and music
-- Particle effects and visual polish
+### Installation
+```bash
+npm install
+```
+
+### Development
+```bash
+npm run dev
+```
+Open your browser to `http://localhost:5173`
+
+### Build for Production
+```bash
+npm run build
+npm run preview
+```
+
+## 📦 Scripts
+
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build for production
+- `npm run preview` - Preview the production build locally
+
+## 🌐 Deployment
+
+This project auto-deploys to GitHub Pages:
+- Push to `main` or `master` branch
+- GitHub Actions builds and deploys automatically
+- Live at: `https://sbryden.github.io/Scalar.Game/`
+
+## 🗺️ What's Next?
+
+Check out our [ROADMAP.md](ROADMAP.md) for planned features including:
+- **Macro Scale**: Third scale tier with giant enemies
+- **Air Biome**: Complete flying environment with wind mechanics
+- **Champion Companions**: AI buddies that fight alongside you
+- **High Score System**: Local and cloud-based leaderboards
+- **Enhanced Audio**: Music and sound effects for all biomes
+- And much more!
+
+## 🤝 Contributing
+
+We welcome contributions! Check the [ROADMAP.md](ROADMAP.md) for areas that need work.
+
+## 📄 License
+
+This project is open source. Check repository for license details.
+
+---
+
+Made with passion using Phaser 3 and TypeScript
