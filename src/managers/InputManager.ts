@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/gameState';
 import { changeSize, getPlayerSize } from '../player';
 import projectileManager from './ProjectileManager';
-import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, PHYSICS_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
@@ -81,7 +81,7 @@ export class InputManager {
         const sizeConfig = SIZE_CONFIG[getPlayerSize()];
         if (!sizeConfig) return;
         
-        const jumpPower = 330 * sizeConfig.jumpMultiplier;
+        const jumpPower = PHYSICS_CONFIG.player.jumpPower * sizeConfig.jumpMultiplier;
         body.setVelocityY(-jumpPower);
         body.setVelocityX(currentVelocityX);
     }

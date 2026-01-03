@@ -399,7 +399,8 @@ export const PHYSICS_CONFIG = {
     },
     player: {
         baseDisplayScale: 0.25, // Base scale for the tank sprite
-        sizeChangeJumpVelocity: -200 // Y velocity applied when changing size
+        sizeChangeJumpVelocity: -200, // Y velocity applied when changing size
+        jumpPower: 200 // Base jump velocity for land-based jumping
     },
     enemy: {
         baseScale: 0.2, // Base scale for enemy sprites
