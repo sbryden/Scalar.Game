@@ -370,12 +370,22 @@ export const COMBAT_CONFIG = {
         cameraShakeDuration: 100, // Duration of camera shake on damage (ms)
         cameraShakeIntensityMelee: 0.003, // Shake intensity in melee mode
         cameraShakeIntensityNormal: 0.005, // Shake intensity in normal mode
-        cameraShakeIntensityPerDamage: 0.0001, // Additional shake per point of damage dealt
-        cameraShakeMaxIntensity: 0.015, // Maximum camera shake intensity
-        impactFlashDuration: 150, // Duration of impact flash effect (ms)
-        impactFlashDamageThreshold: 25, // Minimum damage to trigger impact flash effect
-        meleeModeTintColor: 0x88ccff, // Tint color for melee mode (blue aura)
-        impactFlashColor: 0xFFFFFF // Flash color on high-damage impacts
+            cameraShakeIntensityPerDamage: 0.0001, // Additional shake per point of damage dealt
+            cameraShakeMaxIntensity: 0.015, // Maximum camera shake intensity
+            impactFlashDuration: 150, // Duration of impact flash effect (ms)
+            impactFlashDamageThreshold: 25, // Minimum damage to trigger impact flash effect
+            meleeModeTintColor: 0x88ccff, // Tint color for melee mode (blue aura)
+            impactFlashColor: 0xFFFFFF, // Flash color on high-damage impacts
+            explosion: {
+                duration: 200, // How long explosion lasts (ms)
+                minScale: 0.3, // Starting scale
+                maxScale: 1.5, // Ending scale (expands)
+                particleColor: 0xFFAA00, // Orange explosion color
+                particleCount: 8, // Number of particles
+                particleSpeed: 150, // Speed of particles flying out
+                alphaStart: 1.0, // Starting alpha
+                alphaEnd: 0.0 // Ending alpha (fade out)
+            }
     },
     stun: {
         velocityDecay: 0.95 // Velocity decay multiplier during stun (per frame)

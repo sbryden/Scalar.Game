@@ -110,124 +110,89 @@ export class CombatSystem {
     }
     
     /**
-     * Calculate player velocity magnitude
+     * Create a visual explosion effect at the specified position
+     * Used when projectiles hit their targets
      */
-    private getPlayerVelocityMagnitude(player: Player): number {
-        if (!player.body) return 0;
-        
-        const vx = player.body.velocity.x;
-        const vy = player.body.velocity.y;
-        return Math.sqrt(vx * vx + vy * vy);
+    private createExplosion(scene: Phaser.Scene, x: number, y: number): void {
+        const config = COMBAT_CONFIG.visual.explosion;
+        // Create central flash circle
+        const flash = scene.add.circle(x, y, 5, config.particleColor);
+        flash.setAlpha(config.alphaStart);
+        flash.setDepth(100); // High depth to render on top
+        // Animate flash: expand and fade out
+        scene.tweens.add({
+            targets: flash,
+            scale: { from: config.minScale, to: config.maxScale },
+            alpha: { from: config.alphaStart, to: config.alphaEnd },
+            duration: config.duration,
+            ease: 'Power2',
+            onComplete: () => flash.destroy()
+        });
+        // Create particle burst
+        for (let i = 0; i < config.particleCount; i++) {
+            const angle = (Math.PI * 2 * i) / config.particleCount;
+            const particle = scene.add.circle(x, y, 3, config.particleColor);
+            particle.setAlpha(config.alphaStart);
+            particle.setDepth(100);
+            const velocityX = Math.cos(angle) * config.particleSpeed;
+            const velocityY = Math.sin(angle) * config.particleSpeed;
+            // Animate particle: move outward and fade
+            scene.tweens.add({
+                targets: particle,
+                x: x + velocityX * 0.5,
+                y: y + velocityY * 0.5,
+                alpha: config.alphaEnd,
+                scale: { from: 1, to: 0.2 },
+                duration: config.duration,
+                ease: 'Power2',
+                onComplete: () => particle.destroy()
+            });
+        }
     }
-    
-    /**
-     * Calculate attack angle and determine positioning bonus.
-     *
-     * This looks at the player's movement direction relative to the enemy and
-     * applies a damage multiplier based on the "attack type":
-     * - Head-on: the player is moving directly toward the enemy's position
-     *   (velocity is strongly aligned with the vector from player to enemy).
-     * - Rear: the player's velocity points away from the enemy
-     *   (they are retreating from or have already passed by the enemy).
-     *
-     * Returns the positioning multiplier for the current attack.
-     * @param velocityMagnitude - Pre-calculated velocity magnitude to avoid redundant calculation
+     * Create a visual explosion effect at the specified position
+     * Used when projectiles hit their targets
      */
-    private getPositioningMultiplier(player: Player, enemy: Enemy, velocityMagnitude: number): number {
-        if (!player.body || velocityMagnitude === 0) return 1.0;
+    private createExplosion(scene: Phaser.Scene, x: number, y: number): void {
+        const config = COMBAT_CONFIG.visual.explosion;
         
-        // Calculate direction vector from player to enemy
-        const playerToEnemy = {
-            x: enemy.x - player.x,
-            y: enemy.y - player.y
-        };
+        // Create central flash circle
+        const flash = scene.add.circle(x, y, 5, config.particleColor);
+        flash.setAlpha(config.alphaStart);
+        flash.setDepth(100); // High depth to render on top
         
-        const pteLen = Math.sqrt(playerToEnemy.x * playerToEnemy.x + playerToEnemy.y * playerToEnemy.y);
-        if (pteLen === 0) return 1.0;
+        // Animate flash: expand and fade out
+        scene.tweens.add({
+            targets: flash,
+            scale: { from: config.minScale, to: config.maxScale },
+            alpha: { from: config.alphaStart, to: config.alphaEnd },
+            duration: config.duration,
+            ease: 'Power2',
+            onComplete: () => flash.destroy()
+        });
         
-        // Normalize direction vector
-        const pteDirX = playerToEnemy.x / pteLen;
-        const pteDirY = playerToEnemy.y / pteLen;
-        
-        // Normalize velocity vector (using pre-calculated magnitude)
-        const pvDirX = player.body.velocity.x / velocityMagnitude;
-        const pvDirY = player.body.velocity.y / velocityMagnitude;
-        
-        // Calculate dot product to get angle alignment
-        const dotProduct = pteDirX * pvDirX + pteDirY * pvDirY;
-        
-        // Determine attack type based on angle
-        // Head-on attack: moving directly toward enemy (high dot product)
-        if (dotProduct > PLAYER_COMBAT_CONFIG.headOnDetectionThreshold) {
-            return PLAYER_COMBAT_CONFIG.headOnBonusMultiplier;
+        // Create particle burst
+        for (let i = 0; i < config.particleCount; i++) {
+            const angle = (Math.PI * 2 * i) / config.particleCount;
+            const particle = scene.add.circle(x, y, 3, config.particleColor);
+            particle.setAlpha(config.alphaStart);
+            particle.setDepth(100);
+            
+            const velocityX = Math.cos(angle) * config.particleSpeed;
+            const velocityY = Math.sin(angle) * config.particleSpeed;
+            
+            // Animate particle: move outward and fade
+            scene.tweens.add({
+                targets: particle,
+                x: x + velocityX * 0.5,
+                y: y + velocityY * 0.5,
+                alpha: config.alphaEnd,
+                scale: { from: 1, to: 0.2 },
+                duration: config.duration,
+                ease: 'Power2',
+                onComplete: () => particle.destroy()
+            });
         }
-        
-        // Rear attack: moving away or very oblique angle (less effective but safer)
-        if (dotProduct < 0) {
-            return PLAYER_COMBAT_CONFIG.rearAttackMultiplier;
-        }
-        
-        // Normal attack (no special positioning)
-        return 1.0;
-    }
-    
-    /**
-     * Calculate size-based damage multiplier
-     */
-    private getSizeMultiplier(playerScale: number, enemyWidth: number): number {
-        // Guard against invalid or zero-width enemies
-        if (enemyWidth <= 0) {
-            return 1.0;
-        }
-        
-        // Approximate enemy scale based on width
-        const enemyScale = enemyWidth / PLAYER_COMBAT_CONFIG.standardEnemyWidth;
-        
-        // Compare player scale to enemy scale
-        if (playerScale > enemyScale * 1.2) {
-            // Player significantly larger - size advantage
-            return PLAYER_COMBAT_CONFIG.sizeAdvantageMultiplier;
-        } else if (playerScale < enemyScale * 0.8) {
-            // Player significantly smaller - size disadvantage
-            return PLAYER_COMBAT_CONFIG.sizeDisadvantageMultiplier;
-        }
-        
-        // Similar size - no modifier
-        return 1.0;
-    }
-    
-    /**
-     * Update combo state and get combo multiplier
-     */
-    private getComboMultiplier(player: Player, gameTime: number): number {
-        // Initialize combo tracking if needed
-        if (player.comboCount === undefined) {
-            player.comboCount = 0;
-        }
-        if (player.lastComboHitTime === undefined) {
-            player.lastComboHitTime = 0;
-        }
-        
-        // Check if combo has expired
-        if (gameTime - player.lastComboHitTime > PLAYER_COMBAT_CONFIG.comboTimeWindow) {
-            player.comboCount = 0;
-        }
-        
-        // Increment combo
-        player.comboCount++;
-        player.lastComboHitTime = gameTime;
-        
-        // Calculate combo multiplier (capped at max)
-        const comboBonus = 1 + (player.comboCount - 1) * PLAYER_COMBAT_CONFIG.comboDamageBonus;
-        return Math.min(comboBonus, PLAYER_COMBAT_CONFIG.maxComboMultiplier);
-    }
-    
-    /**
-     * Reset combo when player takes damage
-     */
-    resetCombo(player: Player): void {
-        player.comboCount = 0;
-        player.lastComboHitTime = 0;
+>>>>>>> Stashed changes
     }
     
     /**
@@ -238,6 +203,8 @@ export class CombatSystem {
         
         // Skip damage for dead enemies
         if (enemy.isDead) {
+            // Create explosion effect before destroying
+            this.createExplosion(projectile.scene, projectile.x, projectile.y);
             projectile.destroy();
             return;
         }
@@ -262,6 +229,8 @@ export class CombatSystem {
             }
         });
         
+        // Create explosion effect before destroying
+        this.createExplosion(projectile.scene, projectile.x, projectile.y);
         projectile.destroy();
         
         if (enemy.health <= 0) {
@@ -516,6 +485,8 @@ export class CombatSystem {
         
         // Check if player is immune (after respawn)
         if (player.immuneUntil && gameTime < player.immuneUntil) {
+            // Create explosion effect before destroying
+            this.createExplosion(projectile.scene, projectile.x, projectile.y);
             projectile.destroy();
             return;
         }
@@ -523,6 +494,8 @@ export class CombatSystem {
         // Check if player is in melee mode (shield active)
         if (player.isMeleeMode) {
             // Shield completely blocks the projectile
+            // Create explosion effect before destroying
+            this.createExplosion(projectile.scene, projectile.x, projectile.y);
             projectile.destroy();
             // Visual feedback: flash the player blue briefly to show shield block
             player.setTint(0x0099FF);
@@ -550,6 +523,8 @@ export class CombatSystem {
         // Camera shake effect
         player.scene.cameras.main.shake(COMBAT_CONFIG.visual.cameraShakeDuration, COMBAT_CONFIG.visual.cameraShakeIntensityNormal);
         
+        // Create explosion effect before destroying
+        this.createExplosion(projectile.scene, projectile.x, projectile.y);
         projectile.destroy();
     }
     
