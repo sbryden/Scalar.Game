@@ -36,6 +36,11 @@ export default class MenuScene extends Phaser.Scene {
     }
     
     create(): void {
+        // Reset to default selections every time menu is shown
+        this.selectedDifficulty = 'normal';
+        this.selectedEnvironment = 'land';
+        this.bossMode = false;
+        
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
         
