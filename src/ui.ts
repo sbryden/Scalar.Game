@@ -26,7 +26,7 @@ class UIManager {
     private xpBarBackground: Phaser.GameObjects.Rectangle | null;
 
     constructor() {
-        // No state to initialize - UI elements are created per scene
+        // Initialize UI element properties to null - elements are created per scene
         this.healthBar = null;
         this.healthBarBackground = null;
         this.xpBar = null;
@@ -82,6 +82,7 @@ class UIManager {
      * @param playerStats - Current player stats containing health, maxHealth, xp, and xpToLevel
      */
     updateUIBars(playerStats: PlayerStats): void {
+        // Check if UI elements are initialized (only need to check the bars that are updated)
         if (!this.healthBar || !this.xpBar) {
             console.warn('UIManager: UI elements not initialized. Call createUIElements first.');
             return;
