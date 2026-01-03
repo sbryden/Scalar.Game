@@ -19,7 +19,10 @@ This is a 2D side-scrolling game built with Phaser 3 and Vite. The game features
 - Keep functions concise and focused on single responsibilities
 - Use descriptive variable names with types when beneficial
 - Comment complex logic and game mechanics
-- Prefer classes and modules over global functions
+- **Prefer classes and modules over global functions**
+- **Use singleton pattern for managers and systems** (export default new ClassName())
+- **Group related functionality into class-based managers** in the `managers/` directory
+- **Use systems for cross-cutting concerns** (combat, stats, spawning) in the `systems/` directory
 
 ## Project Structure
 ```
@@ -56,6 +59,8 @@ tsconfig.json           - TypeScript configuration
 - **Scene Lifecycle**: `preload()`, `create()`, `update()` methods
 - **Modular Systems**: Separate systems for combat, stats, spawning, magnetism
 - **Manager Pattern**: InputManager, CollisionManager, CameraManager per scene
+- **Singleton Pattern**: Managers and systems use singleton pattern (export default new ClassName())
+- **Class-Based Architecture**: Prefer classes over function-based modules for better encapsulation
 - **Centralized State**: `gameState` singleton for shared state across scenes
 - **Type Safety**: Property declarations on all classes, typed parameters where beneficial
 - **Import Patterns**: No file extensions in imports (TypeScript standard)
