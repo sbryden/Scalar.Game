@@ -324,11 +324,9 @@ export const PLAYER_COMBAT_CONFIG = {
     sizeAdvantageMultiplier: 1.3,     // Damage multiplier when attacking smaller enemies
     sizeDisadvantageMultiplier: 0.8,  // Damage multiplier when attacking larger enemies
     // Positioning bonuses
-    flankingBonusMultiplier: 1.4,     // 40% bonus damage for flanking attacks
     headOnBonusMultiplier: 1.2,       // 20% bonus damage for head-on collisions
     headOnDetectionThreshold: 0.8,    // Dot product threshold for detecting head-on attacks (0.8 = ~36° cone)
     rearAttackMultiplier: 0.9,        // 10% reduced damage for rear attacks (safer but less effective)
-    flankingAngleThreshold: 60,       // Degrees from perpendicular to count as flanking (60° cone on each side)
     // Combo system
     comboTimeWindow: 2000,            // Time window for consecutive hits to count as combo (ms)
     comboDamageBonus: 0.15,           // 15% bonus damage per combo hit
