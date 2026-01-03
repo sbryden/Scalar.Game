@@ -324,6 +324,7 @@ export const PLAYER_COMBAT_CONFIG = {
     // Positioning bonuses
     flankingBonusMultiplier: 1.4,     // 40% bonus damage for flanking attacks
     headOnBonusMultiplier: 1.2,       // 20% bonus damage for head-on collisions
+    headOnDetectionThreshold: 0.8,    // Dot product threshold for detecting head-on attacks (0.8 = ~36° cone)
     rearAttackMultiplier: 0.9,        // 10% reduced damage for rear attacks (safer but less effective)
     flankingAngleThreshold: 60,       // Degrees from perpendicular to count as flanking (60° cone on each side)
     // Combo system
@@ -332,7 +333,9 @@ export const PLAYER_COMBAT_CONFIG = {
     maxComboMultiplier: 2.0,          // Maximum total damage multiplier from combos (2x at ~7 hits)
     // Scale-based ramming variations
     microScaleMultiplier: 0.9,        // Slightly reduced ramming effectiveness at micro scale
-    normalScaleMultiplier: 1.0        // Normal ramming effectiveness
+    normalScaleMultiplier: 1.0,       // Normal ramming effectiveness
+    // Knockback scaling
+    knockbackVelocityScaleFactor: 500 // Velocity at which knockback force doubles
 };
 
 // Projectile configuration
@@ -369,6 +372,7 @@ export const COMBAT_CONFIG = {
         cameraShakeIntensityPerDamage: 0.0001, // Additional shake per point of damage dealt
         cameraShakeMaxIntensity: 0.015, // Maximum camera shake intensity
         impactFlashDuration: 150, // Duration of impact flash effect (ms)
+        impactFlashDamageThreshold: 25, // Minimum damage to trigger impact flash effect
         meleeModeTintColor: 0x00FF88, // Tint color for melee mode (green-cyan aura)
         impactFlashColor: 0xFFFFFF // Flash color on high-damage impacts
     },

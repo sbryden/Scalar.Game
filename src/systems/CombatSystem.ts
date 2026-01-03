@@ -160,7 +160,7 @@ export class CombatSystem {
         const angleThresholdRad = (PLAYER_COMBAT_CONFIG.flankingAngleThreshold * Math.PI) / 180;
         
         // Head-on attack: moving directly toward enemy (high dot product, low perpendicular)
-        if (dotProduct > 0.8) {
+        if (dotProduct > PLAYER_COMBAT_CONFIG.headOnDetectionThreshold) {
             return PLAYER_COMBAT_CONFIG.headOnBonusMultiplier;
         }
         
@@ -427,8 +427,8 @@ export class CombatSystem {
                 );
                 enemy.scene.cameras.main.shake(COMBAT_CONFIG.visual.cameraShakeDuration, totalShakeIntensity);
                 
-                // Impact flash for high damage hits (>= 25 damage)
-                if (playerDamage >= 25) {
+                // Impact flash for high damage hits
+                if (playerDamage >= COMBAT_CONFIG.visual.impactFlashDamageThreshold) {
                     player.setTint(COMBAT_CONFIG.visual.impactFlashColor);
                     enemy.scene.time.delayedCall(COMBAT_CONFIG.visual.impactFlashDuration, () => {
                         if (player.active && player.isMeleeMode) {
@@ -489,7 +489,7 @@ export class CombatSystem {
         // Scale knockback with player velocity in melee mode
         if (player.isMeleeMode && player.body) {
             const velocity = this.getPlayerVelocityMagnitude(player);
-            const velocityMultiplier = 1 + (velocity / 500); // +1x force at 500 velocity
+            const velocityMultiplier = 1 + (velocity / PLAYER_COMBAT_CONFIG.knockbackVelocityScaleFactor);
             knockbackForce *= Math.min(velocityMultiplier, 2.0); // Cap at 2x
         }
         
