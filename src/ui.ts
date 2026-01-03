@@ -19,6 +19,9 @@ export interface UIElements {
 }
 
 class UIManager {
+    private readonly BAR_WIDTH = 100;
+    private readonly BAR_HEIGHT = 8;
+    
     private healthBar: Phaser.GameObjects.Rectangle | null;
     private healthBarBackground: Phaser.GameObjects.Rectangle | null;
     private xpBar: Phaser.GameObjects.Rectangle | null;
@@ -40,18 +43,15 @@ class UIManager {
      * @returns Object containing references to all created UI elements
      */
     createUIElements(scene: Phaser.Scene): UIElements {
-        const barWidth = 100;
-        const barHeight = 8;
-        
-        this.healthBarBackground = scene.add.rectangle(512, 30, barWidth, barHeight, 0x333333);
-        this.healthBar = scene.add.rectangle(512, 30, barWidth, barHeight, 0xFF0000);
+        this.healthBarBackground = scene.add.rectangle(512, 30, this.BAR_WIDTH, this.BAR_HEIGHT, 0x333333);
+        this.healthBar = scene.add.rectangle(512, 30, this.BAR_WIDTH, this.BAR_HEIGHT, 0xFF0000);
         this.healthBarBackground.setDepth(1000);
         this.healthBar.setDepth(1000);
         this.healthBarBackground.setScrollFactor(0);
         this.healthBar.setScrollFactor(0);
         
-        this.xpBarBackground = scene.add.rectangle(512, 50, barWidth, barHeight, 0x333333);
-        this.xpBar = scene.add.rectangle(512, 50, barWidth, barHeight, 0x00FF00);
+        this.xpBarBackground = scene.add.rectangle(512, 50, this.BAR_WIDTH, this.BAR_HEIGHT, 0x333333);
+        this.xpBar = scene.add.rectangle(512, 50, this.BAR_WIDTH, this.BAR_HEIGHT, 0x00FF00);
         this.xpBarBackground.setDepth(1000);
         this.xpBar.setDepth(1000);
         this.xpBarBackground.setScrollFactor(0);
@@ -64,6 +64,16 @@ class UIManager {
         });
         levelText.setDepth(1000);
         levelText.setScrollFactor(0);
+        
+        // Defensive check to ensure UI elements were created successfully
+        if (
+            !this.healthBar ||
+            !this.healthBarBackground ||
+            !this.xpBar ||
+            !this.xpBarBackground
+        ) {
+            throw new Error('UIManager: Failed to create UI elements.');
+        }
         
         return { 
             healthBar: this.healthBar, 
@@ -87,14 +97,17 @@ class UIManager {
             return;
         }
 
-        const barWidth = 100;
-        
-        const healthPercent = playerStats.health / playerStats.maxHealth;
-        this.healthBar.setDisplayOrigin(barWidth / 2, 4);
+        // Safe division to prevent Infinity or NaN values
+        const safeMaxHealth = playerStats.maxHealth > 0 ? playerStats.maxHealth : 1;
+        let healthPercent = playerStats.health / safeMaxHealth;
+        healthPercent = Math.min(Math.max(healthPercent, 0), 1);
+        this.healthBar.setDisplayOrigin(this.BAR_WIDTH / 2, 4);
         this.healthBar.setScale(healthPercent, 1);
         
-        const xpPercent = playerStats.xp / playerStats.xpToLevel;
-        this.xpBar.setDisplayOrigin(barWidth / 2, 4);
+        const safeXpToLevel = playerStats.xpToLevel > 0 ? playerStats.xpToLevel : 1;
+        let xpPercent = playerStats.xp / safeXpToLevel;
+        xpPercent = Math.min(Math.max(xpPercent, 0), 1);
+        this.xpBar.setDisplayOrigin(this.BAR_WIDTH / 2, 4);
         this.xpBar.setScale(xpPercent, 1);
     }
 }
