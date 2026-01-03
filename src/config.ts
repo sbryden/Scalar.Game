@@ -511,6 +511,27 @@ export const STAMINA_UI_CONFIG = {
     }
 };
 
+// Fuel configuration (for size transformations)
+export const FUEL_CONFIG = {
+    startingMaxFuel: 100,            // Starting maximum fuel
+    startingFuel: 0,                 // Starting current fuel (0 due to initial cooldown)
+    regenerationRate: 5,             // Fuel regenerated per second (base rate)
+    regenerationRatePerLevel: 0.5,   // Additional regeneration per player level
+    consumptionAmount: 20,           // Fuel consumed per size transformation
+    lowFuelThreshold: 0.25,          // 25% - show warning below this
+    initialCooldownDuration: 20000   // 20 seconds initial cooldown (ms)
+};
+
+// UI configuration for fuel display
+export const FUEL_UI_CONFIG = {
+    lowFuelFlashDuration: 300,       // Duration of low fuel flash effect (ms)
+    colors: {
+        normal: 0xFFD700,            // Gold for normal fuel (>25%)
+        lowFuel: 0xFF8800,           // Orange for low fuel warning (≤25%)
+        depleted: 0xFF0000           // Red for depleted (0%)
+    }
+};
+
 // Progressive Level System configuration
 export const LEVEL_SYSTEM_CONFIG = {
     startingLevel: 1,                // Starting level
