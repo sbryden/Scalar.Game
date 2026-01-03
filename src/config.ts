@@ -227,7 +227,13 @@ export const ENEMY_CONFIG: Record<string, {
         patrolDistance: 350,
         knockbackResistance: 2.2,  // Very resistant to knockback
         lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.3
+        chaseSpeedMultiplier: 1.3,
+        // Ranged ability configuration
+        hasRangedAbility: true,
+        projectileTexture: 'bubble',
+        projectileDamage: 10,
+        projectileSpeed: 200,
+        projectileCooldown: 2000
     },
     water_swimming_micro: {
         width: 20,
