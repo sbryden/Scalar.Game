@@ -115,35 +115,35 @@ export class CombatSystem {
      */
     private createExplosion(scene: Phaser.Scene, x: number, y: number): void {
         const config = COMBAT_CONFIG.visual.explosion;
-        // Create central flash circle
-        const flash = scene.add.circle(x, y, 5, config.particleColor);
+        // Create central flash circle - make it bigger for visibility
+        const flash = scene.add.circle(x, y, 15, config.particleColor);
         flash.setAlpha(config.alphaStart);
-        flash.setDepth(100); // High depth to render on top
+        flash.setDepth(200); // Higher depth to render on top
         // Animate flash: expand and fade out
         scene.tweens.add({
             targets: flash,
-            scale: { from: config.minScale, to: config.maxScale },
+            scale: { from: config.minScale, to: config.maxScale * 2 },
             alpha: { from: config.alphaStart, to: config.alphaEnd },
             duration: config.duration,
             ease: 'Power2',
             onComplete: () => flash.destroy()
         });
-        // Create particle burst
-        for (let i = 0; i < config.particleCount; i++) {
-            const angle = (Math.PI * 2 * i) / config.particleCount;
-            const particle = scene.add.circle(x, y, 3, config.particleColor);
+        // Create particle burst - more particles and bigger
+        for (let i = 0; i < config.particleCount * 2; i++) {
+            const angle = (Math.PI * 2 * i) / (config.particleCount * 2);
+            const particle = scene.add.circle(x, y, 6, config.particleColor);
             particle.setAlpha(config.alphaStart);
-            particle.setDepth(100);
-            const velocityX = Math.cos(angle) * config.particleSpeed;
-            const velocityY = Math.sin(angle) * config.particleSpeed;
+            particle.setDepth(200);
+            const velocityX = Math.cos(angle) * config.particleSpeed * 0.8;
+            const velocityY = Math.sin(angle) * config.particleSpeed * 0.8;
             // Animate particle: move outward and fade
             scene.tweens.add({
                 targets: particle,
-                x: x + velocityX * 0.5,
-                y: y + velocityY * 0.5,
+                x: x + velocityX * 0.8,
+                y: y + velocityY * 0.8,
                 alpha: config.alphaEnd,
-                scale: { from: 1, to: 0.2 },
-                duration: config.duration,
+                scale: { from: 1, to: 0.1 },
+                duration: config.duration * 1.5,
                 ease: 'Power2',
                 onComplete: () => particle.destroy()
             });

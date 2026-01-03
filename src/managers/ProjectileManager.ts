@@ -183,6 +183,10 @@ class ProjectileManager {
         body.setCollideWorldBounds(true);
         body.setVelocity(velocityX, velocityY);
         
+        // Make collision body larger for better hit detection with fast-moving projectiles
+        body.setSize(projectile.width * 2, projectile.height * 2);
+        body.setOffset(-projectile.width / 2, -projectile.height / 2);
+        
         // Set damage
         projectile.damage = enemy.projectileDamage || 15;
         
