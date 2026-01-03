@@ -313,8 +313,30 @@ export const PLAYER_COMBAT_CONFIG = {
     // Melee attack mode configuration
     meleeModePlayerDamage: 15,        // Damage dealt to enemy in melee mode (3x base)
     passiveModePlayerDamage: 3,       // Damage dealt when moving toward enemy without melee mode
+    passiveModeVelocityBonusMultiplier: 0.5, // Passive mode gets 50% of velocity bonus compared to melee
     meleeModeDamageReduction: 0.25,   // Player takes 25% damage in melee mode
-    requiredApproachSpeed: 50         // Minimum velocity toward enemy for passive damage
+    requiredApproachSpeed: 50,        // Minimum velocity toward enemy for passive damage
+    // Momentum-based damage
+    velocityDamageMultiplier: 0.01,   // Damage bonus per unit of velocity (0.01 = +1 damage per 100 velocity)
+    maxVelocityBonus: 10,             // Maximum bonus damage from velocity
+    // Size/mass considerations
+    standardEnemyWidth: 30,           // Standard enemy width for size comparison calculations
+    sizeAdvantageMultiplier: 1.3,     // Damage multiplier when attacking smaller enemies
+    sizeDisadvantageMultiplier: 0.8,  // Damage multiplier when attacking larger enemies
+    // Positioning bonuses
+    headOnBonusMultiplier: 1.2,       // 20% bonus damage for head-on collisions
+    headOnDetectionThreshold: 0.8,    // Dot product threshold for detecting head-on attacks (0.8 = ~36° cone)
+    rearAttackMultiplier: 0.9,        // 10% reduced damage for rear attacks (safer but less effective)
+    // Combo system
+    comboTimeWindow: 2000,            // Time window for consecutive hits to count as combo (ms)
+    comboDamageBonus: 0.15,           // 15% bonus damage per combo hit
+    maxComboMultiplier: 2.0,          // Maximum total damage multiplier from combos (2x at ~7 hits)
+    // Scale-based ramming variations
+    microScaleMultiplier: 0.9,        // Slightly reduced ramming effectiveness at micro scale
+    normalScaleMultiplier: 1.0,       // Normal ramming effectiveness
+    // Knockback scaling
+    knockbackVelocityScaleFactor: 500, // Velocity at which knockback force doubles
+    maxKnockbackMultiplier: 2.0       // Maximum knockback multiplier from velocity
 };
 
 // Projectile configuration
@@ -347,7 +369,13 @@ export const COMBAT_CONFIG = {
         enemyFlashDuration: 100, // How long enemy flashes when hit (ms)
         cameraShakeDuration: 100, // Duration of camera shake on damage (ms)
         cameraShakeIntensityMelee: 0.003, // Shake intensity in melee mode
-        cameraShakeIntensityNormal: 0.005 // Shake intensity in normal mode
+        cameraShakeIntensityNormal: 0.005, // Shake intensity in normal mode
+        cameraShakeIntensityPerDamage: 0.0001, // Additional shake per point of damage dealt
+        cameraShakeMaxIntensity: 0.015, // Maximum camera shake intensity
+        impactFlashDuration: 150, // Duration of impact flash effect (ms)
+        impactFlashDamageThreshold: 25, // Minimum damage to trigger impact flash effect
+        meleeModeTintColor: 0x88ccff, // Tint color for melee mode (blue aura)
+        impactFlashColor: 0xFFFFFF // Flash color on high-damage impacts
     },
     stun: {
         velocityDecay: 0.95 // Velocity decay multiplier during stun (per frame)
