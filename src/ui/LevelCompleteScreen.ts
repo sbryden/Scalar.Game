@@ -77,16 +77,16 @@ export class LevelCompleteScreen {
         // Create stats text (will be updated when shown)
         this.statsText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
-            200,
+            180,
             '',
             {
-                fontSize: '28px',
+                fontSize: '24px',
                 color: '#FFFFFF',
                 fontStyle: 'bold',
                 align: 'center',
                 stroke: '#000000',
                 strokeThickness: 4,
-                lineSpacing: 8
+                lineSpacing: 4
             }
         );
         this.statsText.setOrigin(0.5, 0);
@@ -97,10 +97,10 @@ export class LevelCompleteScreen {
         // Create message text
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
-            this.scene.cameras.main.height - 80,
+            this.scene.cameras.main.height - 120,
             'Press N for Next Level\nPress R to Replay\nPress E to Exit to Main Menu',
             {
-                fontSize: '32px',
+                fontSize: '28px',
                 color: '#FFFFFF',
                 fontStyle: 'bold',
                 align: 'center',
