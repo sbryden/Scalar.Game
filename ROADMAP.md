@@ -25,10 +25,10 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 - ✅ TypeScript architecture with modular managers and systems
 
 ### Advanced Features Already Implemented
-- ✅ **Stamina System**: Full stamina management with recharge, consumption, exhaustion mechanics
+- ✅ **Stamina System**: Full stamina management with recharge, consumption, exhaustion mechanics (currently used for melee mode - Shift key)
 - ✅ **Level Progression System**: Player leveling with XP requirements and stat increases
 - ✅ **Map Level System**: Progressive difficulty with level-based enemy scaling
-- ✅ **Difficulty Modes**: Easy, Normal, Hard, and God Mode with stat multipliers
+- ✅ **Difficulty Modes**: Normal, Hard, and God Mode with stat multipliers (design notes mention Easy/Medium/Hard)
 - ✅ **Main Menu**: Environment selection (Land/Water), difficulty dropdown, boss mode toggle
 - ✅ **HUD Display**: Health bar, XP bar, stamina bar, player level, map level indicators
 - ✅ **Boss Enemies**: Multiple boss types per environment with enhanced stats and abilities
@@ -351,12 +351,13 @@ This roadmap outlines the planned features and improvements for Scalar, a 2D sid
 This section identifies areas where the original design notes, current implementation, and roadmap have conflicts or ambiguities that need clarification:
 
 ### 1. Stamina System vs. Size Transformation
-**Conflict**: The design notes state "When the vehicle transforms (small to big or big to small) some stamina or fuel is depleted." However, the current implementation has a stamina system that manages melee/shield mechanics but is NOT connected to size transformation (Q/E keys work without stamina cost).
+**Conflict**: The design notes state "When the vehicle transforms (small to big or big to small) some stamina or fuel is depleted." However, the current implementation has a stamina system that manages melee mode (Shift key for close-range combat with blue tint) but is NOT connected to size transformation (Q/E keys work without stamina cost).
 
 **Questions**:
-- Should stamina consumption be added to size transformations?
-- Should there be a separate "fuel" system for transformations vs. "stamina" for other actions?
-- What should be the stamina cost per transformation? Fixed amount or scale-based?
+- Should stamina consumption be added to size transformations in addition to melee mode?
+- Should there be a separate "fuel" system for transformations vs. "stamina" for melee combat?
+- What should be the stamina/fuel cost per transformation? Fixed amount or scale-based?
+- Should melee mode continue to use stamina, or be reworked?
 
 ### 2. Vehicle Types vs. Environment Selection
 **Conflict**: The design notes mention three distinct vehicle types (Tank/Car, Submarine, Plane), but the current implementation has environment selection (Land/Water) where the same player sprite works in all environments.
@@ -402,12 +403,14 @@ This section identifies areas where the original design notes, current implement
 - Should there be multiple champion slots or just one active companion?
 
 ### 7. Difficulty Settings Discrepancy
-**Conflict**: Design notes describe three difficulties (Easy, Medium, Hard) with specific characteristics, but implementation has four modes (Easy, Normal, Hard, God Mode).
+**Conflict**: Design notes describe three difficulties (Easy, Medium, Hard), but implementation has three modes: Normal, Hard, and God Mode.
 
 **Questions**:
-- Is "Normal" the same as the designed "Medium"?
-- Should "God Mode" be kept as a debug/accessibility option or removed?
-- Do the difficulty multipliers match the intended design (easy = one-shot enemies)?
+- Should "Normal" be renamed to "Medium" to match design notes?
+- Should "Easy" difficulty be added as a fourth option?
+- Or should design notes be updated to reflect Normal/Hard/God Mode as the intended difficulties?
+- Is "God Mode" meant to be a debug/accessibility option or a legitimate difficulty tier?
+- Do the Normal/Hard difficulty multipliers match the intended design (easy = one-shot enemies)?
 
 ### 8. Level Progression Choice System
 **Conflict**: Design notes say "player levels up and has a choice to grow or shrink more" suggesting a choice at each level-up, but current implementation has automatic stat increases.
