@@ -33,10 +33,11 @@ class ProjectileManager {
         
         const config = PROJECTILE_CONFIG.basic;
         
-        let direction = 1;
-        if (gameState.wasdKeys?.A.isDown || gameState.cursors?.left.isDown) {
-            direction = -1;
-        }
+        const player = gameState.player;
+        if (!player) return;
+        
+        // Determine direction based on which way the player is facing
+        const direction = player.flipX ? -1 : 1;
         
         // Check if underwater for slower projectile speed
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
@@ -44,9 +45,6 @@ class ProjectileManager {
         const speedMultiplier = isUnderwater ? PHYSICS_CONFIG.underwater.speedMultiplier : 1.0;
         
         const velocityX = config.speed * direction * speedMultiplier;
-        
-        const player = gameState.player;
-        if (!player) return;
         
         // Offset projectile spawn behind the vehicle (opposite of direction)
         const spawnOffsetX = direction === 1 ? PHYSICS_CONFIG.projectile.spawnOffsetX : -PHYSICS_CONFIG.projectile.spawnOffsetX;
