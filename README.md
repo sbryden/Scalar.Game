@@ -41,9 +41,11 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 
 ### 💪 **Combat & Feedback**
 - **Stamina System**: Manage stamina for melee attacks (recharges over time)
-- **Visual Feedback**: Camera shake, enemy color flashes, health bars
+- **Fuel System**: Separate fuel resource for size transformations with 20-second initial cooldown
+- **Momentum-Based Combat**: Velocity affects ramming damage; melee mode enhances damage and reduces damage taken
+- **Visual Feedback**: Camera shake, enemy color flashes, health bars, impact effects
 - **Magnetization**: XP orbs automatically pulled toward player
-- **Dynamic HUD**: Real-time health, XP, stamina, player level, and map level display
+- **Dynamic HUD**: Real-time health, XP, stamina, fuel, player level, and map level display
 
 ## Quick Start
 
@@ -87,13 +89,17 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - **Shift** - Melee mode (hold for close-range combat, consumes stamina)
 
 **Size Transformation:**
-- **Q** - Shrink (normal → micro scale)
-- **E** - Grow (micro → normal scale)
-- *Note: Future updates will add macro (large) scale for 3-tier system*
+- **Q** - Shrink (normal → micro scale, consumes fuel)
+- **E** - Grow (micro → normal scale, consumes fuel)
+- *Note: 20-second initial cooldown; fuel regenerates faster as you level up*
+- *Future updates will add macro (large) scale for 3-tier system*
 
 ### Gameplay Tips
 - 💡 Collect glowing XP orbs to level up your character
 - 💡 Manage your stamina - melee attacks drain it, it recharges over time
+- 💡 Manage your fuel - size transformations consume fuel; wait for 20-second cooldown at start
+- 💡 Use momentum for ramming damage - moving faster deals more damage to enemies
+- 💡 Melee mode (Shift) enhances your ramming damage and reduces damage you take
 - 💡 Enemies chase when they spot you - use size changes strategically
 - 💡 Underwater physics differ - lighter gravity and slower projectiles
 - 💡 Each scale has different enemies - shrink to face bacteria, stay normal for bigger threats

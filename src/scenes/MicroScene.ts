@@ -24,6 +24,7 @@ import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy, Player } from '../types/game';
+import { generateQuantumBackground } from '../utils/backgroundGenerator';
 
 export default class MicroScene extends Phaser.Scene {
     player!: Player;
@@ -65,38 +66,9 @@ export default class MicroScene extends Phaser.Scene {
     }
     
     createBackground() {
-        // Create cellular-themed background (purple/pink tones)
-        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
-        
-        // Base cellular fluid color
-        bgGraphics.fillStyle(0x2D1B3D, 1);
-        bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        
-        // Add cellular membrane-like patterns
-        bgGraphics.lineStyle(2, 0x5A3D6B, 0.4);
-        for (let i = 0; i < WORLD_WIDTH; i += 150) {
-            for (let j = 0; j < WORLD_HEIGHT; j += 150) {
-                // Draw cellular circles
-                const offsetX = (j / 150) % 2 === 0 ? 75 : 0;
-                bgGraphics.strokeCircle(i + offsetX, j, 60);
-            }
-        }
-        
-        // Add organic looking dots (organelles)
-        bgGraphics.fillStyle(0x8B4F8B, 0.3);
-        for (let i = 0; i < 50; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * WORLD_HEIGHT;
-            const radius = 10 + Math.random() * 20;
-            bgGraphics.fillCircle(x, y, radius);
-        }
-        
-        bgGraphics.generateTexture('microBackground', WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.destroy();
-        
-        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'microBackground')
-            .setOrigin(0.5, 0.5)
-            .setScrollFactor(0);
+        // Generate dynamic quantum realm background with map level seed for consistency
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        generateQuantumBackground(this, mapLevel);
     }
     
     createGround() {

@@ -24,6 +24,7 @@ import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy, Player } from '../types/game';
+import { generateUnderwaterBackground } from '../utils/backgroundGenerator';
 
 export default class UnderwaterScene extends Phaser.Scene {
     player!: Player;
@@ -72,59 +73,9 @@ export default class UnderwaterScene extends Phaser.Scene {
     }
     
     createBackground() {
-        // Create underwater background with blue tones
-        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
-        
-        // Deep blue water gradient
-        bgGraphics.fillGradientStyle(0x0A3D62, 0x0A3D62, 0x1B6CA8, 0x1B6CA8, 1);
-        bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        
-        // Add light rays from above
-        bgGraphics.lineStyle(40, 0x2E86AB, 0.15);
-        for (let i = 0; i < WORLD_WIDTH; i += 200) {
-            bgGraphics.lineBetween(i, 0, i + 100, WORLD_HEIGHT);
-        }
-        
-        // Add kelp decorations
-        bgGraphics.lineStyle(8, 0x1B4D3E, 0.6);
-        for (let x = 100; x < WORLD_WIDTH; x += 300) {
-            // Draw wavy kelp
-            bgGraphics.beginPath();
-            bgGraphics.moveTo(x, WORLD_HEIGHT - 50);
-            for (let y = WORLD_HEIGHT - 50; y > 200; y -= 20) {
-                const wave = Math.sin(y / 30) * 15;
-                bgGraphics.lineTo(x + wave, y);
-            }
-            bgGraphics.strokePath();
-        }
-        
-        // Add coral decorations
-        bgGraphics.fillStyle(0xE63946, 0.4);
-        for (let i = 0; i < 20; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = WORLD_HEIGHT - 100 + Math.random() * 50;
-            const size = 20 + Math.random() * 30;
-            // Draw coral-like shapes
-            bgGraphics.fillCircle(x, y, size);
-            bgGraphics.fillCircle(x - size/2, y - size/2, size * 0.7);
-            bgGraphics.fillCircle(x + size/2, y - size/2, size * 0.7);
-        }
-        
-        // Add small bubbles
-        bgGraphics.fillStyle(0xFFFFFF, 0.3);
-        for (let i = 0; i < 50; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * WORLD_HEIGHT;
-            const radius = 3 + Math.random() * 5;
-            bgGraphics.fillCircle(x, y, radius);
-        }
-        
-        bgGraphics.generateTexture('underwaterBackground', WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.destroy();
-        
-        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'underwaterBackground')
-            .setOrigin(0.5, 0.5)
-            .setScrollFactor(0);
+        // Generate dynamic underwater background with map level seed for consistency
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        generateUnderwaterBackground(this, mapLevel);
     }
     
     createGround() {
