@@ -24,6 +24,7 @@ import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import type { Enemy, Player } from '../types/game';
+import { generateUnderwaterMicroBackground } from '../utils/backgroundGenerator';
 
 export default class UnderwaterMicroScene extends Phaser.Scene {
     player!: Player;
@@ -65,58 +66,9 @@ export default class UnderwaterMicroScene extends Phaser.Scene {
     }
     
     createBackground() {
-        // Create microscopic underwater background (blue-green with plankton)
-        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
-        
-        // Deep blue-green water
-        bgGraphics.fillGradientStyle(0x0B5563, 0x0B5563, 0x0E7490, 0x0E7490, 1);
-        bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        
-        // Add light diffusion patterns
-        bgGraphics.lineStyle(30, 0x06B6D4, 0.1);
-        for (let i = 0; i < WORLD_WIDTH; i += 180) {
-            bgGraphics.lineBetween(i, 0, i + 80, WORLD_HEIGHT);
-        }
-        
-        // Add plankton (small organic shapes)
-        bgGraphics.fillStyle(0x22D3EE, 0.3);
-        for (let i = 0; i < 60; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * WORLD_HEIGHT;
-            const size = 8 + Math.random() * 15;
-            // Draw plankton-like shapes
-            bgGraphics.fillCircle(x, y, size);
-            bgGraphics.fillCircle(x - size/3, y + size/3, size * 0.5);
-            bgGraphics.fillCircle(x + size/3, y + size/3, size * 0.5);
-        }
-        
-        // Add microorganism clusters
-        bgGraphics.fillStyle(0x34D399, 0.25);
-        for (let i = 0; i < 30; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * WORLD_HEIGHT;
-            const clusterSize = 3 + Math.floor(Math.random() * 5);
-            for (let j = 0; j < clusterSize; j++) {
-                const offsetX = (Math.random() - 0.5) * 40;
-                const offsetY = (Math.random() - 0.5) * 40;
-                bgGraphics.fillCircle(x + offsetX, y + offsetY, 5 + Math.random() * 8);
-            }
-        }
-        
-        // Add small particles
-        bgGraphics.fillStyle(0xA7F3D0, 0.4);
-        for (let i = 0; i < 100; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * WORLD_HEIGHT;
-            bgGraphics.fillCircle(x, y, 2 + Math.random() * 3);
-        }
-        
-        bgGraphics.generateTexture('underwaterMicroBackground', WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.destroy();
-        
-        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'underwaterMicroBackground')
-            .setOrigin(0.5, 0.5)
-            .setScrollFactor(0);
+        // Generate dynamic underwater micro background with map level seed for consistency
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        generateUnderwaterMicroBackground(this, mapLevel);
     }
     
     createGround() {

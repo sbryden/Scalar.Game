@@ -8,14 +8,14 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ## 🎯 Core Mechanics Enhancements
 
-### Fuel System for Size Transformations
-**Priority: High**
-- Implement separate fuel system (distinct from stamina which is for melee)
-- 20-second cooldown for size transformations to start
-- Fuel regenerates over time (faster at higher levels)
-- Visual fuel bar in HUD
-- Prevent size changes when fuel depleted
-- Add warning indicators when fuel is low
+### ✅ Fuel System for Size Transformations
+**Status: COMPLETED**
+- ✅ Implemented separate fuel system (distinct from stamina which is for melee)
+- ✅ 20-second cooldown for size transformations at game start
+- ✅ Fuel regenerates over time (faster at higher levels)
+- ✅ Visual fuel bar in HUD
+- ✅ Prevent size changes when fuel depleted
+- ✅ Low fuel warning indicators
 
 ### 3-Tier Scale System (Macro Scale)
 **Priority: High**
@@ -40,14 +40,17 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Particle effects during transformation animations
 - Distinct visual states per upgrade tier
 
-### Ramming/Melee Enhancements
-**Priority: High** (Core mechanic mostly implemented, needs polish)
-- Add vehicle-specific ramming abilities
-- Enhanced visual feedback for collision damage
-- Fine-tune damage balance
-- Momentum-based damage calculation
-- Better risk/reward mechanics
-- Polish melee mode visual effects
+### ✅ Ramming/Melee Enhancements
+**Status: COMPLETED**
+- ✅ Vehicle-specific ramming abilities
+- ✅ Enhanced visual feedback for collision damage (camera shake, tints, impact flashes)
+- ✅ Fine-tuned damage balance with multiple modifiers
+- ✅ Momentum-based damage calculation (velocity bonus)
+- ✅ Risk/reward mechanics (melee mode reduces damage taken, passive mode deals less damage)
+- ✅ Polished melee mode visual effects (tint colors, flashes, screen shake)
+- ✅ Combo system for consecutive hits
+- ✅ Positioning multipliers (attacking from behind/above)
+- ✅ Size-based damage scaling
 
 ---
 

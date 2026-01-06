@@ -20,6 +20,7 @@ import { DebugDisplay } from '../ui/DebugDisplay';
 import type { Enemy, Player } from '../types/game';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
+import { generateSkyBackground } from '../utils/backgroundGenerator';
 
 export default class MainGameScene extends Phaser.Scene {
     player!: Player;
@@ -65,23 +66,9 @@ export default class MainGameScene extends Phaser.Scene {
     }
     
     createBackground() {
-        // Create background
-        const bgGraphics = this.make.graphics({ x: 0, y: 0 });
-        bgGraphics.fillStyle(0x87CEEB, 1);
-        bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.lineStyle(1, 0x4DA6D6, 0.3);
-        for (let i = 0; i < WORLD_WIDTH; i += 100) {
-            bgGraphics.lineBetween(i, 0, i, WORLD_HEIGHT);
-        }
-        for (let i = 0; i < WORLD_HEIGHT; i += 100) {
-            bgGraphics.lineBetween(0, i, WORLD_WIDTH, i);
-        }
-        bgGraphics.generateTexture('background', WORLD_WIDTH, WORLD_HEIGHT);
-        bgGraphics.destroy();
-        
-        this.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'background')
-            .setOrigin(0.5, 0.5)
-            .setScrollFactor(0);
+        // Generate dynamic sky background with map level seed for consistency
+        const mapLevel = levelProgressionSystem.getCurrentLevel();
+        generateSkyBackground(this, mapLevel);
     }
     
     createGround() {
