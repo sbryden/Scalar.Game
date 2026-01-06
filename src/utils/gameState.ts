@@ -67,16 +67,20 @@ class GameState {
             MenuScene: { x: 100, y: 650 },
             MainGameScene: { x: 100, y: 650 },
             MicroScene: { x: 100, y: 650 },
+            MainGameMacroScene: { x: 100, y: 650 },
             UnderwaterScene: { x: 100, y: 650 },
-            UnderwaterMicroScene: { x: 100, y: 650 }
+            UnderwaterMicroScene: { x: 100, y: 650 },
+            UnderwaterMacroScene: { x: 100, y: 650 }
         };
         this.savedEnemies = {
             BootScene: [],
             MenuScene: [],
             MainGameScene: [],
             MicroScene: [],
+            MainGameMacroScene: [],
             UnderwaterScene: [],
-            UnderwaterMicroScene: []
+            UnderwaterMicroScene: [],
+            UnderwaterMacroScene: []
         };
         
         // Difficulty

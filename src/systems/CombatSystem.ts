@@ -417,10 +417,13 @@ export class CombatSystem {
                 const comboMultiplier = this.getComboMultiplier(player, gameTime);
                 playerDamage *= comboMultiplier;
                 
-                // Apply scale-based multiplier (micro vs normal)
-                const scaleMultiplier = gameState.playerSize === 'small' 
-                    ? PLAYER_COMBAT_CONFIG.microScaleMultiplier 
-                    : PLAYER_COMBAT_CONFIG.normalScaleMultiplier;
+                // Apply scale-based multiplier (micro/normal/macro)
+                let scaleMultiplier = PLAYER_COMBAT_CONFIG.normalScaleMultiplier;
+                if (gameState.playerSize === 'small') {
+                    scaleMultiplier = PLAYER_COMBAT_CONFIG.microScaleMultiplier;
+                } else if (gameState.playerSize === 'large') {
+                    scaleMultiplier = PLAYER_COMBAT_CONFIG.macroScaleMultiplier || 1.3; // 30% bonus for macro scale
+                }
                 playerDamage *= scaleMultiplier;
                 
             } else if (this.isPlayerMovingTowardEnemy(player, enemy)) {

@@ -26,7 +26,10 @@ class EnemyManager {
     isSwimmingEnemy(enemyType: string): boolean {
         return enemyType === "micro" || enemyType === "fish" || enemyType === "water_swimming_micro" ||
                enemyType === "boss_land_micro" || enemyType === "boss_water_swimming" || 
-               enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark";
+               enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark" ||
+               // Macro scale swimming enemies
+               enemyType === "whale" || enemyType === "giant_shark" || enemyType === "sea_dragon" ||
+               enemyType === "whale_boss" || enemyType === "giant_shark_boss" || enemyType === "sea_serpent_boss";
     }
 
     /**

@@ -138,9 +138,9 @@ export type Difficulty = 'normal' | 'hard' | 'godMode';
 /**
  * Player size states
  */
-export type PlayerSize = 'small' | 'normal';
+export type PlayerSize = 'small' | 'normal' | 'large';
 
 /**
  * Scene keys
  */
-export type SceneKey = 'BootScene' | 'MenuScene' | 'MainGameScene' | 'MicroScene' | 'UnderwaterScene' | 'UnderwaterMicroScene';
+export type SceneKey = 'BootScene' | 'MenuScene' | 'MainGameScene' | 'MicroScene' | 'MainGameMacroScene' | 'UnderwaterScene' | 'UnderwaterMicroScene' | 'UnderwaterMacroScene';
