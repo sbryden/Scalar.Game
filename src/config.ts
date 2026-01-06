@@ -21,6 +21,12 @@ export const SIZE_CONFIG: Record<string, {
         speedMultiplier: 1.0,
         jumpMultiplier: 1.0,
         color: 0x00FF00 // Green
+    },
+    large: {
+        scale: 1.5,
+        speedMultiplier: 0.8,
+        jumpMultiplier: 0.9,
+        color: 0xFF4500 // Orange-red
     }
 };
 
@@ -273,6 +279,196 @@ export const ENEMY_CONFIG: Record<string, {
         knockbackResistance: 1.3,
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
+    },
+    // === MACRO SCALE LAND ENEMIES ===
+    golem: {
+        width: 60,
+        height: 60,
+        color: 0x696969, // Dim gray (stone)
+        speed: 50,
+        health: 40,
+        damage: 18,
+        xpReward: 45,
+        patrolDistance: 300,
+        knockbackResistance: 2.5,  // Very resistant to knockback
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.2
+    },
+    wolf_macro: {
+        width: 50,
+        height: 50,
+        color: 0x808080, // Gray (wolf)
+        speed: 90,
+        health: 30,
+        damage: 20,
+        xpReward: 40,
+        patrolDistance: 450,
+        knockbackResistance: 1.8,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.6  // Fast chaser
+    },
+    bear: {
+        width: 65,
+        height: 65,
+        color: 0x8B4513, // Saddle brown (bear)
+        speed: 70,
+        health: 50,
+        damage: 22,
+        xpReward: 50,
+        patrolDistance: 350,
+        knockbackResistance: 2.8,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.4
+    },
+    golem_boss: {
+        width: 120,
+        height: 120,
+        color: 0x2F4F4F, // Dark slate gray (boss golem)
+        speed: 60,
+        health: 200,
+        damage: 30,
+        xpReward: 250,
+        patrolDistance: 400,
+        knockbackResistance: 3.5,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.2
+    },
+    bear_boss: {
+        width: 120,
+        height: 120,
+        color: 0x654321, // Dark brown (boss bear)
+        speed: 80,
+        health: 180,
+        damage: 28,
+        xpReward: 240,
+        patrolDistance: 450,
+        knockbackResistance: 3.2,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.5
+    },
+    // === MACRO SCALE UNDERWATER ENEMIES ===
+    whale: {
+        width: 80,
+        height: 80,
+        color: 0x4682B4, // Steel blue (whale)
+        speed: 60,
+        health: 60,
+        damage: 25,
+        xpReward: 55,
+        patrolDistance: 500,
+        knockbackResistance: 3.0,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    giant_shark: {
+        width: 70,
+        height: 70,
+        color: 0x2F4F4F, // Dark slate gray (shark)
+        speed: 85,
+        health: 50,
+        damage: 28,
+        xpReward: 50,
+        patrolDistance: 550,
+        knockbackResistance: 2.5,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.5
+    },
+    sea_dragon: {
+        width: 75,
+        height: 75,
+        color: 0x8B008B, // Dark magenta (sea dragon)
+        speed: 75,
+        health: 55,
+        damage: 26,
+        xpReward: 52,
+        patrolDistance: 480,
+        knockbackResistance: 2.7,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.4
+    },
+    giant_crab: {
+        width: 60,
+        height: 60,
+        color: 0xDC143C, // Crimson (giant crab)
+        speed: 55,
+        health: 70,
+        damage: 30,
+        xpReward: 60,
+        patrolDistance: 300,
+        knockbackResistance: 3.5,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    sea_serpent: {
+        width: 65,
+        height: 65,
+        color: 0x006400, // Dark green (sea serpent)
+        speed: 65,
+        health: 65,
+        damage: 27,
+        xpReward: 58,
+        patrolDistance: 400,
+        knockbackResistance: 2.8,
+        lineOfSightMultiplier: 6.0,
+        chaseSpeedMultiplier: 1.4
+    },
+    whale_boss: {
+        width: 140,
+        height: 140,
+        color: 0x191970, // Midnight blue (boss whale)
+        speed: 70,
+        health: 250,
+        damage: 35,
+        xpReward: 300,
+        patrolDistance: 600,
+        knockbackResistance: 4.0,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    giant_shark_boss: {
+        width: 140,
+        height: 140,
+        color: 0x000080, // Navy (boss shark)
+        speed: 90,
+        health: 220,
+        damage: 32,
+        xpReward: 280,
+        patrolDistance: 650,
+        knockbackResistance: 3.5,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.6,
+        // Ranged ability
+        hasRangedAbility: true,
+        projectileTexture: 'sharkpedo',
+        projectileDamage: 60,
+        projectileSpeed: 350,
+        projectileCooldown: 2500
+    },
+    giant_crab_boss: {
+        width: 140,
+        height: 140,
+        color: 0x8B0000, // Dark red (boss crab)
+        speed: 60,
+        health: 280,
+        damage: 38,
+        xpReward: 320,
+        patrolDistance: 350,
+        knockbackResistance: 4.5,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.2
+    },
+    sea_serpent_boss: {
+        width: 140,
+        height: 140,
+        color: 0x228B22, // Forest green (boss serpent)
+        speed: 75,
+        health: 240,
+        damage: 34,
+        xpReward: 290,
+        patrolDistance: 500,
+        knockbackResistance: 3.8,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.4
     }
 };
 
@@ -340,6 +536,7 @@ export const PLAYER_COMBAT_CONFIG = {
     // Scale-based ramming variations
     microScaleMultiplier: 0.9,        // Slightly reduced ramming effectiveness at micro scale
     normalScaleMultiplier: 1.0,       // Normal ramming effectiveness
+    macroScaleMultiplier: 1.3,        // Enhanced ramming effectiveness at macro scale (30% bonus)
     // Knockback scaling
     knockbackVelocityScaleFactor: 500, // Velocity at which knockback force doubles
     maxKnockbackMultiplier: 2.0       // Maximum knockback multiplier from velocity

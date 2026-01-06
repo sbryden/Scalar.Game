@@ -6,8 +6,10 @@ import BootScene from './scenes/BootScene';
 import MenuScene from './scenes/MenuScene';
 import MainGameScene from './scenes/MainGameScene';
 import MicroScene from './scenes/MicroScene';
+import MainGameMacroScene from './scenes/MainGameMacroScene';
 import UnderwaterScene from './scenes/UnderwaterScene';
 import UnderwaterMicroScene from './scenes/UnderwaterMicroScene';
+import UnderwaterMacroScene from './scenes/UnderwaterMacroScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -21,7 +23,7 @@ const config = {
             debug: false
         }
     },
-    scene: [BootScene, MenuScene, MainGameScene, MicroScene, UnderwaterScene, UnderwaterMicroScene]
+    scene: [BootScene, MenuScene, MainGameScene, MicroScene, MainGameMacroScene, UnderwaterScene, UnderwaterMicroScene, UnderwaterMacroScene]
 };
 
 const game = new Phaser.Game(config);

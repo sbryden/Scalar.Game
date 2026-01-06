@@ -43,6 +43,7 @@ class PlayerManager {
     /**
      * Change the player's size.
      * Handles size transitions, scene changes, and cooldown management.
+     * Supports 3-tier system: small (micro) → normal → large (macro)
      * 
      * @param direction - The direction to change size ('smaller', 'larger', or a specific PlayerSize)
      */
@@ -63,8 +64,8 @@ class PlayerManager {
         const currentSize = gameState.playerSize;
         const currentScene = gameState.currentSceneKey;
         
-        // All scenes only allow small and normal sizes
-        const sizeOrder: PlayerSize[] = ['small', 'normal'];
+        // 3-tier size system: small (micro) → normal → large (macro)
+        const sizeOrder: PlayerSize[] = ['small', 'normal', 'large'];
         const currentIndex = sizeOrder.indexOf(currentSize);
         
         let newSize: PlayerSize;
@@ -73,7 +74,7 @@ class PlayerManager {
             if (currentIndex <= 0) return;
             newSize = sizeOrder[currentIndex - 1]!;
         } else if (direction === 'larger') {
-            // Can't go larger than normal
+            // Can't go larger than large
             if (currentIndex >= sizeOrder.length - 1) return;
             newSize = sizeOrder[currentIndex + 1]!;
         } else {
@@ -92,8 +93,9 @@ class PlayerManager {
             return;
         }
         
-        // Land environment transitions
-        // Transition to MicroScene when going to small from MainGameScene
+        // === LAND ENVIRONMENT TRANSITIONS ===
+        
+        // MicroScene (small) ← MainGameScene (normal)
         if (newSize === 'small' && currentScene === 'MainGameScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
@@ -101,7 +103,7 @@ class PlayerManager {
             return;
         }
         
-        // Transition back to MainGameScene when going to normal from MicroScene
+        // MicroScene (small) → MainGameScene (normal)
         if (newSize === 'normal' && currentScene === 'MicroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
@@ -109,8 +111,25 @@ class PlayerManager {
             return;
         }
         
-        // Underwater environment transitions
-        // Transition to UnderwaterMicroScene when going to small from UnderwaterScene
+        // MainGameScene (normal) → MainGameMacroScene (large)
+        if (newSize === 'large' && currentScene === 'MainGameScene') {
+            gameState.playerSize = newSize;
+            gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+            gameState.scene?.scene.start('MainGameMacroScene');
+            return;
+        }
+        
+        // MainGameMacroScene (large) → MainGameScene (normal)
+        if (newSize === 'normal' && currentScene === 'MainGameMacroScene') {
+            gameState.playerSize = newSize;
+            gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+            gameState.scene?.scene.start('MainGameScene');
+            return;
+        }
+        
+        // === UNDERWATER ENVIRONMENT TRANSITIONS ===
+        
+        // UnderwaterMicroScene (small) ← UnderwaterScene (normal)
         if (newSize === 'small' && currentScene === 'UnderwaterScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
@@ -118,8 +137,24 @@ class PlayerManager {
             return;
         }
         
-        // Transition back to UnderwaterScene when going to normal from UnderwaterMicroScene
+        // UnderwaterMicroScene (small) → UnderwaterScene (normal)
         if (newSize === 'normal' && currentScene === 'UnderwaterMicroScene') {
+            gameState.playerSize = newSize;
+            gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+            gameState.scene?.scene.start('UnderwaterScene');
+            return;
+        }
+        
+        // UnderwaterScene (normal) → UnderwaterMacroScene (large)
+        if (newSize === 'large' && currentScene === 'UnderwaterScene') {
+            gameState.playerSize = newSize;
+            gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
+            gameState.scene?.scene.start('UnderwaterMacroScene');
+            return;
+        }
+        
+        // UnderwaterMacroScene (large) → UnderwaterScene (normal)
+        if (newSize === 'normal' && currentScene === 'UnderwaterMacroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
             gameState.scene?.scene.start('UnderwaterScene');
