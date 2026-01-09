@@ -145,6 +145,13 @@ class EnemyManager {
             enemy.projectileDamage = config.projectileDamage;
             enemy.projectileSpeed = config.projectileSpeed;
             enemy.projectileCooldown = config.projectileCooldown;
+            
+            // Configure burst fire properties if present
+            if (config.burstCount && config.burstDelay) {
+                enemy.burstCount = config.burstCount;
+                enemy.burstDelay = config.burstDelay;
+                enemy.currentBurstShot = 0;
+            }
         }
 
         const barWidth = VISUAL_CONFIG.healthBar.width;

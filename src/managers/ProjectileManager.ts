@@ -112,6 +112,7 @@ class ProjectileManager {
      * Fire an enemy projectile from an enemy toward the player.
      * Handles range checking, cooldown, and direction calculation.
      * Special handling for boss_water_crab which fires in a cone.
+     * Special handling for burst fire enemies like wolf_tank_boss.
      * 
      * @param scene - The Phaser scene to spawn the projectile in
      * @param enemy - The enemy firing the projectile
@@ -137,7 +138,44 @@ class ProjectileManager {
             return;
         }
         
-        // Check cooldown
+        // Handle burst fire logic
+        if (enemy.burstCount && enemy.burstDelay !== undefined) {
+            // Initialize burst state if needed
+            if (enemy.currentBurstShot === undefined) {
+                enemy.currentBurstShot = 0;
+            }
+            
+            // Check if we're in the middle of a burst
+            if (enemy.currentBurstShot > 0 && enemy.currentBurstShot < enemy.burstCount) {
+                // Continue burst if enough time has passed
+                if (enemy.lastBurstShotTime && gameTime - enemy.lastBurstShotTime >= enemy.burstDelay) {
+                    this.fireSingleProjectile(scene, enemy, player);
+                    enemy.currentBurstShot++;
+                    enemy.lastBurstShotTime = gameTime;
+                    
+                    // Reset burst after last shot
+                    if (enemy.currentBurstShot >= enemy.burstCount) {
+                        enemy.currentBurstShot = 0;
+                        enemy.lastProjectileTime = gameTime;
+                    }
+                }
+                return;
+            }
+            
+            // Check cooldown before starting new burst
+            const cooldown = enemy.projectileCooldown || 3000;
+            if (enemy.lastProjectileTime && gameTime - enemy.lastProjectileTime < cooldown) {
+                return;
+            }
+            
+            // Start new burst
+            this.fireSingleProjectile(scene, enemy, player);
+            enemy.currentBurstShot = 1;
+            enemy.lastBurstShotTime = gameTime;
+            return;
+        }
+        
+        // Regular single-shot enemies
         const cooldown = enemy.projectileCooldown || 3000;
         if (enemy.lastProjectileTime && gameTime - enemy.lastProjectileTime < cooldown) {
             return;
@@ -152,6 +190,18 @@ class ProjectileManager {
         }
         
         // Default single projectile firing
+        this.fireSingleProjectile(scene, enemy, player);
+    }
+    
+    /**
+     * Fire a single projectile from enemy toward player.
+     * Helper method used by both regular and burst fire.
+     * 
+     * @param scene - The Phaser scene to spawn the projectile in
+     * @param enemy - The enemy firing the projectile
+     * @param player - The player target
+     */
+    private fireSingleProjectile(scene: Phaser.Scene, enemy: Enemy, player: Phaser.Physics.Arcade.Sprite): void {
         // Calculate direction to player
         const angleToPlayer = Math.atan2(
             player.y - enemy.y,
@@ -163,7 +213,7 @@ class ProjectileManager {
         const velocityY = Math.sin(angleToPlayer) * speed;
         
         // Spawn projectile from enemy position
-        const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture) as Projectile;
+        const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture!) as Projectile;
         projectile.setOrigin(0.5, 0.5);
         projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
         

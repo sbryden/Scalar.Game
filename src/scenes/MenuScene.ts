@@ -456,7 +456,9 @@ export default class MenuScene extends Phaser.Scene {
                 MainGameScene: [],
                 MicroScene: [],
                 UnderwaterScene: [],
-                UnderwaterMicroScene: []
+                UnderwaterMicroScene: [],
+                MainGameMacroScene: [],
+                UnderwaterMacroScene: []
             };
             
             // Start the appropriate scene based on environment
