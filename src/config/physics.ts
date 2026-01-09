@@ -47,15 +47,15 @@ export const PHYSICS_CONFIG = {
 export const SPAWN_CONFIG = {
     segmentCount: 16,
     densityRange: {
-        min: 0.3,
-        max: 1.8
+        min: 0.2,
+        max: 1.2
     },
     positionVariance: {
         x: 50,
         y: 100
     },
     defaults: {
-        baseInterval: 300,
+        baseInterval: 500,
         groundY: 680,
         midWaterY: 400,
         microWaterY: 350,

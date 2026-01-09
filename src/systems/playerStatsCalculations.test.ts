@@ -42,13 +42,13 @@ describe('Player Stats Calculations', () => {
 
         it('handles multiple level ups from large XP gain', () => {
             // Starting: level 1, 0 XP, need 100 to level
-            // After level 2: need 110 XP (100 * 1.1)
-            // After level 3: need 121 XP (110 * 1.1)
-            // Total for level 3: 100 + 110 = 210
+            // After level 2: need 150 XP (100 * 1.5)
+            // After level 3: need 225 XP (150 * 1.5)
+            // Total for level 3: 100 + 150 = 250
             const result = calculateXPGain(1, 0, 100, 100, 250);
             
             expect(result.newLevel).toBe(3);
-            expect(result.newXP).toBe(40); // 250 - 100 - 110 = 40
+            expect(result.newXP).toBe(0); // 250 - 100 - 150 = 0
             expect(result.levelsGained).toBe(2);
         });
 
@@ -154,7 +154,7 @@ describe('Player Stats Calculations', () => {
             let xpToLevel = 100;
             for (let i = 1; i < 5; i++) {
                 expected += xpToLevel;
-                xpToLevel = Math.floor(xpToLevel * 1.1);
+                xpToLevel = Math.floor(xpToLevel * XP_CONFIG.progression.xpScalingFactor);
             }
             expect(calculateTotalXPForLevel(5)).toBe(expected);
         });
