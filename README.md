@@ -27,15 +27,18 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
   - Player enters line of sight
   - Direct collision occurs
 - **Smart Pathfinding**: Swimming enemies move in 2D space, ground enemies jump intelligently
-- **7 Boss Types**: Enhanced bosses with special abilities:
-  - Spawner bosses that summon minions
+- **Multiple Boss Types**: Enhanced bosses with special abilities:
+  - Spawner bosses that summon minions on death (land, water, micro variants)
   - Shark boss with ranged torpedo attacks
+  - Wolf tank boss for land environments
   - Scale-specific variants for land, water, and micro environments
+- **Spawner Enemies**: Micro-scale enemies that explode into 3 minions when destroyed (20% spawn chance in micro scenes)
 
 ### 📊 **Progression Systems**
 - **Player Leveling**: Collect XP orbs dropped by enemies to level up
 - **Map Levels**: Progressive difficulty scaling across multiple map levels
-- **Difficulty Modes**: Normal, Hard, and God Mode with enemy stat multipliers
+- **Difficulty Modes**: Easy (0.7x health, 0.8x speed, 0.6x spawns), Normal, and Hard (1.5x multipliers)
+- **God Mode**: Separate toggle for invincibility (optional)
 - **Boss Mode**: Toggle for boss-heavy gameplay
 - **Stats Tracking**: Detailed end-of-level statistics and score calculation
 
@@ -46,6 +49,7 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 - **Visual Feedback**: Camera shake, enemy color flashes, health bars, impact effects
 - **Magnetization**: XP orbs automatically pulled toward player
 - **Dynamic HUD**: Real-time health, XP, stamina, fuel, player level, and map level display
+- **Dynamic Backgrounds**: Procedurally generated backgrounds with 5 seeded variations per map level, featuring mountains, clouds, fish schools, coral, bioluminescent plankton, and more
 
 ## Quick Start
 
@@ -65,9 +69,10 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 
 ### Getting Started
 1. **Select Your Biome**: Choose between Land or Water environment
-2. **Choose Difficulty**: Normal, Hard, or God Mode
-3. **Toggle Boss Mode**: Enable for boss-heavy gameplay (optional)
-4. **Start Playing**: Battle enemies, collect XP, and progress through map levels!
+2. **Choose Difficulty**: Easy, Normal, or Hard
+3. **Toggle God Mode**: Enable invincibility (optional)
+4. **Toggle Boss Mode**: Enable for boss-heavy gameplay (optional)
+5. **Start Playing**: Battle enemies, collect XP, and progress through map levels!
 
 ### Controls
 
@@ -85,14 +90,17 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - **S / Down Arrow** - Thrust downward (sink slower)
 
 **Combat Controls:**
-- **F** - Shoot projectiles (ranged attack)
+- **F / K** - Shoot projectiles (ranged attack)
 - **Shift** - Melee mode (hold for close-range combat, consumes stamina)
 
 **Size Transformation:**
-- **Q** - Shrink (macro → normal → micro, consumes fuel)
-- **E** - Grow (micro → normal → macro, consumes fuel)
+- **Q** - Grow (micro → normal → macro, consumes fuel)
+- **E** - Shrink (macro → normal → micro, consumes fuel)
 - *Note: 20-second initial cooldown; fuel regenerates faster as you level up*
 - **3-Tier System**: Micro (small) → Normal → Macro (large)
+
+**UI Controls:**
+- **M** - Exit level complete screen (return to menu)
 
 ### Gameplay Tips
 - 💡 Collect glowing XP orbs to level up your character
@@ -102,9 +110,13 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - 💡 Melee mode (Shift) enhances your ramming damage and reduces damage you take
 - 💡 Macro scale gives 30% bonus ramming damage - use it against tough enemies!
 - 💡 Enemies chase when they spot you - use size changes strategically
+- 💡 Watch out for spawner enemies (orange) in micro scenes - they explode into 3 minions!
+- 💡 Defeat all minions to get XP from spawner enemies
 - 💡 Underwater physics differ - lighter gravity and slower projectiles
 - 💡 Each scale has different enemies - micro bacteria, normal threats, macro giants
 - 💡 Boss enemies have enhanced detection range and special abilities
+- 💡 Backgrounds change with each map level - enjoy 5 unique variations per scene type!
+- 💡 Try Easy mode if the game feels too challenging - reduced enemy health and spawn rates
 - 💡 Check your stats at level complete screen to track progress
 
 ## ⚙️ Technical Stack
