@@ -30,28 +30,78 @@ export class CollisionManager {
         // Enemy collisions
         this.scene.physics.add.collider(enemies, platforms);
         
-        // Projectile collisions
-        this.scene.physics.add.collider(projectiles, platforms, (proj) => {
-            proj.destroy();
+        // Projectile collisions with platforms
+        this.scene.physics.add.collider(projectiles, platforms, (obj1, obj2) => {
+            // Type guard to identify projectile
+            const isProjectile = (obj: unknown): obj is Projectile => {
+                return obj !== null && typeof obj === 'object' && 'damage' in obj && 'spawnX' in obj;
+            };
+            
+            // Find and destroy the projectile (not the platform!)
+            if (isProjectile(obj1)) {
+                obj1.destroy();
+            } else if (isProjectile(obj2)) {
+                obj2.destroy();
+            }
         });
         
-        this.scene.physics.add.collider(projectiles, enemies, (proj, enemy) => {
-            const projectile = proj as Projectile;
+        this.scene.physics.add.collider(projectiles, enemies, (obj1, obj2) => {
+            // Type guard to identify projectile vs enemy
+            const isProjectile = (obj: unknown): obj is Projectile => {
+                return obj !== null && typeof obj === 'object' && 'damage' in obj && 'spawnX' in obj;
+            };
+            const isEnemy = (obj: unknown): obj is Enemy => {
+                return obj !== null && typeof obj === 'object' && 'health' in obj && 'enemyType' in obj;
+            };
+            
+            let projectile: Projectile;
+            let enemy: Enemy;
+            
+            if (isProjectile(obj1) && isEnemy(obj2)) {
+                projectile = obj1;
+                enemy = obj2;
+            } else if (isProjectile(obj2) && isEnemy(obj1)) {
+                projectile = obj2;
+                enemy = obj1;
+            } else {
+                // Could not identify both objects, skip collision
+                return;
+            }
+            
             // Only player projectiles damage enemies
             if (!projectile.isEnemyProjectile) {
-                damageEnemy(projectile, enemy as Enemy);
+                damageEnemy(projectile, enemy);
             }
         }, undefined, this.scene);
         
         // Enemy projectile hits player (or shield)
-        this.scene.physics.add.collider(projectiles, player, (proj, p) => {
-            const projectile = proj as Projectile;
-            const playerObj = p as Player;
+        this.scene.physics.add.collider(projectiles, player, (obj1, obj2) => {
+            // Phaser collision callbacks can receive objects in either order
+            // Use type guard to identify which is the projectile vs player
+            const isProjectile = (obj: unknown): obj is Projectile => {
+                return obj !== null && typeof obj === 'object' && 'damage' in obj && 'spawnX' in obj;
+            };
+            
+            let projectile: Projectile;
+            let playerObj: Player;
+            
+            if (isProjectile(obj1)) {
+                projectile = obj1;
+                playerObj = obj2 as Player;
+            } else if (isProjectile(obj2)) {
+                projectile = obj2;
+                playerObj = obj1 as Player;
+            } else {
+                // Neither object is a valid projectile, skip collision
+                console.warn('Projectile-player collision: Could not identify projectile');
+                return;
+            }
+            
             // Only enemy projectiles can hit player
             if (projectile.isEnemyProjectile) {
                 combatSystem.handleEnemyProjectileHit(projectile, playerObj, this.scene.time.now);
             } else {
-                // Player projectile hit the player (shouldn't happen, but destroy to be safe)
+                // Player projectile hit the player - just destroy the projectile, not the player!
                 projectile.destroy();
             }
         }, undefined, this.scene);
@@ -71,8 +121,27 @@ export class CollisionManager {
             return;
         }
         
-        this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (p, enemy) => {
-            combatSystem.handlePlayerEnemyCollision(p as Player, enemy as Enemy, this.scene.time.now);
+        this.playerEnemyCollider = this.scene.physics.add.collider(player, enemies, (obj1, obj2) => {
+            // Type guard to identify player vs enemy
+            const isEnemy = (obj: unknown): obj is Enemy => {
+                return obj !== null && typeof obj === 'object' && 'health' in obj && 'enemyType' in obj;
+            };
+            
+            let playerObj: Player;
+            let enemy: Enemy;
+            
+            if (isEnemy(obj1)) {
+                enemy = obj1;
+                playerObj = obj2 as Player;
+            } else if (isEnemy(obj2)) {
+                enemy = obj2;
+                playerObj = obj1 as Player;
+            } else {
+                // Could not identify enemy, skip collision
+                return;
+            }
+            
+            combatSystem.handlePlayerEnemyCollision(playerObj, enemy, this.scene.time.now);
         }, undefined, this.scene);
     }
 }

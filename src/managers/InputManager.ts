@@ -70,7 +70,11 @@ export class InputManager {
      */
     handleJump(): void {
         const player = gameState.player;
-        if (!player || !player.body.touching.down) {
+        if (!player || !player.body) {
+            return;
+        }
+        
+        if (!player.body.touching.down) {
             return;
         }
         
@@ -158,6 +162,8 @@ export class InputManager {
      * Handle land-based movement (original behavior)
      */
     handleLandMovement(): void {
+        if (!gameState.player || !gameState.player.body) return;
+        
         const baseSpeed = 160;
         const sizeConfig = SIZE_CONFIG[getPlayerSize()];
         if (!sizeConfig) return;
@@ -169,7 +175,7 @@ export class InputManager {
             speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
         }
         
-        const body = gameState.player!.body;
+        const body = gameState.player.body;
         
         if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
             body.setVelocityX(-baseSpeed * speedMultiplier);
