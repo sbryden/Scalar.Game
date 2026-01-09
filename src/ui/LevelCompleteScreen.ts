@@ -15,7 +15,7 @@ export class LevelCompleteScreen {
     messageText: Phaser.GameObjects.Text | null;
     nKey: Phaser.Input.Keyboard.Key | null;
     rKey: Phaser.Input.Keyboard.Key | null;
-    eKey: Phaser.Input.Keyboard.Key | null;
+    mKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
     onNextLevel: (() => void) | null;
     onReplay: (() => void) | null;
@@ -30,7 +30,7 @@ export class LevelCompleteScreen {
         this.messageText = null;
         this.nKey = null;
         this.rKey = null;
-        this.eKey = null;
+        this.mKey = null;
         this.isVisible = false;
         this.onNextLevel = null;
         this.onReplay = null;
@@ -98,7 +98,7 @@ export class LevelCompleteScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 100,
-            'Press N for Next Level\nPress R to Replay\nPress E to Exit to Main Menu',
+            'Press N for Next Level\nPress R to Replay\nPress M to Exit to Main Menu',
             {
                 fontSize: '24px',
                 color: '#FFFFFF',
@@ -113,12 +113,12 @@ export class LevelCompleteScreen {
         this.messageText.setScrollFactor(0);
         this.messageText.setVisible(false);
 
-        // Setup keyboard input for N, R and E
+        // Setup keyboard input for N, R and M
         this.nKey = this.scene.input.keyboard!.addKey('N');
         this.rKey = this.scene.input.keyboard!.addKey('R');
-        this.eKey = this.scene.input.keyboard!.addKey('E');
+        this.mKey = this.scene.input.keyboard!.addKey('M');
 
-        // Add listeners for N, R and E keys
+        // Add listeners for N, R and M keys
         this.nKey.on('down', () => {
             if (this.isVisible) {
                 this.handleNextLevel();
@@ -131,7 +131,7 @@ export class LevelCompleteScreen {
             }
         });
 
-        this.eKey.on('down', () => {
+        this.mKey.on('down', () => {
             if (this.isVisible) {
                 this.handleExit();
             }
@@ -244,7 +244,7 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Handle exit (E key)
+     * Handle exit (M key)
      */
     handleExit(): void {
         this.hide();
@@ -286,8 +286,8 @@ export class LevelCompleteScreen {
         if (this.rKey) {
             this.rKey.removeAllListeners();
         }
-        if (this.eKey) {
-            this.eKey.removeAllListeners();
+        if (this.mKey) {
+            this.mKey.removeAllListeners();
         }
         if (this.overlay) {
             this.overlay.destroy();
