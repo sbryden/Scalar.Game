@@ -3,7 +3,7 @@
  * Manages map level progression and difficulty scaling
  */
 import { LEVEL_SYSTEM_CONFIG } from '../config';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 
 class LevelProgressionSystem {
     /**
@@ -88,5 +88,25 @@ class LevelProgressionSystem {
     }
 }
 
-// Export singleton instance
-export default new LevelProgressionSystem();
+// Singleton instance management
+let levelProgressionSystemInstance: LevelProgressionSystem | null = null;
+
+/**
+ * Get the LevelProgressionSystem instance, creating it if necessary
+ */
+export function getLevelProgressionSystem(): LevelProgressionSystem {
+    if (!levelProgressionSystemInstance) {
+        levelProgressionSystemInstance = new LevelProgressionSystem();
+    }
+    return levelProgressionSystemInstance;
+}
+
+/**
+ * Reset the LevelProgressionSystem instance (useful for testing)
+ */
+export function resetLevelProgressionSystem(): void {
+    levelProgressionSystemInstance = null;
+}
+
+// Default export for backward compatibility
+export default getLevelProgressionSystem();

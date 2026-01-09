@@ -62,6 +62,11 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     projectileSpeed?: number;
     projectileCooldown?: number;
     lastProjectileTime?: number;
+    // Burst fire properties
+    burstCount?: number;
+    burstDelay?: number;
+    currentBurstShot?: number;
+    lastBurstShotTime?: number;
 }
 
 /**
@@ -81,6 +86,10 @@ export interface Projectile extends Phaser.GameObjects.Image {
 export interface XPOrb extends Phaser.GameObjects.Arc {
     body: Phaser.Physics.Arcade.Body;
     xpValue: number;
+    isCompanionOrb?: boolean;
+    // Companion orb float behavior
+    floatTargetY?: number;
+    hasReachedFloatHeight?: boolean;
 }
 
 /**
@@ -96,6 +105,7 @@ export interface PlayerStats {
     maxStamina: number;
     fuel: number;
     maxFuel: number;
+    hasWolfCompanion?: boolean;
 }
 
 /**
@@ -138,9 +148,9 @@ export type Difficulty = 'normal' | 'hard' | 'godMode';
 /**
  * Player size states
  */
-export type PlayerSize = 'small' | 'normal';
+export type PlayerSize = 'small' | 'normal' | 'large';
 
 /**
  * Scene keys
  */
-export type SceneKey = 'BootScene' | 'MenuScene' | 'MainGameScene' | 'MicroScene' | 'UnderwaterScene' | 'UnderwaterMicroScene';
+export type SceneKey = 'BootScene' | 'MenuScene' | 'MainGameScene' | 'MicroScene' | 'MainGameMacroScene' | 'UnderwaterScene' | 'UnderwaterMicroScene' | 'UnderwaterMacroScene';

@@ -88,5 +88,25 @@ class XPOrbManager {
     }
 }
 
-// Export singleton instance
-export default new XPOrbManager();
+// Singleton instance management
+let xpOrbManagerInstance: XPOrbManager | null = null;
+
+/**
+ * Get the XPOrbManager instance, creating it if necessary
+ */
+export function getXPOrbManager(): XPOrbManager {
+    if (!xpOrbManagerInstance) {
+        xpOrbManagerInstance = new XPOrbManager();
+    }
+    return xpOrbManagerInstance;
+}
+
+/**
+ * Reset the XPOrbManager instance (useful for testing)
+ */
+export function resetXPOrbManager(): void {
+    xpOrbManagerInstance = null;
+}
+
+// Default export for backward compatibility
+export default getXPOrbManager();

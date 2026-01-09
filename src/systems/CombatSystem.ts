@@ -6,7 +6,7 @@ import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../confi
 import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import enemyManager from '../managers/EnemyManager';
 import type { Player, Enemy, Projectile } from '../types/game';
 
@@ -417,10 +417,13 @@ export class CombatSystem {
                 const comboMultiplier = this.getComboMultiplier(player, gameTime);
                 playerDamage *= comboMultiplier;
                 
-                // Apply scale-based multiplier (micro vs normal)
-                const scaleMultiplier = gameState.playerSize === 'small' 
-                    ? PLAYER_COMBAT_CONFIG.microScaleMultiplier 
-                    : PLAYER_COMBAT_CONFIG.normalScaleMultiplier;
+                // Apply scale-based multiplier (micro/normal/macro)
+                let scaleMultiplier = PLAYER_COMBAT_CONFIG.normalScaleMultiplier;
+                if (gameState.playerSize === 'small') {
+                    scaleMultiplier = PLAYER_COMBAT_CONFIG.microScaleMultiplier;
+                } else if (gameState.playerSize === 'large') {
+                    scaleMultiplier = PLAYER_COMBAT_CONFIG.macroScaleMultiplier || 1.3; // 30% bonus for macro scale
+                }
                 playerDamage *= scaleMultiplier;
                 
             } else if (this.isPlayerMovingTowardEnemy(player, enemy)) {
@@ -648,9 +651,9 @@ export class CombatSystem {
                 minionY = boss.y; // Same Y position as boss
             }
             
-            // Spawn minion using the gameState spawn function
-            if (gameState.spawnEnemyFunc) {
-                const minion = gameState.spawnEnemyFunc(boss.scene, minionX, minionY, boss.minionType);
+            // Spawn minion using the spawn function
+            if (gameState.scene) {
+                const minion = enemyManager.spawnEnemy(boss.scene, minionX, minionY, boss.minionType);
                 
                 // Link minion to parent spawner boss
                 minion.parentSpawnerBossId = boss.spawnerBossId;
@@ -771,8 +774,19 @@ export class CombatSystem {
         } else {
             // Regular enemy or regular boss (non-spawner)
             
-            // Spawn XP orb immediately at enemy location
-            if (enemy.scene && enemy.xpReward) {
+            // Check if this is a wolf tank boss - spawn companion orb instead of XP
+            if (enemy.enemyType === 'boss_wolf_tank' && enemy.scene) {
+                spawnSystem.spawnCompanionOrb(enemy.scene, enemy.x, enemy.y);
+                
+                // Set depth for companion orb to ensure it appears above dying enemies
+                if (gameState.xpOrbs) {
+                    gameState.xpOrbs.children.entries.forEach((obj) => {
+                        const orb = obj as Phaser.GameObjects.Arc;
+                        orb.setDepth(100);
+                    });
+                }
+            } else if (enemy.scene && enemy.xpReward) {
+                // Spawn XP orb immediately at enemy location for other enemies
                 spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
                 
                 // Set depth for XP orbs to ensure they appear above dying enemies
@@ -859,5 +873,25 @@ export class CombatSystem {
     }
 }
 
-// Export singleton instance
-export default new CombatSystem();
+// Singleton instance management
+let combatSystemInstance: CombatSystem | null = null;
+
+/**
+ * Get the CombatSystem instance, creating it if necessary
+ */
+export function getCombatSystem(): CombatSystem {
+    if (!combatSystemInstance) {
+        combatSystemInstance = new CombatSystem();
+    }
+    return combatSystemInstance;
+}
+
+/**
+ * Reset the CombatSystem instance (useful for testing)
+ */
+export function resetCombatSystem(): void {
+    combatSystemInstance = null;
+}
+
+// Default export for backward compatibility
+export default getCombatSystem();
