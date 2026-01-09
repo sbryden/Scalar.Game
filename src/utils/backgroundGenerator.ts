@@ -343,9 +343,9 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): v
     // Connect nearby nodes
     for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
-            const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+            const dist = Math.hypot(nodes[i]!.x - nodes[j]!.x, nodes[i]!.y - nodes[j]!.y);
             if (dist < 250) {
-                bgGraphics.lineBetween(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);
+                bgGraphics.lineBetween(nodes[i]!.x, nodes[i]!.y, nodes[j]!.x, nodes[j]!.y);
             }
         }
     }
@@ -611,8 +611,8 @@ export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: nu
                 // Circular clusters
                 bgGraphics.fillCircle(x + offsetX, y + offsetY, size);
             } else if (clusterType === 1) {
-                // Star-shaped clusters
-                bgGraphics.fillStar(x + offsetX, y + offsetY, 5, size * 0.5, size, 0);
+                // Star-shaped clusters - using circle instead as fillStar is not standard
+                bgGraphics.fillCircle(x + offsetX, y + offsetY, size);
             } else {
                 // Oval clusters
                 bgGraphics.fillEllipse(x + offsetX, y + offsetY, size * 1.5, size);
