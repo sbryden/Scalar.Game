@@ -28,7 +28,7 @@ export const XP_CONFIG = {
         startingXP: 0,
         startingXPToLevel: 100,
         healthIncreasePerLevel: 20,
-        xpScalingFactor: 1.1
+        xpScalingFactor: 1.5
     },
     vehicleUpgrade: {
         submarineLevel2Threshold: 2,
@@ -41,7 +41,7 @@ export const XP_CONFIG = {
 export const LEVEL_SYSTEM_CONFIG = {
     startingLevel: 1,
     enemyCountBase: 1.0,
-    enemyCountIncreasePerLevel: 0.2,
+    enemyCountIncreasePerLevel: 0.1,
     enemyHealthBase: 1.0,
     enemyHealthIncreasePerLevel: 0.15,
     enemyDamageBase: 1.0,
