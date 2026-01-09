@@ -263,7 +263,16 @@ export function getFuelSystem(): FuelSystem {
     return fuelSystemInstance;
 }
 
+/**
+ * Reset the FuelSystem instance (useful for testing)
+ */
+export function resetFuelSystem(): void {
+    fuelSystemInstance = null;
+}
+
+// Default export for backward compatibility
 export default {
     initialize: initializeFuelSystem,
-    getInstance: getFuelSystem
+    getInstance: getFuelSystem,
+    reset: resetFuelSystem
 };

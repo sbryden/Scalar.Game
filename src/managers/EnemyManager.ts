@@ -4,7 +4,7 @@
  * Singleton pattern for consistent state management across the game.
  */
 import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "../config";
-import gameState from "../utils/gameState";
+import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
@@ -493,5 +493,25 @@ class EnemyManager {
     }
 }
 
-// Export singleton instance
-export default new EnemyManager();
+// Singleton instance management
+let enemyManagerInstance: EnemyManager | null = null;
+
+/**
+ * Get the EnemyManager instance, creating it if necessary
+ */
+export function getEnemyManager(): EnemyManager {
+    if (!enemyManagerInstance) {
+        enemyManagerInstance = new EnemyManager();
+    }
+    return enemyManagerInstance;
+}
+
+/**
+ * Reset the EnemyManager instance (useful for testing)
+ */
+export function resetEnemyManager(): void {
+    enemyManagerInstance = null;
+}
+
+// Default export for backward compatibility
+export default getEnemyManager();

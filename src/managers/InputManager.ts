@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import gameState from '../utils/gameState';
-import { changeSize, getPlayerSize } from '../player';
+import gameState from '../utils/GameContext';
+import playerManager from './PlayerManager';
 import projectileManager from './ProjectileManager';
 import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, PHYSICS_CONFIG } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
@@ -56,8 +56,16 @@ export class InputManager {
         }
         
         // Size changes - Q for smaller, E for larger (one step at a time)
-        this.scene.input.keyboard?.on('keydown-Q', () => changeSize('smaller'));
-        this.scene.input.keyboard?.on('keydown-E', () => changeSize('larger'));
+        this.scene.input.keyboard?.on('keydown-Q', () => {
+            const currentSize = playerManager.getPlayerSize();
+            const newSize = currentSize === 'large' ? 'normal' : 'small';
+            playerManager.changeSize(newSize);
+        });
+        this.scene.input.keyboard?.on('keydown-E', () => {
+            const currentSize = playerManager.getPlayerSize();
+            const newSize = currentSize === 'small' ? 'normal' : 'large';
+            playerManager.changeSize(newSize);
+        });
         
         // Attack
         this.scene.input.keyboard?.on('keydown-F', () => {
@@ -80,7 +88,7 @@ export class InputManager {
         
         const body = player.body;
         const currentVelocityX = body.velocity.x;
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         const jumpPower = PHYSICS_CONFIG.player.jumpPower * sizeConfig.jumpMultiplier;
@@ -165,7 +173,7 @@ export class InputManager {
         if (!gameState.player || !gameState.player.body) return;
         
         const baseSpeed = 160;
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         let speedMultiplier = sizeConfig.speedMultiplier;
@@ -194,7 +202,7 @@ export class InputManager {
     handleUnderwaterMovement(): void {
         const baseSpeed = 140; // Slightly slower in water
         const thrustPower = 150; // Vertical thrust power
-        const sizeConfig = SIZE_CONFIG[getPlayerSize()];
+        const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
         let speedMultiplier = sizeConfig.speedMultiplier;

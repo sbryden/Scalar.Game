@@ -2,8 +2,8 @@
  * Collision Manager
  * Sets up and manages all physics collisions in the game
  */
-import gameState from '../utils/gameState';
-import { damageEnemy } from '../enemies';
+import gameState from '../utils/GameContext';
+import enemyManager from './EnemyManager';
 import combatSystem from '../systems/CombatSystem';
 import type { Player, Enemy, Projectile } from '../types/game';
 
@@ -70,7 +70,7 @@ export class CollisionManager {
             
             // Only player projectiles damage enemies
             if (!projectile.isEnemyProjectile) {
-                damageEnemy(projectile, enemy);
+                enemyManager.damageEnemy(projectile, enemy);
             }
         }, undefined, this.scene);
         

@@ -3,6 +3,19 @@
  * Handles asset preloading before the main game starts
  */
 import Phaser from 'phaser';
+import { Services } from '../services';
+
+// Import singletons for service registration
+import playerManager from '../managers/PlayerManager';
+import projectileManager from '../managers/ProjectileManager';
+import xpOrbManager from '../managers/XPOrbManager';
+import enemyManager from '../managers/EnemyManager';
+import combatSystem from '../systems/CombatSystem';
+import spawnSystem from '../systems/SpawnSystem';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
+import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import levelStatsTracker from '../systems/LevelStatsTracker';
+import magnetismSystem from '../systems/MagnetismSystem';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -102,7 +115,36 @@ export default class BootScene extends Phaser.Scene {
     }
     
     create() {
+        // Register all singleton services with the ServiceLocator
+        this.initializeServices();
+        
         // Once loading is complete, start the menu scene
         this.scene.start('MenuScene');
+    }
+
+    /**
+     * Initialize the ServiceLocator with all game services
+     * This breaks circular dependencies by providing centralized access
+     * 
+     * Note: StaminaSystem and FuelSystem require config initialization
+     * and are registered via PlayerStatsSystem.initializeDifficulty()
+     */
+    private initializeServices(): void {
+        // Managers
+        Services.register('playerManager', playerManager);
+        Services.register('projectileManager', projectileManager);
+        Services.register('xpOrbManager', xpOrbManager);
+        Services.register('enemyManager', enemyManager);
+
+        // Systems
+        Services.register('combatSystem', combatSystem);
+        Services.register('spawnSystem', spawnSystem);
+        Services.register('playerStatsSystem', playerStatsSystem);
+        Services.register('levelProgressionSystem', levelProgressionSystem);
+        Services.register('levelStatsTracker', levelStatsTracker);
+        Services.register('magnetismSystem', magnetismSystem);
+
+        // Mark services as initialized
+        Services.initialize();
     }
 }

@@ -2,496 +2,75 @@
  * Underwater Micro Scene
  * Microscopic underwater scene with swimming micro organisms
  */
-import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../config';
-import spawnSystem from '../systems/SpawnSystem';
-import { spawnEnemy, updateEnemyAI } from '../enemies';
-import projectileManager from '../managers/ProjectileManager';
-import xpOrbManager from '../managers/XPOrbManager';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
-import gameState from '../utils/gameState';
-import playerStatsSystem from '../systems/PlayerStatsSystem';
-import combatSystem from '../systems/CombatSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
+import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
-import { getStaminaSystem } from '../systems/StaminaSystem';
-import { getFuelSystem } from '../systems/FuelSystem';
-import { InputManager } from '../managers/InputManager';
-import { CollisionManager } from '../managers/CollisionManager';
-import { CameraManager } from '../managers/CameraManager';
-import { HUD } from '../ui/HUD';
-import { DebugDisplay } from '../ui/DebugDisplay';
-import { GameOverScreen } from '../ui/GameOverScreen';
-import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
-import type { Enemy, Player } from '../types/game';
 import { generateUnderwaterMicroBackground } from '../utils/backgroundGenerator';
+import BaseGameScene from './BaseGameScene';
+import type { SceneConfig } from './BaseGameScene';
 
-export default class UnderwaterMicroScene extends Phaser.Scene {
-    player!: Player;
-    platforms!: Phaser.Physics.Arcade.StaticGroup;
-    enemies!: Phaser.Physics.Arcade.Group;
-    projectiles!: Phaser.Physics.Arcade.Group;
-    xpOrbs!: Phaser.Physics.Arcade.Group;
-    hud!: HUD;
-    debugDisplay!: DebugDisplay;
-    gameOverScreen!: GameOverScreen;
-    levelCompleteScreen!: LevelCompleteScreen;
-    inputManager!: InputManager;
-    collisionManager!: CollisionManager;
-    cameraManager!: CameraManager;
-
+export default class UnderwaterMicroScene extends BaseGameScene {
     constructor() {
-        super({ key: 'UnderwaterMicroScene' });
+        super('UnderwaterMicroScene');
     }
-    
-    create() {
-        // Reset spawner boss tracking
-        combatSystem.resetSpawnerTracking();
-        
-        // Start tracking level stats
-        levelStatsTracker.startLevel(this.time.now);
-        
-        // Set very light gravity for micro underwater (half of underwater)
-        this.physics.world.gravity.y = 50;
-        
-        this.createBackground();
-        this.createGround();
-        this.createPlayer();
-        this.createGroups();
-        this.initializeGameState();
-        this.createUI();
-        this.restoreOrSpawnEnemies();
-        this.setupManagers();
-        this.createDebugText();
+
+    protected getSceneConfig(): SceneConfig {
+        return {
+            sceneKey: 'UnderwaterMicroScene',
+            gravity: 50, // Very light gravity for micro underwater
+            playerTexture: 'sub_1',
+            playerScale: 0.15, // Smaller for micro scale
+            playerBounce: 0.1,
+            playerDrag: { x: 70, y: 70 }, // More drag for micro environment
+            defaultEnemyType: 'micro_fish',
+            spawnInterval: SPAWN_CONFIG.defaults.baseInterval,
+            groundY: SPAWN_CONFIG.defaults.midWaterY,
+            allowYVariance: true
+        };
     }
-    
-    createBackground() {
-        // Generate dynamic underwater micro background with map level seed for consistency
+
+    protected getBossTypes(): string[] {
+        return ['boss_water_micro'];
+    }
+
+    protected createBackground(): void {
         const mapLevel = levelProgressionSystem.getCurrentLevel();
         generateUnderwaterMicroBackground(this, mapLevel);
     }
-    
-    createGround() {
-        // Create microscopic membrane-like ground
-        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
-        
-        // Base membrane color (blue-green)
-        groundGraphics.fillStyle(0x065F46, 1);
-        groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
-        
-        // Add organic membrane texture
-        groundGraphics.fillStyle(0x047857, 1);
-        for (let x = 0; x < WORLD_WIDTH; x += 35) {
-            for (let y = 0; y < 50; y += 18) {
-                const offset = (y === 18) ? 18 : 0;
-                groundGraphics.fillCircle(x + offset + 8, y + 8, 6);
-            }
-        }
-        
-        // Add micro-particles on ground
-        groundGraphics.fillStyle(0x10B981, 0.5);
-        for (let i = 0; i < 80; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * 50;
-            groundGraphics.fillCircle(x, y, 2 + Math.random() * 4);
-        }
-        
-        groundGraphics.generateTexture('underwaterMicroGround', WORLD_WIDTH, 50);
-        groundGraphics.destroy();
-        
-        // Create platforms
-        this.platforms = this.physics.add.staticGroup();
-        this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        const ground = this.platforms.create(WORLD_WIDTH / 2, 750, 'underwaterMicroGround');
-        ground.setOrigin(0.5, 0.5);
-        ground.setScale(1).refreshBody();
-    }
-    
-    createPlayer() {
-        // Restore player position or use default
-        const savedPos = gameState.savedPositions.UnderwaterMicroScene;
-        
-        // Create player (smaller submarine)
-        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'sub_1') as Player;
-        this.player.setScale(0.15);
-        this.player.setBounce(0.1);
-        this.player.setCollideWorldBounds(true);
-        // More drag for micro environment
-        this.player.setDrag(70, 70);
-        this.player.scene = this;
-        
-        this.physics.add.collider(this.player, this.platforms);
-    }
-    
-    createGroups() {
-        // Create groups
-        this.enemies = this.physics.add.group();
-        this.projectiles = this.physics.add.group();
-        this.xpOrbs = this.physics.add.group();
-    }
-    
-    initializeGameState() {
-        // Initialize gameState with all game objects
-        gameState.player = this.player;
-        gameState.enemies = this.enemies;
-        gameState.projectiles = this.projectiles;
-        gameState.xpOrbs = this.xpOrbs;
-        gameState.platforms = this.platforms;
-        gameState.scene = this;
-        gameState.currentSceneKey = 'UnderwaterMicroScene';
-        gameState.spawnEnemyFunc = spawnEnemy;
-        
-        // Apply correct vehicle texture based on player level
-        spawnSystem.upgradePlayerCar();
-    }
-    
-    createUI() {
-        // Create HUD
-        this.hud = new HUD(this);
-        gameState.levelText = this.hud.levelText;
-        
-        // Create Game Over Screen
-        this.gameOverScreen = new GameOverScreen(this);
-        this.gameOverScreen.create();
-        
-        // Set up game over callback
-        playerStatsSystem.setGameOverCallback(() => {
-            this.handleGameOver();
-        });
-        
-        // Set up continue and quit callbacks
-        this.gameOverScreen.setContinueCallback(() => {
-            this.handleContinue();
-        });
-        
-        this.gameOverScreen.setQuitCallback(() => {
-            this.handleQuit();
-        });
-        
-        // Create Level Complete Screen
-        this.levelCompleteScreen = new LevelCompleteScreen(this);
-        this.levelCompleteScreen.create();
-        
-        // Set up boss defeat callback
-        combatSystem.setBossDefeatCallback(() => {
-            this.handleLevelComplete();
-        });
-        
-        // Set up next level, replay and exit callbacks
-        this.levelCompleteScreen.setNextLevelCallback(() => {
-            this.handleNextLevel();
-        });
-        
-        this.levelCompleteScreen.setReplayCallback(() => {
-            this.handleReplay();
-        });
-        
-        this.levelCompleteScreen.setExitCallback(() => {
-            this.handleExitToMenu();
-        });
-    }
-    
-    restoreOrSpawnEnemies() {
-        // Check if we have saved enemies for this scene
-        const savedEnemies = gameState.savedEnemies.UnderwaterMicroScene;
 
-        // Check if boss mode is active
-        const bossMode = this.registry.get('bossMode') === true;
-        
-        if (savedEnemies && savedEnemies.length > 0) {
-            // Restore saved enemies
-            savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'water_swimming_micro');
-                enemy.health = enemyData.health;
-                enemy.startX = enemyData.startX;
-                enemy.startY = enemyData.startY || enemyData.y;
-                enemy.direction = enemyData.direction;
-            });
-        } else {
-            if (bossMode) {
-                // Boss mode: spawn only bosses (swimming micro + crab micro)
-                const { fishSpawns, crabSpawns } = spawnSystem.generateMixedSpawnPoints(0.8);
-                
-                // Spawn boss swimming micro
-                fishSpawns.forEach(point => {
-                    spawnEnemy(this, point.x, point.y, 'boss_water_swimming_micro');
-                });
-                
-                // Spawn boss micro crabs
-                crabSpawns.forEach(point => {
-                    spawnEnemy(this, point.x, point.y, 'boss_water_crab_micro');
-                });
-                
-                // Set total bosses for tracking
-                combatSystem.setTotalBosses(fishSpawns.length + crabSpawns.length);
-            } else {
-                // Normal mode: Generate dynamic spawn points with random density distribution
-                // Water swimming micro enemies are floating enemies, so allow Y variance
-                const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
-                    SPAWN_CONFIG.defaults.baseInterval,
-                    SPAWN_CONFIG.defaults.microWaterY,
-                    true
-                );
-                
-                // Spawn water swimming micro enemies at generated points
-                spawnPoints.forEach(point => {
-                    if (point.isBoss) {
-                        // Spawn boss water swimming micro
-                        spawnEnemy(this, point.x, point.y, 'boss_water_swimming_micro');
-                    } else {
-                        // Spawn regular water swimming micro
-                        spawnEnemy(this, point.x, point.y, 'water_swimming_micro');
-                    }
-                });
+    protected createGround(): void {
+        this.createGroundWithTexture('underwaterMicroGround', (graphics) => {
+            // Base membrane color (blue-green)
+            graphics.fillStyle(0x065F46, 1);
+            graphics.fillRect(0, 0, WORLD_WIDTH, 50);
+            
+            // Add organic membrane texture
+            graphics.fillStyle(0x047857, 1);
+            for (let x = 0; x < WORLD_WIDTH; x += 35) {
+                for (let y = 0; y < 50; y += 18) {
+                    const offset = (y === 18) ? 18 : 0;
+                    graphics.fillCircle(x + offset + 8, y + 8, 6);
+                }
             }
-        }
-    }
-    
-    setupManagers() {
-        // Setup managers
-        this.inputManager = new InputManager(this);
-        this.inputManager.setupInput();
-        
-        this.collisionManager = new CollisionManager(this);
-        this.collisionManager.setupCollisions();
-        
-        this.cameraManager = new CameraManager(this);
-        this.cameraManager.setupCamera();
-    }
-    
-    createDebugText() {
-        // Create debug display (only enabled in development)
-        this.debugDisplay = new DebugDisplay(this);
-    }
-    
-    update() {
-        const playerStats = xpOrbManager.getPlayerStats();
-        
-        // Update stamina system
-        const staminaSystem = getStaminaSystem();
-        const isMeleeActive = this.player?.isMeleeMode || false;
-        staminaSystem.update(isMeleeActive, this.time.now);
-        
-        // Update fuel system
-        const fuelSystem = getFuelSystem();
-        fuelSystem.update(this.time.now);
-        
-        // Update debug display (only if enabled)
-        if (this.debugDisplay?.enabled) {
-            this.debugDisplay.update(this.player.x, playerStats);
-        }
-        
-        // Update HUD
-        this.hud.update(playerStats);
-        
-        // Update boss count display if in boss mode
-        const bossMode = this.registry.get('bossMode') === true;
-        if (bossMode) {
-            const bossProgress = combatSystem.getBossProgress();
-            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
-        } else {
-            this.hud.hideBossCount();
-        }
-        
-        // Update size change cooldown
-        let timer = getSizeChangeTimer();
-        if (timer > 0) {
-            timer -= 1000 / 60;
-            setSizeChangeTimer(timer);
-        }
-        
-        // Handle player movement
-        this.inputManager.handleMovement();
-        
-        // Update enemies
-        this.enemies.children.entries.forEach(obj => {
-            const enemy = obj as Enemy;
-            if (enemy.active) {
-                updateEnemyAI(enemy, this.time.now);
+            
+            // Add micro-particles on ground
+            graphics.fillStyle(0x10B981, 0.5);
+            for (let i = 0; i < 80; i++) {
+                const x = Math.random() * WORLD_WIDTH;
+                const y = Math.random() * 50;
+                graphics.fillCircle(x, y, 2 + Math.random() * 4);
             }
         });
-        
-        // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
-        
-        // Update projectiles
-        projectileManager.updateProjectiles();
-        
-        // Update XP orb magnetism
-        xpOrbManager.updateXPOrbMagnetism();
-        
-        // Update camera
-        this.cameraManager.update();
     }
-    
-    handleGameOver() {
-        console.log('Game Over - Showing screen...');
-        this.gameOverScreen.show();
-    }
-    
-    startImmunityFlash(player: Phaser.Physics.Arcade.Sprite): void {
-        let flashCount = 0;
-        const maxFlashes = 20; // Flash 20 times over 2 seconds (10 on/off cycles)
-        
-        const flashTimer = this.time.addEvent({
-            delay: 100, // Flash every 100ms
-            callback: () => {
-                flashCount++;
-                if (flashCount % 2 === 0) {
-                    player.setAlpha(1);
-                } else {
-                    player.setAlpha(0.3);
-                }
-                
-                if (flashCount >= maxFlashes) {
-                    player.setAlpha(1); // Ensure fully visible at end
-                    flashTimer.destroy();
-                }
-            },
-            loop: true
-        });
-    }
-    
-    handleContinue() {
-        console.log('Player chose to continue');
-        
-        // Reset player stats
-        playerStatsSystem.reset();
-        
-        // Reset player position
-        this.player.setPosition(400, 100);
-        this.player.setVelocity(0, 0);
-        
-        // Clear player tint if any
-        this.player.clearTint();
-        
-        // Activate immunity for 2 seconds
-        this.player.immuneUntil = this.time.now + 2000;
-        
-        // Start flashing effect
-        this.startImmunityFlash(this.player);
-        
-        // Disable collisions with enemies temporarily
-        const collider = this.collisionManager.playerEnemyCollider;
-        if (collider) {
-            this.physics.world.removeCollider(collider);
-        }
-        
-        // Re-enable collisions after immunity ends
-        this.time.delayedCall(2000, () => {
-            this.collisionManager.setupPlayerEnemyCollision();
-        });
-        
-        // Clear all enemies and their health bars
-        this.enemies.children.entries.forEach((enemy: any) => {
-            if (enemy.healthBar) enemy.healthBar.destroy();
-            if (enemy.healthBarBg) enemy.healthBarBg.destroy();
-        });
-        this.enemies.clear(true, true);
-        
-        // Clear all projectiles and XP orbs
-        this.projectiles.clear(true, true);
-        this.xpOrbs.clear(true, true);
-        
-        // Spawn new enemies
-        for (let x = 300; x < WORLD_WIDTH; x += 400) {
-            spawnEnemy(this, x, 680, 'water_swimming_micro');
-        }
-        
-        // Update HUD
-        this.hud.update(playerStatsSystem.getStats());
-    }
-    
-    handleQuit() {
-        console.log('Player chose to quit');
-        
-        // Reset player stats
-        playerStatsSystem.reset();
-        
-        // Go back to menu
-        this.scene.start('MenuScene');
-    }
-    
-    handleLevelComplete() {
-        console.log('Level Complete - Boss Defeated!');
-        
-        // End level tracking
-        levelStatsTracker.endLevel(this.time.now);
-        
-        this.levelCompleteScreen.show();
-    }
-    
-    handleNextLevel() {
-        console.log('Advancing to next level');
-        
-        // Advance to next level
-        levelProgressionSystem.advanceToNextLevel();
-        
-        // Reset stats tracker for new level
-        levelStatsTracker.reset();
-        
-        // Reset player position to start
-        gameState.savedPositions.UnderwaterMicroScene = { x: 100, y: 650 };
-        
-        // Clear saved enemies to spawn fresh enemies for new level
-        gameState.savedEnemies.UnderwaterMicroScene = [];
-        
-        // Restart the scene with new level
-        this.scene.restart();
-    }
-    
-    handleReplay() {
-        console.log('Replaying level');
-        
-        // Reset stats tracker for new attempt
-        levelStatsTracker.reset();
-        
-        // Reset player position to start
-        gameState.savedPositions.UnderwaterMicroScene = { x: 100, y: 650 };
-        
-        // Clear saved enemies to respawn for replay
-        gameState.savedEnemies.UnderwaterMicroScene = [];
-        
-        // Restart the current scene
-        this.scene.restart();
-    }
-    
-    handleExitToMenu() {
-        console.log('Exiting to main menu');
-        
-        // Reset stats tracker when exiting
-        levelStatsTracker.reset();
-        
-        // Reset level progression to level 1
-        levelProgressionSystem.resetToLevel1();
-        
-        // Go back to menu
-        this.scene.start('MenuScene');
-    }
-    
-    shutdown() {
-        // Save enemy states before leaving scene
-        gameState.savedEnemies.UnderwaterMicroScene = this.enemies.children.entries
-            .filter(enemy => enemy.active)
-            .map((enemy) => {
-                const e = enemy as Enemy;
-                return {
-                    x: e.x,
-                    y: e.y,
-                    health: e.health,
-                    startX: e.startX,
-                    startY: e.startY,
-                    direction: e.direction,
-                    enemyType: e.enemyType
-                };
-            });
-        
-        // Save player position
-        if (this.player) {
-            gameState.savedPositions.UnderwaterMicroScene = {
-                x: this.player.x,
-                y: this.player.y
-            };
-        }
+
+    protected spawnSceneEnemies(bossMode: boolean): void {
+        const config = this.getSceneConfig();
+        this.spawnWithDynamicPoints(
+            bossMode,
+            this.getBossTypes(),
+            config.defaultEnemyType,
+            config.spawnInterval,
+            config.groundY,
+            config.allowYVariance
+        );
     }
 }
