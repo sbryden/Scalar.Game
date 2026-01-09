@@ -141,7 +141,7 @@ export const ENEMY_CONFIG: Record<string, {
         chaseSpeedMultiplier: 1.4,
         // Burst fire configuration
         hasRangedAbility: true,
-        projectileTexture: 'beam',
+        projectileTexture: 'wolf_boss_bullet',
         projectileDamage: 30,
         projectileSpeed: 350,
         projectileCooldown: 2000,
@@ -526,7 +526,7 @@ export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight
         { texture: 'crabboss', weight: 1.0 }
     ],
     wolf_tank_boss: [
-        { texture: 'enemy', weight: 1.0 }
+        { texture: 'wolf_boss', weight: 1.0 }
     ]
 };
 
