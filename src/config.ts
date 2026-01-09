@@ -127,7 +127,7 @@ export const ENEMY_CONFIG: Record<string, {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
     },
-    wolf_tank_boss: {
+    boss_wolf_tank: {
         width: 120,
         height: 120,
         color: 0x808080, // Gray
@@ -525,7 +525,7 @@ export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight
     boss_water_crab_micro: [
         { texture: 'crabboss', weight: 1.0 }
     ],
-    wolf_tank_boss: [
+    boss_wolf_tank: [
         { texture: 'wolf_boss', weight: 1.0 }
     ]
 };
