@@ -42,6 +42,7 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('micromonkeyboss', '/Scalar.Game/micromonkeyboss.png');
         this.load.image('micro_boss', '/Scalar.Game/micro_boss.png');
         this.load.image('rock_car_with_minions', '/Scalar.Game/rock_car_with_minions.png');
+        this.load.image('wolf_boss', '/Scalar.Game/wolf_boss.png');
         
         // Load minion images
         this.load.image('rock_minion_1', '/Scalar.Game/rock_minion_1.png');
@@ -54,6 +55,10 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('beam', '/Scalar.Game/beam.png');
         this.load.image('sharkpedo', '/Scalar.Game/sharkpedo.png');
         this.load.image('bubble', '/Scalar.Game/bubble.png');
+        this.load.image('wolf_boss_bullet', '/Scalar.Game/wolf_boss_bullet.png');
+        
+        // Load special orb images
+        this.load.image('wolf_orb', '/Scalar.Game/wolf_orb.png');
         
         // Load menu assets
         this.load.image('secure_robot', '/Scalar.Game/secure_robot.png');
