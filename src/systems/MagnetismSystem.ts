@@ -3,7 +3,7 @@
  * Handles XP orb attraction to the player
  */
 import Phaser from 'phaser';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import { XP_CONFIG } from '../config';
 import type { XPOrb } from '../types/game';
 
@@ -54,5 +54,25 @@ export class MagnetismSystem {
     }
 }
 
-// Export singleton instance
-export default new MagnetismSystem();
+// Singleton instance management
+let magnetismSystemInstance: MagnetismSystem | null = null;
+
+/**
+ * Get the MagnetismSystem instance, creating it if necessary
+ */
+export function getMagnetismSystem(): MagnetismSystem {
+    if (!magnetismSystemInstance) {
+        magnetismSystemInstance = new MagnetismSystem();
+    }
+    return magnetismSystemInstance;
+}
+
+/**
+ * Reset the MagnetismSystem instance (useful for testing)
+ */
+export function resetMagnetismSystem(): void {
+    magnetismSystemInstance = null;
+}
+
+// Default export for backward compatibility
+export default getMagnetismSystem();

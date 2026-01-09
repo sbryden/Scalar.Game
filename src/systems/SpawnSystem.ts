@@ -3,7 +3,7 @@
  * Handles spawning of XP orbs and enemy spawn point generation
  */
 import Phaser from 'phaser';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import playerStatsSystem from './PlayerStatsSystem';
 import levelProgressionSystem from './LevelProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
@@ -467,5 +467,25 @@ export class SpawnSystem {
     }
 }
 
-// Export singleton instance
-export default new SpawnSystem();
+// Singleton instance management
+let spawnSystemInstance: SpawnSystem | null = null;
+
+/**
+ * Get the SpawnSystem instance, creating it if necessary
+ */
+export function getSpawnSystem(): SpawnSystem {
+    if (!spawnSystemInstance) {
+        spawnSystemInstance = new SpawnSystem();
+    }
+    return spawnSystemInstance;
+}
+
+/**
+ * Reset the SpawnSystem instance (useful for testing)
+ */
+export function resetSpawnSystem(): void {
+    spawnSystemInstance = null;
+}
+
+// Default export for backward compatibility
+export default getSpawnSystem();

@@ -4,7 +4,7 @@
  * Singleton pattern for consistent state management across the game.
  */
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, PHYSICS_CONFIG } from '../config';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import { getFuelSystem } from '../systems/FuelSystem';
 import type { PlayerSize } from '../types/game';
 

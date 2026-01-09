@@ -6,7 +6,7 @@ import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../confi
 import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import enemyManager from '../managers/EnemyManager';
 import type { Player, Enemy, Projectile } from '../types/game';
 
@@ -651,9 +651,9 @@ export class CombatSystem {
                 minionY = boss.y; // Same Y position as boss
             }
             
-            // Spawn minion using the gameState spawn function
-            if (gameState.spawnEnemyFunc) {
-                const minion = gameState.spawnEnemyFunc(boss.scene, minionX, minionY, boss.minionType);
+            // Spawn minion using the spawn function
+            if (gameState.scene) {
+                const minion = enemyManager.spawnEnemy(boss.scene, minionX, minionY, boss.minionType);
                 
                 // Link minion to parent spawner boss
                 minion.parentSpawnerBossId = boss.spawnerBossId;
@@ -873,5 +873,25 @@ export class CombatSystem {
     }
 }
 
-// Export singleton instance
-export default new CombatSystem();
+// Singleton instance management
+let combatSystemInstance: CombatSystem | null = null;
+
+/**
+ * Get the CombatSystem instance, creating it if necessary
+ */
+export function getCombatSystem(): CombatSystem {
+    if (!combatSystemInstance) {
+        combatSystemInstance = new CombatSystem();
+    }
+    return combatSystemInstance;
+}
+
+/**
+ * Reset the CombatSystem instance (useful for testing)
+ */
+export function resetCombatSystem(): void {
+    combatSystemInstance = null;
+}
+
+// Default export for backward compatibility
+export default getCombatSystem();

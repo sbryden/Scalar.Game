@@ -2,87 +2,45 @@
  * Main Game Macro Scene
  * Giant-scale gameplay scene for land environment with massive enemies
  */
-import Phaser from 'phaser';
-import { WORLD_WIDTH, WORLD_HEIGHT, SPAWN_CONFIG, BOSS_MODE_CONFIG } from '../config';
-import spawnSystem from '../systems/SpawnSystem';
-import { spawnEnemy, updateEnemyAI } from '../enemies';
-import projectileManager from '../managers/ProjectileManager';
-import xpOrbManager from '../managers/XPOrbManager';
-import { getSizeChangeTimer, setSizeChangeTimer } from '../player';
-import gameState from '../utils/gameState';
-import playerStatsSystem from '../systems/PlayerStatsSystem';
-import combatSystem from '../systems/CombatSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
+import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
-import { getStaminaSystem } from '../systems/StaminaSystem';
-import { getFuelSystem } from '../systems/FuelSystem';
-import { InputManager } from '../managers/InputManager';
-import { CollisionManager } from '../managers/CollisionManager';
-import { CameraManager } from '../managers/CameraManager';
-import { HUD } from '../ui/HUD';
-import { DebugDisplay } from '../ui/DebugDisplay';
-import type { Enemy, Player } from '../types/game';
-import { GameOverScreen } from '../ui/GameOverScreen';
-import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
 import { generateSkyBackground } from '../utils/backgroundGenerator';
+import BaseGameScene from './BaseGameScene';
+import type { SceneConfig } from './BaseGameScene';
 
-export default class MainGameMacroScene extends Phaser.Scene {
-    player!: Player;
-    platforms!: Phaser.Physics.Arcade.StaticGroup;
-    enemies!: Phaser.Physics.Arcade.Group;
-    projectiles!: Phaser.Physics.Arcade.Group;
-    xpOrbs!: Phaser.Physics.Arcade.Group;
-    hud!: HUD;
-    debugDisplay!: DebugDisplay;
-    gameOverScreen!: GameOverScreen;
-    levelCompleteScreen!: LevelCompleteScreen;
-    inputManager!: InputManager;
-    collisionManager!: CollisionManager;
-    cameraManager!: CameraManager;
-
+export default class MainGameMacroScene extends BaseGameScene {
     constructor() {
-        super({ key: 'MainGameMacroScene' });
+        super('MainGameMacroScene');
     }
-    
-    create() {
-        // Initialize difficulty if this is first time entering game
-        const difficulty = this.registry.get('difficulty') || 'normal';
-        if (!gameState.difficultyInitialized) {
-            playerStatsSystem.initializeDifficulty(difficulty);
-            gameState.difficultyInitialized = true;
-        }
-        
-        // Reset spawner boss tracking
-        combatSystem.resetSpawnerTracking();
-        
-        // Start tracking level stats
-        levelStatsTracker.startLevel(this.time.now);
-        
-        // Increase gravity for macro scale (heavier feeling)
-        this.physics.world.gravity.y = 450;
-        
-        this.createBackground();
-        this.createGround();
-        this.createPlayer();
-        this.createGroups();
-        this.initializeGameState();
-        this.createUI();
-        this.restoreOrSpawnEnemies();
-        this.setupManagers();
-        this.createDebugText();
+
+    protected getSceneConfig(): SceneConfig {
+        return {
+            sceneKey: 'MainGameMacroScene',
+            gravity: 450, // Heavier gravity for macro scale
+            playerTexture: 'car_1',
+            playerScale: 0.35, // Larger scale for macro
+            playerBounce: 0.2,
+            playerDrag: { x: 0, y: 0 },
+            defaultEnemyType: 'macro',
+            spawnInterval: SPAWN_CONFIG.defaults.baseInterval,
+            groundY: SPAWN_CONFIG.defaults.groundY,
+            allowYVariance: false
+        };
     }
-    
-    createBackground() {
-        // Generate dynamic sky background with map level seed for consistency
+
+    protected getBossTypes(): string[] {
+        return ['boss_land_macro'];
+    }
+
+    protected createBackground(): void {
         const mapLevel = levelProgressionSystem.getCurrentLevel();
         generateSkyBackground(this, mapLevel);
         
         // Add distant mountain silhouettes for macro scale feeling
         this.createMountainSilhouettes();
     }
-    
-    createMountainSilhouettes() {
-        // Create distant mountain layer for depth perception
+
+    private createMountainSilhouettes(): void {
         const mountainGraphics = this.add.graphics();
         mountainGraphics.setScrollFactor(0.3); // Parallax effect
         mountainGraphics.setDepth(-50);
@@ -96,7 +54,6 @@ export default class MainGameMacroScene extends Phaser.Scene {
             const height = 200 + Math.random() * 150;
             const width = 300 + Math.random() * 200;
             
-            // Draw triangle mountain
             mountainGraphics.fillTriangle(
                 x, 800,
                 x + width / 2, 800 - height,
@@ -104,382 +61,33 @@ export default class MainGameMacroScene extends Phaser.Scene {
             );
         }
     }
-    
-    createGround() {
-        // Create massive rock/earth ground texture for macro scale
-        const groundGraphics = this.make.graphics({ x: 0, y: 0 });
-        
-        // Base earth color - darker and rockier
-        groundGraphics.fillStyle(0x4a3c2a, 1);
-        groundGraphics.fillRect(0, 0, WORLD_WIDTH, 50);
-        
-        // Add large rock patterns
-        groundGraphics.fillStyle(0x3a2c1a, 1);
-        for (let x = 0; x < WORLD_WIDTH; x += 100) {
-            for (let y = 0; y < 50; y += 30) {
-                const offset = (y === 30) ? 50 : 0;
-                groundGraphics.fillRect(x + offset, y, 40, 15);
-            }
-        }
-        
-        // Add boulder-like texture
-        groundGraphics.fillStyle(0x5a4c3a, 0.7);
-        for (let i = 0; i < 30; i++) {
-            const x = Math.random() * WORLD_WIDTH;
-            const y = Math.random() * 50;
-            const size = 5 + Math.random() * 10;
-            groundGraphics.fillCircle(x, y, size);
-        }
-        
-        groundGraphics.generateTexture('ground_macro', WORLD_WIDTH, 50);
-        groundGraphics.destroy();
-        
-        // Create platforms
-        this.platforms = this.physics.add.staticGroup();
-        this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-        const ground = this.platforms.create(WORLD_WIDTH / 2, 750, 'ground_macro');
-        ground.setOrigin(0.5, 0.5);
-        ground.setScale(1).refreshBody();
-    }
-    
-    createPlayer() {
-        // Restore player position or use default
-        const savedPos = gameState.savedPositions.MainGameMacroScene;
-        
-        // Create player (car) - larger scale for macro
-        this.player = this.physics.add.sprite(savedPos.x, savedPos.y, 'car_1') as Player;
-        this.player.setScale(0.35); // Larger than normal scale (0.25)
-        this.player.setBounce(0.2);
-        this.player.setCollideWorldBounds(true);
-        this.player.setDrag(0, 0);
-        this.player.scene = this;
-        
-        this.physics.add.collider(this.player, this.platforms);
-    }
-    
-    createGroups() {
-        // Create groups
-        this.enemies = this.physics.add.group();
-        this.projectiles = this.physics.add.group();
-        this.xpOrbs = this.physics.add.group();
-    }
-    
-    initializeGameState() {
-        // Initialize gameState with all game objects
-        gameState.player = this.player;
-        gameState.enemies = this.enemies;
-        gameState.projectiles = this.projectiles;
-        gameState.xpOrbs = this.xpOrbs;
-        gameState.platforms = this.platforms;
-        gameState.scene = this;
-        gameState.currentSceneKey = 'MainGameMacroScene';
-        gameState.spawnEnemyFunc = spawnEnemy;
-        
-        // Apply correct vehicle texture based on player level
-        spawnSystem.upgradePlayerCar();
-    }
-    
-    createUI() {
-        // Create HUD
-        this.hud = new HUD(this);
-        gameState.levelText = this.hud.levelText;
-        
-        // Create Game Over Screen
-        this.gameOverScreen = new GameOverScreen(this);
-        this.gameOverScreen.create();
-        
-        // Set up game over callback
-        playerStatsSystem.setGameOverCallback(() => {
-            this.handleGameOver();
-        });
-        
-        // Set up continue and quit callbacks
-        this.gameOverScreen.setContinueCallback(() => {
-            this.handleContinue();
-        });
-        
-        this.gameOverScreen.setQuitCallback(() => {
-            this.handleQuit();
-        });
-        
-        // Create Level Complete Screen
-        this.levelCompleteScreen = new LevelCompleteScreen(this);
-        this.levelCompleteScreen.create();
-        
-        // Set up boss defeat callback
-        combatSystem.setBossDefeatCallback(() => {
-            this.handleLevelComplete();
-        });
-        
-        // Set up next level, replay and exit callbacks
-        this.levelCompleteScreen.setNextLevelCallback(() => {
-            this.handleNextLevel();
-        });
-        
-        this.levelCompleteScreen.setReplayCallback(() => {
-            this.handleReplay();
-        });
-        
-        this.levelCompleteScreen.setExitCallback(() => {
-            this.handleExitToMenu();
-        });
-    }
-    
-    restoreOrSpawnEnemies() {
-        // Check if we have saved enemies for this scene
-        const savedEnemies = gameState.savedEnemies.MainGameMacroScene;
 
-        // Check if boss mode is active
-        const bossMode = this.registry.get('bossMode') === true;
-        
-        if (savedEnemies.length > 0) {
-            // Restore saved enemies
-            savedEnemies.forEach(enemyData => {
-                const enemy = spawnEnemy(this, enemyData.x, enemyData.y, enemyData.enemyType || 'golem');
-                enemy.health = enemyData.health;
-                enemy.startX = enemyData.startX;
-                enemy.startY = enemyData.startY || enemyData.y;
-                enemy.direction = enemyData.direction;
-            });
-        } else {
-            // Generate dynamic spawn points with reduced density for macro scale (bigger enemies)
-            const spawnPoints = spawnSystem.generateDynamicSpawnPoints(
-                SPAWN_CONFIG.defaults.baseInterval * 1.5, // More space between macro enemies
-                SPAWN_CONFIG.defaults.groundY,
-                false
-            );
+    protected createGround(): void {
+        this.createGroundWithTexture('macroGround', (graphics) => {
+            // Rocky macro-scale ground
+            graphics.fillStyle(0x5A4A3A, 1);
+            graphics.fillRect(0, 0, WORLD_WIDTH, 50);
             
-            // Spawn macro-scale enemies at generated points
-            if (bossMode) {
-                // Boss mode: spawn macro boss types
-                spawnPoints.forEach((point, index) => {
-                    if (index % 2 === 0) {
-                        spawnEnemy(this, point.x, point.y, 'golem_boss');
-                    } else {
-                        spawnEnemy(this, point.x, point.y, 'bear_boss');
-                    }
-                });
+            // Large rock pattern
+            graphics.fillStyle(0x4A3A2A, 1);
+            for (let x = 0; x < WORLD_WIDTH; x += 80) {
+                for (let y = 0; y < 50; y += 25) {
+                    const offset = (y === 25) ? 40 : 0;
+                    graphics.fillRect(x + offset, y, 40, 15);
+                }
+            }
+        });
+    }
 
-                // Set total bosses for tracking
-                combatSystem.setTotalBosses(spawnPoints.length);
-            } else {
-                // Normal mode: macro enemies + random macro boss
-                spawnPoints.forEach(point => {
-                    if (point.isBoss) {
-                        // Random macro boss type
-                        const bossTypes = ['golem_boss', 'bear_boss'];
-                        const bossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
-                        spawnEnemy(this, point.x, point.y, bossType);
-                    } else {
-                        // Spawn regular macro enemies
-                        const enemyTypes = ['golem', 'wolf_macro', 'bear'];
-                        const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-                        spawnEnemy(this, point.x, point.y, enemyType);
-                    }
-                });
-            }
-        }
-    }
-    
-    setupManagers() {
-        // Setup managers
-        this.inputManager = new InputManager(this);
-        this.inputManager.setupInput();
-        
-        this.collisionManager = new CollisionManager(this);
-        this.collisionManager.setupCollisions();
-        
-        this.cameraManager = new CameraManager(this);
-        this.cameraManager.setupCamera();
-    }
-    
-    createDebugText() {
-        // Create debug display (only enabled in development)
-        this.debugDisplay = new DebugDisplay(this);
-    }
-    
-    update() {
-        const playerStats = xpOrbManager.getPlayerStats();
-        
-        // Update stamina system
-        const staminaSystem = getStaminaSystem();
-        const isMeleeActive = this.player?.isMeleeMode || false;
-        staminaSystem.update(isMeleeActive, this.time.now);
-        
-        // Update fuel system
-        const fuelSystem = getFuelSystem();
-        fuelSystem.update(this.time.now);
-        
-        // Update debug display (only if enabled)
-        if (this.debugDisplay?.enabled) {
-            this.debugDisplay.update(this.player.x, playerStats);
-        }
-        
-        // Update HUD
-        this.hud.update(playerStats);
-        
-        // Update boss count display if in boss mode
-        const bossMode = this.registry.get('bossMode') === true;
-        if (bossMode) {
-            const bossProgress = combatSystem.getBossProgress();
-            this.hud.updateBossCount(bossProgress.defeated, bossProgress.total);
-        } else {
-            this.hud.hideBossCount();
-        }
-        
-        // Update size change cooldown
-        let timer = getSizeChangeTimer();
-        if (timer > 0) {
-            timer -= 1000 / 60;
-            setSizeChangeTimer(timer);
-        }
-        
-        // Handle player movement
-        this.inputManager.handleMovement();
-        
-        // Update enemies
-        this.enemies.children.entries.forEach(obj => {
-            const enemy = obj as Enemy;
-            if (enemy.active) {
-                updateEnemyAI(enemy, this.time.now);
-            }
-        });
-        
-        // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
-        
-        // Update projectiles
-        projectileManager.updateProjectiles();
-        
-        // Update XP orb magnetism
-        xpOrbManager.updateXPOrbMagnetism();
-        
-        // Update camera
-        this.cameraManager.update();
-    }
-    
-    handleGameOver() {
-        console.log('Game Over - Showing screen...');
-        this.gameOverScreen.show();
-    }
-    
-    startImmunityFlash(player: Phaser.Physics.Arcade.Sprite): void {
-        let flashCount = 0;
-        const maxFlashes = 20;
-        
-        const flashTimer = this.time.addEvent({
-            delay: 100,
-            callback: () => {
-                flashCount++;
-                if (flashCount % 2 === 0) {
-                    player.setAlpha(1);
-                } else {
-                    player.setAlpha(0.3);
-                }
-                
-                if (flashCount >= maxFlashes) {
-                    player.setAlpha(1);
-                    flashTimer.destroy();
-                }
-            },
-            loop: true
-        });
-    }
-    
-    handleContinue() {
-        console.log('Player chose to continue');
-        
-        playerStatsSystem.reset();
-        this.player.setPosition(400, 100);
-        this.player.setVelocity(0, 0);
-        this.player.clearTint();
-        this.player.immuneUntil = this.time.now + 4000;
-        this.startImmunityFlash(this.player);
-        
-        const collider = this.collisionManager.playerEnemyCollider;
-        if (collider) {
-            this.physics.world.removeCollider(collider);
-        }
-        
-        this.time.delayedCall(2000, () => {
-            this.collisionManager.setupPlayerEnemyCollision();
-        });
-        
-        this.enemies.children.entries.forEach((enemy: any) => {
-            if (enemy.healthBar) enemy.healthBar.destroy();
-            if (enemy.healthBarBg) enemy.healthBarBg.destroy();
-        });
-        this.enemies.clear(true, true);
-        this.projectiles.clear(true, true);
-        this.xpOrbs.clear(true, true);
-        
-        // Spawn macro enemies
-        for (let x = 400; x < WORLD_WIDTH; x += 400) {
-            spawnEnemy(this, x, 680, 'golem');
-        }
-        
-        this.hud.update(playerStatsSystem.getStats());
-    }
-    
-    handleQuit() {
-        console.log('Player chose to quit');
-        playerStatsSystem.reset();
-        this.scene.start('MenuScene');
-    }
-    
-    handleLevelComplete() {
-        console.log('Level Complete - Boss Defeated!');
-        levelStatsTracker.endLevel(this.time.now);
-        this.levelCompleteScreen.show();
-    }
-    
-    handleNextLevel() {
-        console.log('Advancing to next level');
-        levelProgressionSystem.advanceToNextLevel();
-        levelStatsTracker.reset();
-        gameState.savedPositions.MainGameMacroScene = { x: 100, y: 650 };
-        gameState.savedEnemies.MainGameMacroScene = [];
-        this.scene.restart();
-    }
-    
-    handleReplay() {
-        console.log('Replaying level');
-        levelStatsTracker.reset();
-        gameState.savedPositions.MainGameMacroScene = { x: 100, y: 650 };
-        gameState.savedEnemies.MainGameMacroScene = [];
-        this.scene.restart();
-    }
-    
-    handleExitToMenu() {
-        console.log('Exiting to main menu');
-        levelStatsTracker.reset();
-        levelProgressionSystem.resetToLevel1();
-        this.scene.start('MenuScene');
-    }
-    
-    shutdown() {
-        // Save enemy states before leaving scene
-        gameState.savedEnemies.MainGameMacroScene = this.enemies.children.entries
-            .filter(enemy => enemy.active)
-            .map((enemy) => {
-                const e = enemy as Enemy;
-                return {
-                    x: e.x,
-                    y: e.y,
-                    health: e.health,
-                    startX: e.startX,
-                    startY: e.startY,
-                    direction: e.direction,
-                    enemyType: e.enemyType
-                };
-            });
-        
-        // Save player position
-        if (this.player) {
-            gameState.savedPositions.MainGameMacroScene = {
-                x: this.player.x,
-                y: this.player.y
-            };
-        }
+    protected spawnSceneEnemies(bossMode: boolean): void {
+        const config = this.getSceneConfig();
+        this.spawnWithDynamicPoints(
+            bossMode,
+            this.getBossTypes(),
+            config.defaultEnemyType,
+            config.spawnInterval,
+            config.groundY,
+            config.allowYVariance
+        );
     }
 }

@@ -3,7 +3,7 @@
  * Main menu with title, difficulty selection, and start button
  */
 import Phaser from 'phaser';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { BUILD_NUMBER } from '../buildInfo';
 

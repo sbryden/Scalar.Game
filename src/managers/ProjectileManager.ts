@@ -4,7 +4,7 @@
  * Singleton pattern for consistent state management across the game.
  */
 import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG } from '../config';
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import type { WASDKeys, Projectile, Enemy } from '../types/game';
@@ -317,5 +317,25 @@ class ProjectileManager {
     }
 }
 
-// Export singleton instance
-export default new ProjectileManager();
+// Singleton instance management
+let projectileManagerInstance: ProjectileManager | null = null;
+
+/**
+ * Get the ProjectileManager instance, creating it if necessary
+ */
+export function getProjectileManager(): ProjectileManager {
+    if (!projectileManagerInstance) {
+        projectileManagerInstance = new ProjectileManager();
+    }
+    return projectileManagerInstance;
+}
+
+/**
+ * Reset the ProjectileManager instance (useful for testing)
+ */
+export function resetProjectileManager(): void {
+    projectileManagerInstance = null;
+}
+
+// Default export for backward compatibility
+export default getProjectileManager();
