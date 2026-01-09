@@ -67,8 +67,11 @@ export class InputManager {
             playerManager.changeSize(newSize);
         });
         
-        // Attack
+        // Attack - F or K
         this.scene.input.keyboard?.on('keydown-F', () => {
+            projectileManager.fireProjectile(this.scene);
+        });
+        this.scene.input.keyboard?.on('keydown-K', () => {
             projectileManager.fireProjectile(this.scene);
         });
     }
