@@ -21,7 +21,7 @@ export default class UnderwaterMicroScene extends BaseGameScene {
             playerScale: 0.15, // Smaller for micro scale
             playerBounce: 0.1,
             playerDrag: { x: 70, y: 70 }, // More drag for micro environment
-            defaultEnemyType: 'micro_fish',
+            defaultEnemyType: 'water_swimming_micro',
             spawnInterval: SPAWN_CONFIG.defaults.baseInterval,
             groundY: SPAWN_CONFIG.defaults.midWaterY,
             allowYVariance: true

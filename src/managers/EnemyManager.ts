@@ -148,6 +148,22 @@ class EnemyManager {
             enemy.spawnRadius = 100;
         }
         
+        // Configure spawner micro enemies
+        if (enemyType === 'spawner_micro') {
+            enemy.isSpawnerBoss = true;
+            enemy.minionType = 'micro_minion';
+            enemy.minionCount = 3;
+            enemy.spawnRadius = 50;
+        }
+        
+        // Configure spawner water micro enemies
+        if (enemyType === 'spawner_water_swimming_micro') {
+            enemy.isSpawnerBoss = true;
+            enemy.minionType = 'water_micro_minion';
+            enemy.minionCount = 3;
+            enemy.spawnRadius = 50;
+        }
+        
         // Configure ranged ability properties
         if (config.hasRangedAbility) {
             enemy.hasRangedAbility = true;

@@ -535,7 +535,14 @@ export default abstract class BaseGameScene extends Phaser.Scene {
                     const bossType = Phaser.Utils.Array.GetRandom(bossTypes);
                     enemyManager.spawnEnemy(this, point.x, point.y, bossType);
                 } else {
-                    enemyManager.spawnEnemy(this, point.x, point.y, defaultEnemyType);
+                    // 20% chance to spawn spawner variant for micro enemies
+                    let enemyTypeToSpawn = defaultEnemyType;
+                    if (defaultEnemyType === 'micro' && Math.random() < 0.2) {
+                        enemyTypeToSpawn = 'spawner_micro';
+                    } else if (defaultEnemyType === 'water_swimming_micro' && Math.random() < 0.2) {
+                        enemyTypeToSpawn = 'spawner_water_swimming_micro';
+                    }
+                    enemyManager.spawnEnemy(this, point.x, point.y, enemyTypeToSpawn);
                 }
             });
         }

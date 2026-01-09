@@ -114,6 +114,32 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 5.0,
         chaseSpeedMultiplier: 1.5
     },
+    spawner_micro: {
+        width: 30,
+        height: 30,
+        color: 0xFF8800,
+        speed: 50,
+        health: 8,
+        damage: 5,
+        xpReward: 25,
+        patrolDistance: 200,
+        knockbackResistance: 1.0,
+        lineOfSightMultiplier: 5.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    micro_minion: {
+        width: 18,  // 60% of 30
+        height: 18,
+        color: 0x00FF88,
+        speed: 70,
+        health: 2,  // 30% of micro's 5 HP (rounded)
+        damage: 4,
+        xpReward: 3,
+        patrolDistance: 150,
+        knockbackResistance: 0.6,
+        lineOfSightMultiplier: 4.0,
+        chaseSpeedMultiplier: 1.6
+    },
     boss_land_micro: {
         width: 90,
         height: 90,
@@ -218,6 +244,32 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         knockbackResistance: 0.5,
         lineOfSightMultiplier: 5.0,
         chaseSpeedMultiplier: 1.5
+    },
+    spawner_water_swimming_micro: {
+        width: 20,
+        height: 20,
+        color: 0xFF8800,
+        speed: 40,
+        health: 5,
+        damage: 3,
+        xpReward: 20,
+        patrolDistance: 180,
+        knockbackResistance: 0.7,
+        lineOfSightMultiplier: 5.0,
+        chaseSpeedMultiplier: 1.3
+    },
+    water_micro_minion: {
+        width: 12,  // 60% of 20
+        height: 12,
+        color: 0x7FFFD4,
+        speed: 60,
+        health: 1,  // 30% of water_swimming_micro's 3 HP (rounded)
+        damage: 2,
+        xpReward: 2,
+        patrolDistance: 120,
+        knockbackResistance: 0.4,
+        lineOfSightMultiplier: 4.0,
+        chaseSpeedMultiplier: 1.6
     },
     boss_water_swimming_micro: {
         width: 60,
