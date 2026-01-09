@@ -75,7 +75,7 @@ export const PROJECTILE_CONFIG = {
         width: 10,
         height: 10,
         color: 0xFFFF00,
-        speed: 300,
+        speed: 375,
         damage: 10,
         cooldown: 500
     },
