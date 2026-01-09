@@ -50,10 +50,23 @@ export class SpawnSystem {
         
         // Add physics and configure properties
         scene.physics.add.existing(orb);
-        orb.body.setVelocity(
-            Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity, XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity),
-            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.minUpwardVelocity, XP_CONFIG.orb.spawnVelocity.maxUpwardVelocity)
-        );
+        
+        // Special behavior for companion orbs - float up to 1/3 screen height
+        if (isCompanion) {
+            // Strong upward velocity for companion orbs
+            orb.body.setVelocity(0, -200);
+            // Set target height (1/3 from top of screen)
+            const screenHeight = scene.cameras.main.height;
+            orb.floatTargetY = screenHeight / 3;
+            orb.hasReachedFloatHeight = false;
+        } else {
+            // Regular XP orb velocity
+            orb.body.setVelocity(
+                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity, XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity),
+                Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.minUpwardVelocity, XP_CONFIG.orb.spawnVelocity.maxUpwardVelocity)
+            );
+        }
+        
         orb.body.setCollideWorldBounds(true);
         orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
         orb.xpValue = isCompanion ? 0 : xpValue;
