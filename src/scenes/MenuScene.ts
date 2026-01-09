@@ -4,7 +4,9 @@
  */
 import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import levelStatsTracker from '../systems/LevelStatsTracker';
 import { BUILD_NUMBER } from '../buildInfo';
 
 export default class MenuScene extends Phaser.Scene {
@@ -495,20 +497,17 @@ export default class MenuScene extends Phaser.Scene {
             this.registry.set('gameEnvironment', this.selectedEnvironment);
             this.registry.set('bossMode', this.bossMode);
             
-            // Reset to level 1 when starting a new game
+            // FULL GAME STATE RESET - Clear everything from any previous game
+            gameState.fullReset();
+            
+            // Reset player stats system
+            playerStatsSystem.reset();
+            
+            // Reset to level 1
             levelProgressionSystem.resetToLevel1();
             
-            // Clear saved enemies when starting a new game
-            gameState.savedEnemies = {
-                BootScene: [],
-                MenuScene: [],
-                MainGameScene: [],
-                MicroScene: [],
-                UnderwaterScene: [],
-                UnderwaterMicroScene: [],
-                MainGameMacroScene: [],
-                UnderwaterMacroScene: []
-            };
+            // Reset level stats tracker
+            levelStatsTracker.reset();
             
             // Start the appropriate scene based on environment
             if (this.selectedEnvironment === 'water') {

@@ -198,7 +198,8 @@ export class PlayerStatsSystem {
             stamina: STAMINA_CONFIG.startingStamina,
             maxStamina: STAMINA_CONFIG.startingMaxStamina,
             fuel: FUEL_CONFIG.startingFuel,
-            maxFuel: FUEL_CONFIG.startingMaxFuel
+            maxFuel: FUEL_CONFIG.startingMaxFuel,
+            hasWolfCompanion: false
         };
         
         // Reset stamina system
