@@ -171,7 +171,7 @@ class PlayerManager {
         
         // Apply new scale
         const player = gameState.player;
-        if (!player) return;
+        if (!player || !player.body) return;
         
         player.setScale(baseDisplayScale * config.scale);
         player.body.updateFromGameObject();
