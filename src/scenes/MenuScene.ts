@@ -11,6 +11,7 @@ export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
     selectedEnvironment!: string;
     bossMode!: boolean;
+    godMode!: boolean;
     dropdownOpen!: boolean;
     environmentDropdownOpen!: boolean;
     dropdownContainer!: Phaser.GameObjects.Container;
@@ -31,6 +32,7 @@ export default class MenuScene extends Phaser.Scene {
         this.selectedDifficulty = 'normal';
         this.selectedEnvironment = 'land';
         this.bossMode = false;
+        this.godMode = false;
         this.dropdownOpen = false;
         this.environmentDropdownOpen = false;
     }
@@ -40,6 +42,7 @@ export default class MenuScene extends Phaser.Scene {
         this.selectedDifficulty = 'normal';
         this.selectedEnvironment = 'land';
         this.bossMode = false;
+        this.godMode = false;
         
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -97,14 +100,17 @@ export default class MenuScene extends Phaser.Scene {
         // Create environment dropdown
         this.createEnvironmentDropdown(width / 2, 465);
         
-        // Boss Mode checkbox
-        this.createBossModeCheckbox(width / 2, 530);
+        // Start button (moved up slightly)
+        this.createStartButton(width / 2, 545);
         
-        // Start button
-        this.createStartButton(width / 2, 590);
+        // Boss Mode checkbox
+        this.createBossModeCheckbox(width / 2, 605);
+        
+        // God Mode checkbox
+        this.createGodModeCheckbox(width / 2, 640);
         
         // Instructions
-        const instructions = this.add.text(width / 2, 650, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F - Fire', {
+        const instructions = this.add.text(width / 2, 685, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F/K - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff'
@@ -113,7 +119,7 @@ export default class MenuScene extends Phaser.Scene {
         instructions.setAlpha(0.6);
         
         // Build number
-        const buildNumber = this.add.text(width / 2, 680, `Build: ${BUILD_NUMBER}`, {
+        const buildNumber = this.add.text(width / 2, 715, `Build: ${BUILD_NUMBER}`, {
             fontSize: '12px',
             fontFamily: 'Arial, sans-serif',
             color: '#888888'
@@ -201,8 +207,7 @@ export default class MenuScene extends Phaser.Scene {
         const options = [
             { value: 'easy', label: 'Easy' },
             { value: 'normal', label: 'Normal' },
-            { value: 'hard', label: 'Hard' },
-            { value: 'godMode', label: 'God Mode' }
+            { value: 'hard', label: 'Hard' }
         ];
         
         this.optionElements = [];
@@ -397,7 +402,7 @@ export default class MenuScene extends Phaser.Scene {
         checkmark.setVisible(false);
         
         // Label
-        const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'Boss Mode (Testing)', {
+        const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'Boss Mode', {
             fontSize: '18px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff'
@@ -414,6 +419,46 @@ export default class MenuScene extends Phaser.Scene {
         checkbox.on('pointerdown', () => {
             this.bossMode = !this.bossMode;
             checkmark.setVisible(this.bossMode);
+        });
+    }
+    
+    createGodModeCheckbox(centerX: number, y: number): void {
+        const checkboxSize = 24;
+        const spacing = 10;
+        
+        // Checkbox background
+        const checkbox = this.add.rectangle(centerX - 80, y, checkboxSize, checkboxSize, 0x2c3e50);
+        checkbox.setStrokeStyle(2, 0x3498db);
+        checkbox.setInteractive({ useHandCursor: true });
+        
+        // Checkmark (initially hidden)
+        const checkmark = this.add.text(centerX - 80, y, '✓', {
+            fontSize: '20px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#00ff88',
+            fontStyle: 'bold'
+        });
+        checkmark.setOrigin(0.5);
+        checkmark.setVisible(false);
+        
+        // Label
+        const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'God Mode', {
+            fontSize: '18px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffffff'
+        });
+        label.setOrigin(0, 0.5);
+        
+        // Toggle functionality
+        checkbox.on('pointerover', () => {
+            checkbox.setStrokeStyle(2, 0x5dade2);
+        });
+        checkbox.on('pointerout', () => {
+            checkbox.setStrokeStyle(2, 0x3498db);
+        });
+        checkbox.on('pointerdown', () => {
+            this.godMode = !this.godMode;
+            checkmark.setVisible(this.godMode);
         });
     }
     
@@ -442,8 +487,11 @@ export default class MenuScene extends Phaser.Scene {
             startText.setScale(1);
         });
         startButton.on('pointerdown', () => {
+            // Apply god mode as difficulty if checkbox is checked
+            const finalDifficulty = this.godMode ? 'godMode' : this.selectedDifficulty;
+            
             // Store difficulty, environment, and boss mode in registry for access by other scenes
-            this.registry.set('difficulty', this.selectedDifficulty);
+            this.registry.set('difficulty', finalDifficulty);
             this.registry.set('gameEnvironment', this.selectedEnvironment);
             this.registry.set('bossMode', this.bossMode);
             
