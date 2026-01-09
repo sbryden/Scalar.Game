@@ -21,7 +21,9 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install --no-audit
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit
 
       - name: Build
         run: npm run build
