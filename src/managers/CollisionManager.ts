@@ -50,6 +50,9 @@ export class CollisionManager {
             // Only enemy projectiles can hit player
             if (projectile.isEnemyProjectile) {
                 combatSystem.handleEnemyProjectileHit(projectile, playerObj, this.scene.time.now);
+            } else {
+                // Player projectile hit the player (shouldn't happen, but destroy to be safe)
+                projectile.destroy();
             }
         }, undefined, this.scene);
         
