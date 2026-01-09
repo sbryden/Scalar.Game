@@ -17,17 +17,33 @@ class SeededRandom {
         this.seed = seed;
     }
 
+    /**
+     * Generate next random value between 0 and 1
+     * @returns Random float in range [0, 1)
+     */
     next(): number {
         this.seed = (this.seed * 9301 + 49297) % 233280;
         return this.seed / 233280;
     }
 
+    /**
+     * Generate random float between min and max
+     * @param min Minimum value (inclusive)
+     * @param max Maximum value (exclusive)
+     * @returns Random float in range [min, max)
+     */
     between(min: number, max: number): number {
         return min + this.next() * (max - min);
     }
 
+    /**
+     * Generate random integer between min and max
+     * @param min Minimum value (inclusive)
+     * @param max Maximum value (inclusive)
+     * @returns Random integer in range [min, max]
+     */
     integer(min: number, max: number): number {
-        return Math.floor(this.between(min, max + 1));
+        return Math.min(max, Math.floor(this.between(min, max + 1)));
     }
 }
 
@@ -46,19 +62,19 @@ function getLuminance(hex: number): number {
  */
 function randomizeDarkColor(baseColor: number, rng: SeededRandom): number {
     const lum = getLuminance(baseColor);
-    if (lum > 80) {
+    if (lum > 120) {
         // Base color is too light, darken it
         const r = Math.max(20, ((baseColor >> 16) & 0xFF) * 0.4);
         const g = Math.max(20, ((baseColor >> 8) & 0xFF) * 0.4);
         const b = Math.max(20, (baseColor & 0xFF) * 0.4);
-        return (r << 16) | (g << 8) | b;
+        return (((r << 16) | (g << 8) | b) >>> 0);
     }
     // Slightly vary the dark color
     const variation = rng.between(-20, 20);
     const r = Math.max(0, Math.min(255, ((baseColor >> 16) & 0xFF) + variation));
     const g = Math.max(0, Math.min(255, ((baseColor >> 8) & 0xFF) + variation));
     const b = Math.max(0, Math.min(255, (baseColor & 0xFF) + variation));
-    return (r << 16) | (g << 8) | b;
+    return (((r << 16) | (g << 8) | b) >>> 0);
 }
 
 /**
@@ -71,14 +87,14 @@ function randomizeLightColor(baseColor: number, rng: SeededRandom): number {
         const r = Math.min(255, ((baseColor >> 16) & 0xFF) + 100);
         const g = Math.min(255, ((baseColor >> 8) & 0xFF) + 100);
         const b = Math.min(255, (baseColor & 0xFF) + 100);
-        return (r << 16) | (g << 8) | b;
+        return (((r << 16) | (g << 8) | b) >>> 0);
     }
     // Slightly vary the light color
     const variation = rng.between(-30, 30);
     const r = Math.max(100, Math.min(255, ((baseColor >> 16) & 0xFF) + variation));
     const g = Math.max(100, Math.min(255, ((baseColor >> 8) & 0xFF) + variation));
     const b = Math.max(100, Math.min(255, (baseColor & 0xFF) + variation));
-    return (r << 16) | (g << 8) | b;
+    return (((r << 16) | (g << 8) | b) >>> 0);
 }
 
 // Sky color palettes for regular (land) scenes (5 variations)
@@ -213,8 +229,8 @@ const UNDERWATER_MICRO_PALETTES = [
  * @param seed - Map level seed for deterministic variation (1-5 variations)
  */
 export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void {
-    const effectiveSeed = seed ?? 1;
-    const rng = new SeededRandom(effectiveSeed * 12345); // Multiply for better distribution
+    const effectiveSeed = seed !== undefined ? seed : 1;
+    const rng = new SeededRandom(effectiveSeed * 12345); // Different multiplier per scene type for variation
     
     // Select palette based on map level
     const basePalette = SKY_PALETTES[effectiveSeed % SKY_PALETTES.length];
@@ -295,8 +311,8 @@ export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void 
  * @param seed - Map level seed for deterministic variation (1-5 variations)
  */
 export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): void {
-    const effectiveSeed = seed ?? 1;
-    const rng = new SeededRandom(effectiveSeed * 23456); // Different multiplier for variation
+    const effectiveSeed = seed !== undefined ? seed : 1;
+    const rng = new SeededRandom(effectiveSeed * 23456); // Different multiplier per scene type for variation
     
     // Select palette based on map level
     const basePalette = QUANTUM_PALETTES[effectiveSeed % QUANTUM_PALETTES.length];
@@ -402,8 +418,8 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): v
  * @param seed - Map level seed for deterministic variation (1-5 variations)
  */
 export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number): void {
-    const effectiveSeed = seed ?? 1;
-    const rng = new SeededRandom(effectiveSeed * 34567); // Different multiplier for variation
+    const effectiveSeed = seed !== undefined ? seed : 1;
+    const rng = new SeededRandom(effectiveSeed * 34567); // Different multiplier per scene type for variation
     
     // Select palette based on map level
     const basePalette = UNDERWATER_PALETTES[effectiveSeed % UNDERWATER_PALETTES.length];
@@ -497,8 +513,8 @@ export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number)
  * @param seed - Map level seed for deterministic variation (1-5 variations)
  */
 export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: number): void {
-    const effectiveSeed = seed ?? 1;
-    const rng = new SeededRandom(effectiveSeed * 45678); // Different multiplier for variation
+    const effectiveSeed = seed !== undefined ? seed : 1;
+    const rng = new SeededRandom(effectiveSeed * 45678); // Different multiplier per scene type for variation
     
     // Select palette based on map level
     const basePalette = UNDERWATER_MICRO_PALETTES[effectiveSeed % UNDERWATER_MICRO_PALETTES.length];
