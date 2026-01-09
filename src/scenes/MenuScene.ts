@@ -199,6 +199,7 @@ export default class MenuScene extends Phaser.Scene {
         
         // Create options
         const options = [
+            { value: 'easy', label: 'Easy' },
             { value: 'normal', label: 'Normal' },
             { value: 'hard', label: 'Hard' },
             { value: 'godMode', label: 'God Mode' }
