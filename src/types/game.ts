@@ -87,6 +87,9 @@ export interface XPOrb extends Phaser.GameObjects.Arc {
     body: Phaser.Physics.Arcade.Body;
     xpValue: number;
     isCompanionOrb?: boolean;
+    // Companion orb float behavior
+    floatTargetY?: number;
+    hasReachedFloatHeight?: boolean;
 }
 
 /**

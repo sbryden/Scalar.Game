@@ -10,12 +10,26 @@ import type { XPOrb } from '../types/game';
 export class MagnetismSystem {
     /**
      * Update all XP orbs - attract them to player if in range
+     * Companion orbs float upward first, then magnetize
      */
     update(): void {
         if (!gameState.player || !gameState.xpOrbs) return;
         
         gameState.xpOrbs.children.entries.forEach(obj => {
             const orb = obj as XPOrb;
+            
+            // Special handling for companion orbs - float up first
+            if (orb.isCompanionOrb && !orb.hasReachedFloatHeight) {
+                // Check if orb has reached target height
+                if (orb.floatTargetY && orb.y <= orb.floatTargetY) {
+                    orb.hasReachedFloatHeight = true;
+                    // Stop vertical movement and allow magnetism
+                    orb.body.setVelocity(0, 0);
+                }
+                // Skip magnetism while floating up
+                return;
+            }
+            
             const distance = Phaser.Math.Distance.Between(
                 gameState.player!.x, 
                 gameState.player!.y, 
