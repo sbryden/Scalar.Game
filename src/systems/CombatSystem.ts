@@ -775,7 +775,7 @@ export class CombatSystem {
             // Regular enemy or regular boss (non-spawner)
             
             // Check if this is a wolf tank boss - spawn companion orb instead of XP
-            if (enemy.enemyType === 'wolf_tank_boss' && enemy.scene) {
+            if (enemy.enemyType === 'boss_wolf_tank' && enemy.scene) {
                 spawnSystem.spawnCompanionOrb(enemy.scene, enemy.x, enemy.y);
                 
                 // Set depth for companion orb to ensure it appears above dying enemies
