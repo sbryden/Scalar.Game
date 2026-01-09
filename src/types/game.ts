@@ -62,6 +62,11 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     projectileSpeed?: number;
     projectileCooldown?: number;
     lastProjectileTime?: number;
+    // Burst fire properties
+    burstCount?: number;
+    burstDelay?: number;
+    currentBurstShot?: number;
+    lastBurstShotTime?: number;
 }
 
 /**
@@ -81,6 +86,7 @@ export interface Projectile extends Phaser.GameObjects.Image {
 export interface XPOrb extends Phaser.GameObjects.Arc {
     body: Phaser.Physics.Arcade.Body;
     xpValue: number;
+    isCompanionOrb?: boolean;
 }
 
 /**
@@ -96,6 +102,7 @@ export interface PlayerStats {
     maxStamina: number;
     fuel: number;
     maxFuel: number;
+    hasWolfCompanion?: boolean;
 }
 
 /**

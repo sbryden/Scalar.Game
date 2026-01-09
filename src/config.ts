@@ -85,6 +85,8 @@ export const ENEMY_CONFIG: Record<string, {
     projectileDamage?: number;
     projectileSpeed?: number;
     projectileCooldown?: number;
+    burstCount?: number;
+    burstDelay?: number;
 }> = {
     generic: {
         width: 30,
@@ -124,6 +126,27 @@ export const ENEMY_CONFIG: Record<string, {
         knockbackResistance: 2.0,
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
+    },
+    wolf_tank_boss: {
+        width: 120,
+        height: 120,
+        color: 0x808080, // Gray
+        speed: 75,
+        health: 180,  // 6x base health
+        damage: 25,
+        xpReward: 220,
+        patrolDistance: 400,
+        knockbackResistance: 2.5,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.4,
+        // Burst fire configuration
+        hasRangedAbility: true,
+        projectileTexture: 'beam',
+        projectileDamage: 30,
+        projectileSpeed: 350,
+        projectileCooldown: 2000,
+        burstCount: 3,
+        burstDelay: 100
     },
     rock_minion: {
         width: 25,
@@ -501,6 +524,9 @@ export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight
     ],
     boss_water_crab_micro: [
         { texture: 'crabboss', weight: 1.0 }
+    ],
+    wolf_tank_boss: [
+        { texture: 'enemy', weight: 1.0 }
     ]
 };
 
@@ -763,7 +789,7 @@ export const BOSS_MODE_CONFIG = {
     // Segments where bosses spawn (avoiding first 2 segments for starting area)
     // Distributes bosses evenly across remaining segments (2-14)
     bossSegments: {
-        land: [3, 10],              // 2 bosses: SnakeBoss, RockCarSpawner
+        land: [3, 10, 14],           // 3 bosses: SnakeBoss, RockCarSpawner, WolfTank
         micro: [7],                  // 1 boss: MicroBoss
         water: [4, 11],              // 2 bosses: SharkBoss, CrabBoss
         waterMicro: [5, 12]          // 2 bosses: MicroSwimBoss, MicroCrabBoss

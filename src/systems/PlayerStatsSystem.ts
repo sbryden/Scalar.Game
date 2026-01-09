@@ -35,7 +35,8 @@ export class PlayerStatsSystem {
             stamina: STAMINA_CONFIG.startingStamina,
             maxStamina: STAMINA_CONFIG.startingMaxStamina,
             fuel: FUEL_CONFIG.startingFuel,
-            maxFuel: FUEL_CONFIG.startingMaxFuel
+            maxFuel: FUEL_CONFIG.startingMaxFuel,
+            hasWolfCompanion: false
         };
         this.difficulty = 'normal';
         this.onLevelUp = null;
@@ -228,6 +229,20 @@ export class PlayerStatsSystem {
      */
     isGodMode(): boolean {
         return this.difficulty === 'godMode';
+    }
+    
+    /**
+     * Check if player has wolf companion
+     */
+    hasWolfCompanion(): boolean {
+        return this.stats.hasWolfCompanion || false;
+    }
+    
+    /**
+     * Grant wolf companion to player
+     */
+    grantWolfCompanion(): void {
+        this.stats.hasWolfCompanion = true;
     }
 }
 

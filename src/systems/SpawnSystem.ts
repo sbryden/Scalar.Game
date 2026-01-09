@@ -40,6 +40,7 @@ export class SpawnSystem {
         orb.body.setCollideWorldBounds(true);
         orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
         orb.xpValue = xpValue;
+        orb.isCompanionOrb = false;
         
         // Disable gravity for orbs in underwater scenes
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
@@ -57,11 +58,72 @@ export class SpawnSystem {
         scene.physics.add.collider(orb, gameState.platforms!);
         scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
             const xpOrb = o as XPOrb;
-            playerStatsSystem.gainXP(xpOrb.xpValue || XP_CONFIG.orb.defaultValue);
             
-            // Restore stamina when collecting XP orb
-            const staminaSystem = getStaminaSystem();
-            staminaSystem.restoreStamina(STAMINA_CONFIG.xpOrbRestoration);
+            if (xpOrb.isCompanionOrb) {
+                // Grant wolf companion
+                playerStatsSystem.grantWolfCompanion();
+                console.log('Wolf companion acquired!');
+            } else {
+                // Regular XP orb
+                playerStatsSystem.gainXP(xpOrb.xpValue || XP_CONFIG.orb.defaultValue);
+                
+                // Restore stamina when collecting XP orb
+                const staminaSystem = getStaminaSystem();
+                staminaSystem.restoreStamina(STAMINA_CONFIG.xpOrbRestoration);
+            }
+            
+            xpOrb.destroy();
+        });
+    }
+    
+    /**
+     * Spawn a companion orb at the given location (dropped by wolf tank boss)
+     */
+    spawnCompanionOrb(scene: Phaser.Scene, x: number, y: number): void {
+        // Companion orb is larger and blue
+        const companionOrbRadius = 12;
+        const companionOrbColor = 0x0080FF; // Blue
+        
+        const orb = scene.add.circle(x, y, companionOrbRadius, companionOrbColor) as XPOrb;
+        scene.physics.add.existing(orb);
+        orb.body.setVelocity(
+            Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity, XP_CONFIG.orb.spawnVelocity.xMaxAbsVelocity),
+            Phaser.Math.Between(XP_CONFIG.orb.spawnVelocity.minUpwardVelocity, XP_CONFIG.orb.spawnVelocity.maxUpwardVelocity)
+        );
+        orb.body.setCollideWorldBounds(true);
+        orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
+        orb.xpValue = 0; // No XP value
+        orb.isCompanionOrb = true;
+        
+        // Disable gravity for orbs in underwater scenes
+        const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
+                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+        if (isUnderwater) {
+            orb.body.setAllowGravity(false);
+            // Give orbs a gentle floating motion
+            orb.body.setVelocity(
+                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity, XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity),
+                Phaser.Math.Between(-XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity, XP_CONFIG.orb.spawnVelocity.maxUnderwaterVelocity)
+            );
+        }
+        
+        gameState.xpOrbs!.add(orb);
+        scene.physics.add.collider(orb, gameState.platforms!);
+        scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
+            const xpOrb = o as XPOrb;
+            
+            if (xpOrb.isCompanionOrb) {
+                // Grant wolf companion
+                playerStatsSystem.grantWolfCompanion();
+                console.log('Wolf companion acquired!');
+            } else {
+                // Regular XP orb
+                playerStatsSystem.gainXP(xpOrb.xpValue || XP_CONFIG.orb.defaultValue);
+                
+                // Restore stamina when collecting XP orb
+                const staminaSystem = getStaminaSystem();
+                staminaSystem.restoreStamina(STAMINA_CONFIG.xpOrbRestoration);
+            }
             
             xpOrb.destroy();
         });

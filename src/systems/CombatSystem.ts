@@ -774,8 +774,19 @@ export class CombatSystem {
         } else {
             // Regular enemy or regular boss (non-spawner)
             
-            // Spawn XP orb immediately at enemy location
-            if (enemy.scene && enemy.xpReward) {
+            // Check if this is a wolf tank boss - spawn companion orb instead of XP
+            if (enemy.enemyType === 'wolf_tank_boss' && enemy.scene) {
+                spawnSystem.spawnCompanionOrb(enemy.scene, enemy.x, enemy.y);
+                
+                // Set depth for companion orb to ensure it appears above dying enemies
+                if (gameState.xpOrbs) {
+                    gameState.xpOrbs.children.entries.forEach((obj) => {
+                        const orb = obj as Phaser.GameObjects.Arc;
+                        orb.setDepth(100);
+                    });
+                }
+            } else if (enemy.scene && enemy.xpReward) {
+                // Spawn XP orb immediately at enemy location for other enemies
                 spawnSystem.spawnXPOrb(enemy.scene, enemy.x, enemy.y, enemy.xpReward);
                 
                 // Set depth for XP orbs to ensure they appear above dying enemies

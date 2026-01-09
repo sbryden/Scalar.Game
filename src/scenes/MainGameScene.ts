@@ -204,12 +204,14 @@ export default class MainGameScene extends Phaser.Scene {
             // Spawn enemies at generated points
             if (bossMode) {
                 // Boss mode: spawn one of each boss type
-                // Land has 2 bosses: regular boss and spawner boss
+                // Land has 3 bosses: regular boss, spawner boss, and wolf tank boss
                 spawnPoints.forEach((point, index) => {
                     if (index === 0) {
                         spawnEnemy(this, point.x, point.y, 'boss_land');
-                    } else {
+                    } else if (index === 1) {
                         spawnEnemy(this, point.x, point.y, 'spawner_boss_land');
+                    } else {
+                        spawnEnemy(this, point.x, point.y, 'wolf_tank_boss');
                     }
                 });
 
@@ -219,8 +221,9 @@ export default class MainGameScene extends Phaser.Scene {
                 // Normal mode: regular enemies + random boss
                 spawnPoints.forEach(point => {
                     if (point.isBoss) {
-                        // 50% chance to spawn spawner boss, 50% regular boss
-                        const bossType = Math.random() < 0.5 ? 'spawner_boss_land' : 'boss_land';
+                        // Random boss selection: regular boss, spawner boss, or wolf tank boss
+                        const bossTypes = ['boss_land', 'spawner_boss_land', 'wolf_tank_boss'];
+                        const bossType = Phaser.Utils.Array.GetRandom(bossTypes);
                         spawnEnemy(this, point.x, point.y, bossType);
                     } else {
                         // Spawn regular enemy
