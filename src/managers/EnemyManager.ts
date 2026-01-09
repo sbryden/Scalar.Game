@@ -3,7 +3,7 @@
  * Manages all enemy-related functionality including spawning, AI, and behavior.
  * Singleton pattern for consistent state management across the game.
  */
-import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "../config";
+import { ENEMY_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "../config";
 import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
@@ -55,11 +55,21 @@ class EnemyManager {
         // Check if this is a boss enemy
         const isBoss = enemyType.startsWith('boss_');
         
-        // Apply hard mode multipliers if in hard mode
-        const isHardMode = playerStatsSystem.difficulty === 'hard';
-        const difficultyHealthMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyHealthMultiplier : 1;
-        const difficultySpeedMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpeedMultiplier : 1;
-        const lineOfSightMultiplier = isHardMode ? HARD_MODE_CONFIG.enemyLineOfSightMultiplier : 1;
+        // Apply difficulty multipliers
+        const difficulty = playerStatsSystem.difficulty;
+        let difficultyHealthMultiplier = 1;
+        let difficultySpeedMultiplier = 1;
+        let lineOfSightMultiplier = 1;
+        
+        if (difficulty === 'easy') {
+            difficultyHealthMultiplier = EASY_MODE_CONFIG.enemyHealthMultiplier;
+            difficultySpeedMultiplier = EASY_MODE_CONFIG.enemySpeedMultiplier;
+            lineOfSightMultiplier = EASY_MODE_CONFIG.enemyLineOfSightMultiplier;
+        } else if (difficulty === 'hard') {
+            difficultyHealthMultiplier = HARD_MODE_CONFIG.enemyHealthMultiplier;
+            difficultySpeedMultiplier = HARD_MODE_CONFIG.enemySpeedMultiplier;
+            lineOfSightMultiplier = HARD_MODE_CONFIG.enemyLineOfSightMultiplier;
+        }
         
         // Apply level-based multipliers (these stack with difficulty multipliers)
         const levelHealthMultiplier = levelProgressionSystem.getEnemyHealthMultiplier();

@@ -143,7 +143,7 @@ export interface SavedEnemy {
 /**
  * Game difficulty levels
  */
-export type Difficulty = 'normal' | 'hard' | 'godMode';
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'godMode';
 
 /**
  * Player size states

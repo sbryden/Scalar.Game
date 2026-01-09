@@ -7,7 +7,7 @@ import gameState from '../utils/GameContext';
 import playerStatsSystem from './PlayerStatsSystem';
 import levelProgressionSystem from './LevelProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
-import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
+import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
 import type { XPOrb } from '../types/game';
 
 /**
@@ -255,9 +255,15 @@ export class SpawnSystem {
         
         const spawnPoints: SpawnPoint[] = [];
         
-        // Apply hard mode multiplier
-        const isHardMode = playerStatsSystem.difficulty === 'hard';
-        const difficultyMultiplier = isHardMode ? HARD_MODE_CONFIG.enemySpawnMultiplier : 1;
+        // Apply difficulty multiplier
+        const difficulty = playerStatsSystem.difficulty;
+        let difficultyMultiplier = 1;
+        
+        if (difficulty === 'easy') {
+            difficultyMultiplier = EASY_MODE_CONFIG.enemySpawnMultiplier;
+        } else if (difficulty === 'hard') {
+            difficultyMultiplier = HARD_MODE_CONFIG.enemySpawnMultiplier;
+        }
         
         // Apply level-based multiplier (stacks with difficulty)
         const levelMultiplier = levelProgressionSystem.getEnemyCountMultiplier();

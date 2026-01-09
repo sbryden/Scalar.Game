@@ -479,6 +479,14 @@ export const DETECTION_CONFIG = {
     maxLineOfSightScreenPercent: 1.0
 } as const;
 
+// Easy mode enemy modifiers
+export const EASY_MODE_CONFIG = {
+    enemyHealthMultiplier: 0.7,
+    enemySpeedMultiplier: 0.8,
+    enemyLineOfSightMultiplier: 0.7,
+    enemySpawnMultiplier: 0.6
+} as const;
+
 // Hard mode enemy modifiers
 export const HARD_MODE_CONFIG = {
     enemyHealthMultiplier: 1.5,

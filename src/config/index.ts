@@ -18,6 +18,7 @@ export {
     ENEMY_CONFIG,
     BOSS_TEXTURE_CONFIG,
     DETECTION_CONFIG,
+    EASY_MODE_CONFIG,
     HARD_MODE_CONFIG
 } from './enemies';
 export type { EnemyStats } from './enemies';
