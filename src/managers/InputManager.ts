@@ -61,9 +61,7 @@ export class InputManager {
         
         // Attack
         this.scene.input.keyboard?.on('keydown-F', () => {
-            if (gameState.player) {
-                projectileManager.fireProjectile(gameState.player.scene);
-            }
+            projectileManager.fireProjectile(this.scene);
         });
     }
     
