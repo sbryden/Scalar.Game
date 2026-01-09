@@ -2,7 +2,7 @@
  * Camera Manager
  * Handles camera setup and following behavior
  */
-import gameState from '../utils/gameState';
+import gameState from '../utils/GameContext';
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
 
 export class CameraManager {

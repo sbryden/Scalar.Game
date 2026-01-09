@@ -11,11 +11,11 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 ## ✨ Key Features
 
 ### 🎮 **Core Gameplay**
-- **Size-Shifting Mechanics**: Shrink and grow between normal and micro scales (Q/E keys)
+- **Size-Shifting Mechanics**: 3-tier scale system - shrink to micro, grow to macro (Q/E keys)
 - **Two Complete Biomes**: 
   - 🌳 **Land Environment** with jumping mechanics
   - 🌊 **Underwater Environment** with submarine-style vertical thrust controls
-- **4 Unique Scenes**: Each biome has normal and micro scale variants with distinct enemies
+- **6 Unique Scenes**: Each biome has micro, normal, and macro scale variants with distinct enemies
 - **Melee Combat System**: Hold Shift for close-range attacks with stamina management
 - **Projectile Combat**: Shoot enemies with F key (slower projectiles underwater)
 - **Smooth Physics**: Arcade physics with environment-specific gravity
@@ -89,10 +89,10 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - **Shift** - Melee mode (hold for close-range combat, consumes stamina)
 
 **Size Transformation:**
-- **Q** - Shrink (normal → micro scale, consumes fuel)
-- **E** - Grow (micro → normal scale, consumes fuel)
+- **Q** - Shrink (macro → normal → micro, consumes fuel)
+- **E** - Grow (micro → normal → macro, consumes fuel)
 - *Note: 20-second initial cooldown; fuel regenerates faster as you level up*
-- *Future updates will add macro (large) scale for 3-tier system*
+- **3-Tier System**: Micro (small) → Normal → Macro (large)
 
 ### Gameplay Tips
 - 💡 Collect glowing XP orbs to level up your character
@@ -100,9 +100,10 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - 💡 Manage your fuel - size transformations consume fuel; wait for 20-second cooldown at start
 - 💡 Use momentum for ramming damage - moving faster deals more damage to enemies
 - 💡 Melee mode (Shift) enhances your ramming damage and reduces damage you take
+- 💡 Macro scale gives 30% bonus ramming damage - use it against tough enemies!
 - 💡 Enemies chase when they spot you - use size changes strategically
 - 💡 Underwater physics differ - lighter gravity and slower projectiles
-- 💡 Each scale has different enemies - shrink to face bacteria, stay normal for bigger threats
+- 💡 Each scale has different enemies - micro bacteria, normal threats, macro giants
 - 💡 Boss enemies have enhanced detection range and special abilities
 - 💡 Check your stats at level complete screen to track progress
 

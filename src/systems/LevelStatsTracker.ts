@@ -244,5 +244,25 @@ export class LevelStatsTracker {
     }
 }
 
-// Export singleton instance
-export default new LevelStatsTracker();
+// Singleton instance management
+let levelStatsTrackerInstance: LevelStatsTracker | null = null;
+
+/**
+ * Get the LevelStatsTracker instance, creating it if necessary
+ */
+export function getLevelStatsTracker(): LevelStatsTracker {
+    if (!levelStatsTrackerInstance) {
+        levelStatsTrackerInstance = new LevelStatsTracker();
+    }
+    return levelStatsTrackerInstance;
+}
+
+/**
+ * Reset the LevelStatsTracker instance (useful for testing)
+ */
+export function resetLevelStatsTracker(): void {
+    levelStatsTrackerInstance = null;
+}
+
+// Default export for backward compatibility
+export default getLevelStatsTracker();

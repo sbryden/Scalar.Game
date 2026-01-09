@@ -17,19 +17,19 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - ✅ Prevent size changes when fuel depleted
 - ✅ Low fuel warning indicators
 
-### 3-Tier Scale System (Macro Scale)
-**Priority: High**
-- Add macro (large) scale to existing micro/normal scales
-- Progressive scaling: micro → normal → macro (E key advances, Q key reverses)
-- Create 2 new scenes per biome:
+### ✅ 3-Tier Scale System (Macro Scale)
+**Status: COMPLETED**
+- ✅ Add macro (large) scale to existing micro/normal scales
+- ✅ Progressive scaling: micro → normal → macro (E key advances, Q key reverses)
+- ✅ Created 2 new scenes per biome:
   - MainGameMacroScene (land, macro scale)
   - UnderwaterMacroScene (water, macro scale)
-- Macro-scale enemies:
-  - Land: Giant golems, rock animals, massive wolves/bears
-  - Water: Whales, giant sharks, mythological sea creatures
-- Camera scaling adjustments for macro perspective
-- Visual continuity: use prior scale's ground texture as background
-- Ant-Man style transition animations (player shrinks, enemies appear to grow)
+- ✅ Macro-scale enemies:
+  - Land: Golems, wolves, bears, and macro bosses
+  - Water: Whales, giant sharks, sea dragons, giant crabs, sea serpents
+- ✅ Camera and physics scaling adjustments for macro perspective
+- ✅ Enhanced visuals: mountain silhouettes, deep ocean effects, bioluminescent elements
+- ✅ Macro combat bonuses: 30% enhanced ramming damage
 
 ### Vehicle Visual Progression
 **Priority: Medium**

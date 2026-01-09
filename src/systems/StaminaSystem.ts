@@ -236,7 +236,16 @@ export function getStaminaSystem(): StaminaSystem {
     return staminaSystemInstance;
 }
 
+/**
+ * Reset the StaminaSystem instance (useful for testing)
+ */
+export function resetStaminaSystem(): void {
+    staminaSystemInstance = null;
+}
+
+// Default export for backward compatibility
 export default {
     initialize: initializeStaminaSystem,
-    getInstance: getStaminaSystem
+    getInstance: getStaminaSystem,
+    reset: resetStaminaSystem
 };

@@ -4,7 +4,7 @@
  * Singleton pattern for consistent state management across the game.
  */
 import { ENEMY_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "../config";
-import gameState from "../utils/gameState";
+import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
@@ -26,7 +26,10 @@ class EnemyManager {
     isSwimmingEnemy(enemyType: string): boolean {
         return enemyType === "micro" || enemyType === "fish" || enemyType === "water_swimming_micro" ||
                enemyType === "boss_land_micro" || enemyType === "boss_water_swimming" || 
-               enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark";
+               enemyType === "boss_water_swimming_micro" || enemyType === "boss_water_shark" ||
+               // Macro scale swimming enemies
+               enemyType === "whale" || enemyType === "giant_shark" || enemyType === "sea_dragon" ||
+               enemyType === "whale_boss" || enemyType === "giant_shark_boss" || enemyType === "sea_serpent_boss";
     }
 
     /**
@@ -142,6 +145,13 @@ class EnemyManager {
             enemy.projectileDamage = config.projectileDamage;
             enemy.projectileSpeed = config.projectileSpeed;
             enemy.projectileCooldown = config.projectileCooldown;
+            
+            // Configure burst fire properties if present
+            if (config.burstCount && config.burstDelay) {
+                enemy.burstCount = config.burstCount;
+                enemy.burstDelay = config.burstDelay;
+                enemy.currentBurstShot = 0;
+            }
         }
 
         const barWidth = VISUAL_CONFIG.healthBar.width;
@@ -483,5 +493,25 @@ class EnemyManager {
     }
 }
 
-// Export singleton instance
-export default new EnemyManager();
+// Singleton instance management
+let enemyManagerInstance: EnemyManager | null = null;
+
+/**
+ * Get the EnemyManager instance, creating it if necessary
+ */
+export function getEnemyManager(): EnemyManager {
+    if (!enemyManagerInstance) {
+        enemyManagerInstance = new EnemyManager();
+    }
+    return enemyManagerInstance;
+}
+
+/**
+ * Reset the EnemyManager instance (useful for testing)
+ */
+export function resetEnemyManager(): void {
+    enemyManagerInstance = null;
+}
+
+// Default export for backward compatibility
+export default getEnemyManager();
