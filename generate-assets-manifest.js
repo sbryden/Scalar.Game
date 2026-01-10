@@ -81,11 +81,40 @@ async function generateManifest() {
             
             return {
                 key: sanitizedKey,
-                path: file
+                path: file,
+                originalKey: key
             };
         });
         
-        // Generate TypeScript content with sanitized keys
+        // Check for post-sanitization collisions
+        const sanitizedKeys = assetEntries.map(e => e.key);
+        const sanitizedDuplicates = sanitizedKeys.filter((key, index) => 
+            sanitizedKeys.indexOf(key) !== index
+        );
+        if (sanitizedDuplicates.length > 0) {
+            const collisions = [...new Set(sanitizedDuplicates)].map(dupKey => {
+                const affected = assetEntries.filter(e => e.key === dupKey);
+                return `  ${dupKey}: ${affected.map(e => e.originalKey).join(', ')}`;
+            }).join('\n');
+            
+            throw new Error(
+                `Key collision detected after sanitization:\n${collisions}\n` +
+                'Files with special characters may have been sanitized to the same key. ' +
+                'Please rename files to avoid conflicts.'
+            );
+        }
+        
+        // Helper to safely escape strings for TypeScript
+        const escapeForTS = (str) => {
+            return str
+                .replace(/\\/g, '\\\\')  // Backslashes
+                .replace(/'/g, "\\'")     // Single quotes
+                .replace(/\n/g, '\\n')    // Newlines
+                .replace(/\r/g, '\\r')    // Carriage returns
+                .replace(/\t/g, '\\t');   // Tabs
+        };
+        
+        // Generate TypeScript content with properly escaped keys
         const tsContent = `/**
  * Auto-generated asset manifest
  * 
@@ -107,7 +136,7 @@ interface AssetEntry {
  * Array of all PNG asset entries found in the assets directory
  */
 export const ASSET_ENTRIES: readonly AssetEntry[] = [
-${assetEntries.map(entry => `    { key: '${entry.key.replace(/'/g, "\\'")}', path: '${entry.path.replace(/'/g, "\\'")}' }`).join(',\n')}
+${assetEntries.map(entry => `    { key: '${escapeForTS(entry.key)}', path: '${escapeForTS(entry.path)}' }`).join(',\n')}
 ] as const;
 
 /**
