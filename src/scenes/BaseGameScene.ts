@@ -20,6 +20,8 @@ import { getFuelSystem } from '../systems/FuelSystem';
 import { InputManager } from '../managers/InputManager';
 import { CollisionManager } from '../managers/CollisionManager';
 import { CameraManager } from '../managers/CameraManager';
+import { initializeCompanionManager, getCompanionManager } from '../managers/CompanionManager';
+import { Services } from '../services';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
@@ -130,6 +132,13 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         this.restoreOrSpawnEnemies();
         this.setupManagers();
         this.createDebugText();
+        
+        // Initialize and register companion manager for this scene
+        const companionManager = initializeCompanionManager(this);
+        Services.register('companionManager', companionManager);
+        
+        // Respawn companions if they should be active in this scene
+        companionManager.respawnCompanions();
     }
 
     update(): void {
@@ -186,6 +195,12 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Update XP orb magnetism
         xpOrbManager.updateXPOrbMagnetism();
+        
+        // Update companions
+        const companionManager = getCompanionManager();
+        if (companionManager) {
+            companionManager.update(this.time.now - (this.time.now - 16)); // delta in ms
+        }
 
         // Update camera
         this.cameraManager.update();
@@ -217,6 +232,12 @@ export default abstract class BaseGameScene extends Phaser.Scene {
                 x: this.player.x,
                 y: this.player.y
             };
+        }
+        
+        // Despawn companions on scene shutdown (they'll respawn in next scene if appropriate)
+        const companionManager = getCompanionManager();
+        if (companionManager) {
+            companionManager.despawnAll();
         }
     }
 
@@ -382,6 +403,13 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Reset player stats
         playerStatsSystem.reset();
+        
+        // Clear companions on continue (keep diedThisRun to prevent revival)
+        playerStatsSystem.clearCompanionsOnContinue();
+        const companionManager = getCompanionManager();
+        if (companionManager) {
+            companionManager.despawnAll();
+        }
 
         // Reset player position
         this.player.setPosition(400, 100);
@@ -431,6 +459,10 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleQuit(): void {
         console.log('Player chose to quit');
         playerStatsSystem.reset();
+        
+        // Full reset of companions for new run
+        playerStatsSystem.resetCompanions();
+        
         this.scene.start('MenuScene');
     }
 
@@ -461,6 +493,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         console.log('Replaying level');
 
         levelStatsTracker.reset();
+        
+        // Full reset of companions for new run
+        playerStatsSystem.resetCompanions();
 
         gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
         gameState.savedEnemies[config.sceneKey] = [];
@@ -473,6 +508,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         levelStatsTracker.reset();
         levelProgressionSystem.resetToLevel1();
+        
+        // Full reset of companions for new run
+        playerStatsSystem.resetCompanions();
 
         this.scene.start('MenuScene');
     }

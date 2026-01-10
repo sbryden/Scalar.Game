@@ -87,9 +87,53 @@ export interface XPOrb extends Phaser.GameObjects.Arc {
     body: Phaser.Physics.Arcade.Body;
     xpValue: number;
     isCompanionOrb?: boolean;
+    companionKind?: CompanionKind;
     // Companion orb float behavior
     floatTargetY?: number;
     hasReachedFloatHeight?: boolean;
+}
+
+/**
+ * Companion types
+ */
+export type CompanionKind = 'wolf' | 'fish' | 'hawk';
+
+/**
+ * Companion sprite with custom properties
+ */
+export interface Companion extends Phaser.Physics.Arcade.Sprite {
+    body: Phaser.Physics.Arcade.Body;
+    companionKind: CompanionKind;
+    health: number;
+    maxHealth: number;
+    stamina: number;
+    maxStamina: number;
+    damage: number;
+    isMeleeMode?: boolean;
+    stunnedUntil?: number;
+    healthBarBg: Phaser.GameObjects.Rectangle;
+    healthBar: Phaser.GameObjects.Rectangle;
+    staminaBarBg: Phaser.GameObjects.Rectangle;
+    staminaBar: Phaser.GameObjects.Rectangle;
+    barOffsetY: number;
+    // Stamina mechanics (mirroring player shield)
+    isExhausted?: boolean;
+    isDepleted?: boolean;
+    needsReset?: boolean;
+    depletionPauseRemaining?: number;
+}
+
+/**
+ * Companion state (persisted across scenes)
+ */
+export interface CompanionState {
+    kind: CompanionKind;
+    alive: boolean;
+    diedThisRun: boolean;
+    currentHealth: number;
+    maxHealth: number;
+    currentStamina: number;
+    maxStamina: number;
 }
 
 /**
@@ -105,7 +149,8 @@ export interface PlayerStats {
     maxStamina: number;
     fuel: number;
     maxFuel: number;
-    hasWolfCompanion?: boolean;
+    hasWolfCompanion?: boolean; // Deprecated: keeping for backwards compatibility
+    companions?: Map<CompanionKind, CompanionState>;
 }
 
 /**
