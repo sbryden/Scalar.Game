@@ -8,6 +8,15 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ## 🎯 Core Mechanics Enhancements
 
+### ✅ Improved HUD & Stat Display
+**Status: COMPLETED**
+- ✅ Redesigned vertical stat bars into horizontal top bar layout
+- ✅ Added clear text labels for each stat (HP, STA, FUEL, XP)
+- ✅ Optimized use of horizontal screen space
+- ✅ Maintained pixel-art styling with bold text and contrasting colors
+- ✅ Preserved existing color states for stamina and fuel warnings
+- ✅ Repositioned level/map info and pause button for clean layout
+
 ### ✅ Fuel System for Size Transformations
 **Status: COMPLETED**
 - ✅ Implemented separate fuel system (distinct from stamina which is for melee)
@@ -99,16 +108,16 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 ### Land Champion: Mechanical Wolf
 - Wolf sprite and animations
 - Melee attack behavior
-- Digging mechanic: periodically digs mounds of dirt/gravel
+- (future) Digging mechanic: periodically digs mounds of dirt/gravel
 - Occasionally uncovers XP orbs or upgrade parts
-- Defensive support abilities
-- Howl ability to stun nearby enemies
+- Defensive support abilities - auto attacks near by enemies, draws aggro from enemies it is attacking
+- (future) Howl ability to stun nearby enemies
 
 ### Water Champion: Mechanical Fish
 - Mechanical fish sprite and animations
 - Stat bonuses: +speed, +oxygen/HP
 - Ranged attack behavior underwater
-- Highlights enemy weak points (critical hit system integration)
+- (future) Highlights enemy weak points (critical hit system integration)
 - Enhanced maneuverability bonus in water
 - School mechanic: creates duplicate decoys
 
@@ -117,7 +126,7 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Fire rate multiplier passive ability
 - Agility bonus for player
 - Dive bomb attack (massive damage on cooldown)
-- Scout ability: reveals nearby enemies
+- (future) Scout ability: reveals nearby enemies
 - Wind riding: reduces fuel consumption
 
 ---
