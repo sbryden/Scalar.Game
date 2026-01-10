@@ -7,8 +7,9 @@ import gameState from '../utils/GameContext';
 import playerStatsSystem from './PlayerStatsSystem';
 import levelProgressionSystem from './LevelProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
+import { getCompanionManager } from '../managers/CompanionManager';
 import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
-import type { XPOrb } from '../types/game';
+import type { XPOrb, CompanionKind } from '../types/game';
 
 /**
  * Spawn point data structure
@@ -35,8 +36,9 @@ export class SpawnSystem {
      * @param y - Y coordinate
      * @param isCompanion - Whether this is a companion orb (true) or XP orb (false)
      * @param xpValue - XP value for XP orbs (ignored for companion orbs)
+     * @param companionKind - Type of companion for companion orbs (defaults to 'wolf')
      */
-    private spawnOrb(scene: Phaser.Scene, x: number, y: number, isCompanion: boolean, xpValue: number = 0): void {
+    private spawnOrb(scene: Phaser.Scene, x: number, y: number, isCompanion: boolean, xpValue: number = 0, companionKind: CompanionKind = 'wolf'): void {
         // Create appropriate orb visual
         let orb: XPOrb;
         if (isCompanion) {
@@ -71,6 +73,7 @@ export class SpawnSystem {
         orb.body.setBounce(XP_CONFIG.orb.bounce, XP_CONFIG.orb.bounce);
         orb.xpValue = isCompanion ? 0 : xpValue;
         orb.isCompanionOrb = isCompanion;
+        orb.companionKind = isCompanion ? companionKind : undefined;
         
         // Disable gravity for orbs in underwater scenes
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
@@ -90,9 +93,31 @@ export class SpawnSystem {
         scene.physics.add.overlap(gameState.player!, orb, (p, o) => {
             const xpOrb = o as XPOrb;
             
-            if (xpOrb.isCompanionOrb) {
-                // Grant wolf companion
-                playerStatsSystem.grantWolfCompanion();
+            if (xpOrb.isCompanionOrb && xpOrb.companionKind) {
+                // Grant or refresh companion
+                const result = playerStatsSystem.grantCompanion(xpOrb.companionKind);
+                
+                if (result.spawned) {
+                    // New companion - spawn it in the scene
+                    console.log(`Unlocked ${xpOrb.companionKind} companion!`);
+                    const companionManager = getCompanionManager();
+                    const companionState = playerStatsSystem.getCompanionState(xpOrb.companionKind);
+                    if (companionManager && companionState) {
+                        companionManager.spawnCompanion(xpOrb.companionKind, companionState);
+                    }
+                } else if (result.refreshed) {
+                    // Existing companion refreshed
+                    console.log(`${xpOrb.companionKind} companion HP and stamina restored!`);
+                } else {
+                    // Companion is dead this run - cannot revive
+                    console.log(`${xpOrb.companionKind} companion cannot be revived this run`);
+                    return; // Don't destroy orb so player knows
+                }
+                
+                // Backwards compatibility
+                if (xpOrb.companionKind === 'wolf') {
+                    playerStatsSystem.grantWolfCompanion();
+                }
             } else {
                 // Regular XP orb
                 playerStatsSystem.gainXP(xpOrb.xpValue || XP_CONFIG.orb.defaultValue);
@@ -114,10 +139,11 @@ export class SpawnSystem {
     }
     
     /**
-     * Spawn a companion orb at the given location (dropped by wolf tank boss)
+     * Spawn a companion orb at the given location (dropped by bosses)
+     * @param kind - Type of companion ('wolf', 'fish', 'hawk')
      */
-    spawnCompanionOrb(scene: Phaser.Scene, x: number, y: number): void {
-        this.spawnOrb(scene, x, y, true);
+    spawnCompanionOrb(scene: Phaser.Scene, x: number, y: number, kind: CompanionKind = 'wolf'): void {
+        this.spawnOrb(scene, x, y, true, 0, kind);
     }
     
     /**
