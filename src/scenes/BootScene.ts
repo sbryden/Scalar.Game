@@ -70,9 +70,10 @@ export default class BootScene extends Phaser.Scene {
         this.initializeServices();
         
         // LEGACY COMPATIBILITY: Create 'enemy' as an alias for 'rockgiant' texture
-        // This avoids loading the same asset twice while maintaining backward compatibility
-        // with existing code that references the 'enemy' texture key.
-        // Consider refactoring code to use 'rockgiant' directly and removing this alias.
+        // This avoids loading the same asset twice while maintaining backward compatibility.
+        // 
+        // Future enhancement: If more aliases are needed, consider moving this to a
+        // configuration object like: const ASSET_ALIASES = { 'enemy': 'rockgiant', ... }
         if (this.textures.exists('rockgiant') && !this.textures.exists('enemy')) {
             const rockgiantTexture = this.textures.get('rockgiant');
             const sourceImage = rockgiantTexture.getSourceImage() as HTMLImageElement;
