@@ -30,8 +30,12 @@ export default class BootScene extends Phaser.Scene {
             this.load.image(entry.key, `/Scalar.Game/${entry.path}`);
         }
         
-        // Load legacy 'enemy' alias for backward compatibility
-        // (maps to rockgiant.png)
+        // LEGACY COMPATIBILITY: Load 'enemy' as an alias for 'rockgiant'
+        // This alias is maintained for backward compatibility with existing code
+        // that references the 'enemy' texture key. The 'rockgiant' texture is
+        // already loaded above from the manifest, so this creates a duplicate
+        // texture entry under a different key. Consider refactoring code to use
+        // 'rockgiant' directly and removing this alias in a future update.
         this.load.image('enemy', '/Scalar.Game/rockgiant.png');
         
         // Optional: Add loading progress bar
