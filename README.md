@@ -164,9 +164,39 @@ npm run preview
 
 ## 📦 Scripts
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
+- `npm run dev` - Start development server with hot reload (auto-generates asset manifest)
+- `npm run build` - Build for production (auto-generates asset manifest)
 - `npm run preview` - Preview the production build locally
+- `npm run generate-manifest` - Manually generate asset manifest from PNG files in ./assets
+
+## 🎨 Asset Management
+
+This project uses an **automated asset manifest system** for zero-maintenance asset loading:
+
+### How It Works
+1. The `generate-assets-manifest.js` script scans the `./assets` directory for all `.png` files
+2. It automatically generates `src/assets-manifest.ts` with an array of asset keys
+3. `BootScene.ts` imports and loads all assets from this manifest automatically
+4. **No manual updates required** when adding or removing PNG files!
+
+### Adding New Assets
+Simply drop `.png` files into the `./assets` directory and rebuild:
+```bash
+# Assets are auto-loaded on next build or dev server start
+npm run dev
+# or
+npm run build
+```
+
+The manifest is automatically regenerated before every build and dev server start.
+
+### Manual Manifest Generation
+If you need to regenerate the manifest manually:
+```bash
+npm run generate-manifest
+```
+
+**Note:** The generated `src/assets-manifest.ts` file is in `.gitignore` and will be regenerated on each build.
 
 ## 🌐 Deployment
 

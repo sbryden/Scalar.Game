@@ -1,0 +1,174 @@
+#!/usr/bin/env node
+/**
+ * Asset Manifest Generator
+ * 
+ * Scans the ./assets directory for all .png files and generates a TypeScript
+ * manifest file (src/assets-manifest.ts) that exports an array of asset keys.
+ * 
+ * This script should be run before building the project to ensure all assets
+ * are automatically loaded without manual updates to BootScene.ts.
+ */
+
+import { readdir, writeFile } from 'fs/promises';
+import { join, basename, extname, relative } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const ASSETS_DIR = join(__dirname, 'assets');
+const OUTPUT_FILE = join(__dirname, 'src', 'assets-manifest.ts');
+
+/**
+ * Recursively scan directory for PNG files
+ */
+async function findPngFiles(dir) {
+    const entries = await readdir(dir, { withFileTypes: true });
+    const files = [];
+    
+    for (const entry of entries) {
+        const fullPath = join(dir, entry.name);
+        if (entry.isDirectory()) {
+            // Recursively scan subdirectories
+            const subFiles = await findPngFiles(fullPath);
+            files.push(...subFiles);
+        } else if (entry.isFile() && extname(entry.name).toLowerCase() === '.png') {
+            // Get relative path from assets directory (cross-platform safe)
+            const relativePath = relative(ASSETS_DIR, fullPath);
+            files.push(relativePath);
+        }
+    }
+    
+    return files;
+}
+
+/**
+ * Generate TypeScript manifest file
+ */
+async function generateManifest() {
+    try {
+        console.log('Scanning assets directory for PNG files...');
+        const pngFiles = await findPngFiles(ASSETS_DIR);
+        
+        if (pngFiles.length === 0) {
+            console.warn('Warning: No PNG files found in assets directory');
+        }
+        
+        // Sort alphabetically for consistency
+        pngFiles.sort();
+        
+        console.log(`Found ${pngFiles.length} PNG file(s)`);
+        
+        // Check for duplicate basenames (would cause key collisions)
+        const basenames = pngFiles.map(file => basename(file, '.png'));
+        const duplicates = basenames.filter((name, index) => basenames.indexOf(name) !== index);
+        if (duplicates.length > 0) {
+            throw new Error(
+                `Duplicate asset basenames detected: ${[...new Set(duplicates)].join(', ')}. ` +
+                'Asset files in different subdirectories cannot have the same basename.'
+            );
+        }
+        
+        // Generate asset entries with sanitized keys
+        const assetEntries = pngFiles.map(file => {
+            // Use relative path from assets dir (without extension) as key
+            const key = file.replace(/\.png$/i, '');
+            
+            // Normalize path separators to forward slash for consistency
+            const normalizedKey = key.replace(/\\/g, '/');
+            
+            // Sanitize key for safe inclusion in TypeScript
+            // Only allow alphanumeric, underscore, hyphen, forward slash
+            // Note: Forward slashes are allowed to support subdirectories.
+            // If you need object property access, consider replacing '/' with '_'
+            const sanitizedKey = normalizedKey.replace(/[^a-zA-Z0-9_\-/]/g, '_');
+            
+            return {
+                key: sanitizedKey,
+                path: file.replace(/\\/g, '/'), // Normalize path separators
+                originalKey: normalizedKey
+            };
+        });
+        
+        // Check for post-sanitization collisions
+        const sanitizedKeys = assetEntries.map(e => e.key);
+        const sanitizedDuplicates = sanitizedKeys.filter((key, index) => 
+            sanitizedKeys.indexOf(key) !== index
+        );
+        if (sanitizedDuplicates.length > 0) {
+            const collisions = [...new Set(sanitizedDuplicates)].map(dupKey => {
+                const affected = assetEntries.filter(e => e.key === dupKey);
+                return `  ${dupKey}: ${affected.map(e => e.originalKey).join(', ')}`;
+            }).join('\n');
+            
+            throw new Error(
+                `Key collision detected after sanitization:\n${collisions}\n` +
+                'Files with special characters may have been sanitized to the same key. ' +
+                'Please rename files to avoid conflicts.'
+            );
+        }
+        
+        // Helper to safely escape strings for TypeScript
+        const escapeForTS = (str) => {
+            return str
+                .replace(/\\/g, '\\\\')  // Backslashes
+                .replace(/'/g, "\\'")     // Single quotes
+                .replace(/\n/g, '\\n')    // Newlines
+                .replace(/\r/g, '\\r')    // Carriage returns
+                .replace(/\t/g, '\\t');   // Tabs
+        };
+        
+        // Generate TypeScript content with properly escaped keys
+        const tsContent = `/**
+ * Auto-generated asset manifest
+ * 
+ * This file is automatically generated by generate-assets-manifest.js
+ * DO NOT EDIT MANUALLY - any changes will be overwritten
+ * 
+ * Generated: ${new Date().toISOString()}
+ */
+
+/**
+ * Asset manifest entry
+ */
+interface AssetEntry {
+    readonly key: string;
+    readonly path: string;
+}
+
+/**
+ * Array of all PNG asset entries found in the assets directory
+ */
+export const ASSET_ENTRIES: readonly AssetEntry[] = [
+${assetEntries.map(entry => `    { key: '${escapeForTS(entry.key)}', path: '${escapeForTS(entry.path)}' }`).join(',\n')}
+] as const;
+
+/**
+ * Array of asset keys for convenient iteration
+ */
+export const ASSET_KEYS: readonly string[] = ASSET_ENTRIES.map(e => e.key);
+
+/**
+ * Asset key type for type-safe asset references
+ */
+export type AssetKey = typeof ASSET_KEYS[number];
+`;
+        
+        await writeFile(OUTPUT_FILE, tsContent, 'utf8');
+        
+        console.log(`✓ Generated manifest: ${OUTPUT_FILE}`);
+        console.log(`✓ Exported ${assetEntries.length} asset(s)`);
+        
+        // Log all asset entries for verification
+        console.log('\nAsset entries:');
+        assetEntries.forEach(entry => console.log(`  - ${entry.key} -> ${entry.path}`));
+        
+    } catch (error) {
+        console.error('Error generating asset manifest:', error);
+        process.exit(1);
+    }
+}
+
+// Run the generator
+generateManifest();

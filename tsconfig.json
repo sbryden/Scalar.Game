@@ -55,6 +55,7 @@
     "vitest.config.ts",
     "dist",
     "node_modules",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "generate-assets-manifest.js"
   ]
 }
