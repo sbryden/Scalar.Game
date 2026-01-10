@@ -40,6 +40,11 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 - **Difficulty Modes**: Easy (0.7x health, 0.8x speed, 0.6x spawns), Normal, and Hard (1.5x multipliers)
 - **God Mode**: Separate toggle for invincibility (optional)
 - **Boss Mode**: Toggle for boss-heavy gameplay
+- **Flag-Based Level Completion**: 
+  - Defeat all bosses to clear remaining enemies
+  - A golden flag spawns near the map's end
+  - Reach the flag to trigger a firework celebration
+  - Stats screen displays after the celebration
 - **Stats Tracking**: Detailed end-of-level statistics and score calculation
 
 ### 💪 **Combat & Feedback**
@@ -128,6 +133,9 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - 💡 Enemies chase when they spot you - use size changes strategically
 - 💡 Watch out for spawner enemies (orange) in micro scenes - they explode into 3 minions!
 - 💡 Defeat all minions to get XP from spawner enemies
+- 💡 Defeat all bosses to clear remaining enemies and spawn the completion flag
+- 💡 Look for the golden flag near the map's end after defeating all bosses
+- 💡 Reach the flag to trigger a celebratory firework display and complete the level
 - 💡 Underwater physics differ - lighter gravity and slower projectiles
 - 💡 Each scale has different enemies - micro bacteria, normal threats, macro giants
 - 💡 Boss enemies have enhanced detection range and special abilities

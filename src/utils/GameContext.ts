@@ -55,6 +55,7 @@ class GameContext {
     private _savedEnemies: Record<SceneKey, SavedEnemy[]>;
     private _difficultyInitialized: boolean = false;
     private _currentMapLevel: number = 1;
+    private _levelCompleteFlag: Phaser.GameObjects.Sprite | null = null;
 
     constructor() {
         // Initialize saved positions for all scenes
@@ -86,6 +87,7 @@ class GameContext {
     get currentSceneKey(): SceneKey { return this._currentSceneKey; }
     get difficultyInitialized(): boolean { return this._difficultyInitialized; }
     get currentMapLevel(): number { return this._currentMapLevel; }
+    get levelCompleteFlag(): Phaser.GameObjects.Sprite | null { return this._levelCompleteFlag; }
 
     // Read-only access to saved state maps
     // Note: The Record itself is mutable to allow gameState.savedPositions[key] = value patterns
@@ -113,6 +115,7 @@ class GameContext {
     set currentSceneKey(value: SceneKey) { this._currentSceneKey = value; }
     set difficultyInitialized(value: boolean) { this._difficultyInitialized = value; }
     set currentMapLevel(value: number) { this._currentMapLevel = Math.max(1, value); }
+    set levelCompleteFlag(value: Phaser.GameObjects.Sprite | null) { this._levelCompleteFlag = value; }
 
     // ============================================
     // SCENE STATE METHODS
