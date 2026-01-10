@@ -2,7 +2,7 @@
  * Micro Scene
  * Cellular-level gameplay scene with bacteria enemies
  */
-import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateQuantumBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -14,9 +14,10 @@ export default class MicroScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'MicroScene',
-            gravity: 150, // Reduced gravity for micro scene
+            gravity: options.microLandGravity,
             playerTexture: 'car_1',
             playerScale: 0.15, // Smaller scale for micro
             playerBounce: 0.2,

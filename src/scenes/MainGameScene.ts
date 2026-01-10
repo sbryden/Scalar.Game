@@ -3,7 +3,7 @@
  * Land-based gameplay scene at normal scale
  */
 import Phaser from 'phaser';
-import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateSkyBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -15,9 +15,10 @@ export default class MainGameScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'MainGameScene',
-            gravity: 300,
+            gravity: options.landGravity,
             playerTexture: 'car_1',
             playerScale: 0.25,
             playerBounce: 0.2,

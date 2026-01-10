@@ -3,7 +3,7 @@
  * Manages all projectile-related functionality including player and enemy projectiles.
  * Singleton pattern for consistent state management across the game.
  */
-import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG } from '../config';
+import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG, getOptions } from '../config';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
@@ -32,6 +32,7 @@ class ProjectileManager {
         this.lastProjectileTime = gameTime;
         
         const config = PROJECTILE_CONFIG.basic;
+        const options = getOptions();
         
         const player = gameState.player;
         if (!player) return;
@@ -44,7 +45,7 @@ class ProjectileManager {
                             gameState.currentSceneKey === 'UnderwaterMicroScene';
         const speedMultiplier = isUnderwater ? PHYSICS_CONFIG.underwater.speedMultiplier : 1.0;
         
-        const velocityX = config.speed * direction * speedMultiplier;
+        const velocityX = options.playerProjectileSpeed * direction * speedMultiplier;
         
         // Offset projectile spawn behind the vehicle (opposite of direction)
         const spawnOffsetX = direction === 1 ? PHYSICS_CONFIG.projectile.spawnOffsetX : -PHYSICS_CONFIG.projectile.spawnOffsetX;
@@ -80,7 +81,7 @@ class ProjectileManager {
         body.setVelocity(velocityX, 0);
         
         // Set damage (god mode damage or normal)
-        projectile.damage = playerStatsSystem.isGodMode() ? COMBAT_CONFIG.godMode.damage : config.damage;
+        projectile.damage = playerStatsSystem.isGodMode() ? COMBAT_CONFIG.godMode.damage : options.playerProjectileDamage;
         
         // Track projectile spawn position and max range (based on viewport width, not world width)
         projectile.spawnX = projectileX;
