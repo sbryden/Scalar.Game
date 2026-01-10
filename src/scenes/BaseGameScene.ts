@@ -75,6 +75,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
+    
+    // Level completion state
+    private isLevelCompleting: boolean = false;
 
     constructor(sceneKey: SceneKey) {
         super({ key: sceneKey });
@@ -208,13 +211,14 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         this.cameraManager.update();
         
         // Check for player-flag collision
-        if (gameState.levelCompleteFlag && this.player) {
+        if (gameState.levelCompleteFlag && this.player && !this.isLevelCompleting) {
             const distance = Phaser.Math.Distance.Between(
                 this.player.x, this.player.y,
                 gameState.levelCompleteFlag.x, gameState.levelCompleteFlag.y
             );
             
             if (distance < 50) { // Collision threshold
+                this.isLevelCompleting = true;
                 this.handleFlagReached();
             }
         }
@@ -493,17 +497,21 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         const flagX = WORLD_WIDTH - 300; // 300 pixels from the end
         const flagY = 650; // Near the ground
         
-        // Create flag sprite (using a simple graphics object for now - can be replaced with sprite later)
-        const flag = this.add.graphics();
-        flag.fillStyle(0xFFD700, 1); // Gold color
-        flag.fillRect(0, 0, 20, 60); // Pole
-        flag.fillStyle(0xFF0000, 1); // Red flag
-        flag.fillTriangle(20, 0, 20, 40, 70, 20); // Triangular flag
-        flag.generateTexture('level_complete_flag', 80, 70);
-        flag.destroy();
+        const flagTextureKey = 'level_complete_flag';
+        
+        // Generate the flag texture once per scene, if it does not already exist
+        if (!this.textures.exists(flagTextureKey)) {
+            const flag = this.add.graphics();
+            flag.fillStyle(0xFFD700, 1); // Gold color
+            flag.fillRect(0, 0, 5, 60); // Pole (1/4 of 20 = 5 pixels wide)
+            flag.fillStyle(0xFF0000, 1); // Red flag
+            flag.fillTriangle(5, 0, 5, 40, 70, 20); // Triangular flag starting from pole edge
+            flag.generateTexture(flagTextureKey, 80, 70);
+            flag.destroy();
+        }
         
         // Create the flag as a sprite
-        const flagSprite = this.physics.add.sprite(flagX, flagY, 'level_complete_flag');
+        const flagSprite = this.physics.add.sprite(flagX, flagY, flagTextureKey);
         flagSprite.setScale(1.5);
         flagSprite.setDepth(100);
         

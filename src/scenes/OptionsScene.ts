@@ -3,11 +3,11 @@
  * Allows players to customize game parameters
  */
 import Phaser from 'phaser';
-import { getOptions, saveOptions, resetOptions, getDefaultOptions, type GameOptions } from '../config/options';
+import { getOptions, saveOptions, resetOptions, type GameOptions } from '../config/options';
 
 export default class OptionsScene extends Phaser.Scene {
     private options!: GameOptions;
-    private sliders: Map<keyof GameOptions, { slider: Phaser.GameObjects.Rectangle, valueText: Phaser.GameObjects.Text, track: Phaser.GameObjects.Rectangle }> = new Map();
+    private sliders: Map<keyof GameOptions, { slider: Phaser.GameObjects.Rectangle, valueText: Phaser.GameObjects.Text, track: Phaser.GameObjects.Rectangle, min: number, max: number, step: number, centerX: number, trackWidth: number }> = new Map();
     private isDragging: Map<keyof GameOptions, boolean> = new Map();
     
     constructor() {
@@ -42,17 +42,17 @@ export default class OptionsScene extends Phaser.Scene {
         
         // Define option configurations
         const optionConfigs: Array<{ key: keyof GameOptions, label: string, min: number, max: number, step: number }> = [
-            { key: 'playerSpeed', label: 'Player Speed', min: 80, max: 400, step: 10 },
-            { key: 'playerJumpHeight', label: 'Jump Height', min: 100, max: 400, step: 10 },
-            { key: 'playerProjectileSpeed', label: 'Projectile Speed', min: 150, max: 600, step: 10 },
-            { key: 'playerProjectileDamage', label: 'Projectile Damage', min: 5, max: 50, step: 1 },
-            { key: 'landGravity', label: 'Land Gravity', min: 100, max: 800, step: 10 },
-            { key: 'waterGravity', label: 'Water Gravity', min: 20, max: 300, step: 10 },
-            { key: 'microLandGravity', label: 'Micro Land Gravity', min: 50, max: 400, step: 10 },
-            { key: 'microWaterGravity', label: 'Micro Water Gravity', min: 10, max: 150, step: 5 },
-            { key: 'macroLandGravity', label: 'Macro Land Gravity', min: 200, max: 1000, step: 10 },
-            { key: 'macroWaterGravity', label: 'Macro Water Gravity', min: 30, max: 200, step: 5 },
-            { key: 'startingHP', label: 'Starting HP', min: 50, max: 500, step: 10 }
+            { key: 'playerSpeed', label: 'Player Speed', min: 80, max: 800, step: 10 },
+            { key: 'playerJumpHeight', label: 'Jump Height', min: 100, max: 800, step: 10 },
+            { key: 'playerProjectileSpeed', label: 'Projectile Speed', min: 150, max: 1200, step: 10 },
+            { key: 'playerProjectileDamage', label: 'Projectile Damage', min: 5, max: 100, step: 1 },
+            { key: 'landGravity', label: 'Land Gravity', min: 100, max: 1600, step: 10 },
+            { key: 'waterGravity', label: 'Water Gravity', min: 20, max: 600, step: 10 },
+            { key: 'microLandGravity', label: 'Micro Land Gravity', min: 50, max: 800, step: 10 },
+            { key: 'microWaterGravity', label: 'Micro Water Gravity', min: 10, max: 300, step: 5 },
+            { key: 'macroLandGravity', label: 'Macro Land Gravity', min: 200, max: 2000, step: 10 },
+            { key: 'macroWaterGravity', label: 'Macro Water Gravity', min: 30, max: 400, step: 5 },
+            { key: 'startingHP', label: 'Starting HP', min: 50, max: 1000, step: 10 }
         ];
         
         // Create sliders for each option
@@ -138,8 +138,8 @@ export default class OptionsScene extends Phaser.Scene {
         const slider = this.add.rectangle(sliderX, y, sliderSize, sliderSize, 0x3498db);
         slider.setInteractive({ useHandCursor: true, draggable: true });
         
-        // Store references
-        this.sliders.set(key, { slider, valueText, track });
+        // Store references including min/max/step for later updates
+        this.sliders.set(key, { slider, valueText, track, min, max, step, centerX, trackWidth });
         this.isDragging.set(key, false);
         
         // Drag events
@@ -190,10 +190,10 @@ export default class OptionsScene extends Phaser.Scene {
             const value = this.options[key];
             sliderData.valueText.setText(value.toString());
             
-            // Update slider position based on the option config
-            // We need to recalculate min/max for proper positioning
-            // For now, just update the text - proper implementation would store min/max
-            // This is a simplified version
+            // Update slider position based on the stored min/max values
+            const normalizedValue = (value - sliderData.min) / (sliderData.max - sliderData.min);
+            const sliderX = sliderData.centerX - sliderData.trackWidth / 2 + normalizedValue * sliderData.trackWidth;
+            sliderData.slider.x = sliderX;
         });
     }
     

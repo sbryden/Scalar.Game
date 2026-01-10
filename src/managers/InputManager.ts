@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
 import playerManager from './PlayerManager';
 import projectileManager from './ProjectileManager';
-import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, PHYSICS_CONFIG, getOptions } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, getOptions } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
