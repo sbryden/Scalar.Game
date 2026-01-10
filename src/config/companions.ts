@@ -53,7 +53,7 @@ export const WOLF_COMPANION_CONFIG = {
     barBackgroundAlpha: 0.5,
     
     // Biome restriction
-    allowedBiomes: ['land'] as BiomeType[]
+    allowedBiomes: ['land'] as const
 } as const;
 
 /**
@@ -184,5 +184,5 @@ export function getCompanionConfig(kind: CompanionKind) {
  */
 export function isCompanionAllowedInBiome(kind: CompanionKind, biome: BiomeType): boolean {
     const config = getCompanionConfig(kind);
-    return config.allowedBiomes.includes(biome);
+    return config.allowedBiomes.some(b => b === biome);
 }

@@ -5,7 +5,6 @@
 import gameState from '../utils/GameContext';
 import enemyManager from './EnemyManager';
 import combatSystem from '../systems/CombatSystem';
-import { getCompanionManager } from './CompanionManager';
 import type { Player, Enemy, Projectile, Companion } from '../types/game';
 
 export class CollisionManager {
