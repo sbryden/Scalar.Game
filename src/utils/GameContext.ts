@@ -4,7 +4,7 @@
  * Replaces the legacy gameState with better encapsulation.
  */
 import Phaser from 'phaser';
-import type { Player, Enemy, WASDKeys, SavedPosition, SavedEnemy, PlayerSize, SceneKey } from '../types/game';
+import type { Player, Enemy, Companion, WASDKeys, SavedPosition, SavedEnemy, PlayerSize, SceneKey } from '../types/game';
 
 /**
  * Default positions for each scene
@@ -43,6 +43,7 @@ class GameContext {
     private _projectiles: Phaser.Physics.Arcade.Group | null = null;
     private _xpOrbs: Phaser.Physics.Arcade.Group | null = null;
     private _platforms: Phaser.Physics.Arcade.StaticGroup | null = null;
+    private _companions: Companion[] = [];
     private _scene: Phaser.Scene | null = null;
     private _cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
     private _wasdKeys: WASDKeys | null = null;
@@ -75,6 +76,7 @@ class GameContext {
     get projectiles(): Phaser.Physics.Arcade.Group | null { return this._projectiles; }
     get xpOrbs(): Phaser.Physics.Arcade.Group | null { return this._xpOrbs; }
     get platforms(): Phaser.Physics.Arcade.StaticGroup | null { return this._platforms; }
+    get companions(): Companion[] { return this._companions; }
     get scene(): Phaser.Scene | null { return this._scene; }
     get cursors(): Phaser.Types.Input.Keyboard.CursorKeys | null { return this._cursors; }
     get wasdKeys(): WASDKeys | null { return this._wasdKeys; }
@@ -101,6 +103,7 @@ class GameContext {
     set projectiles(value: Phaser.Physics.Arcade.Group | null) { this._projectiles = value; }
     set xpOrbs(value: Phaser.Physics.Arcade.Group | null) { this._xpOrbs = value; }
     set platforms(value: Phaser.Physics.Arcade.StaticGroup | null) { this._platforms = value; }
+    set companions(value: Companion[]) { this._companions = value; }
     set scene(value: Phaser.Scene | null) { this._scene = value; }
     set cursors(value: Phaser.Types.Input.Keyboard.CursorKeys | null) { this._cursors = value; }
     set wasdKeys(value: WASDKeys | null) { this._wasdKeys = value; }
@@ -170,6 +173,7 @@ class GameContext {
         this._projectiles = null;
         this._xpOrbs = null;
         this._platforms = null;
+        this._companions = [];
         this._scene = null;
         this._cursors = null;
         this._wasdKeys = null;
@@ -191,6 +195,37 @@ class GameContext {
             this._savedPositions[key] = { ...DEFAULT_POSITION };
             this._savedEnemies[key] = [];
         }
+    }
+    
+    /**
+     * Add a companion to the context
+     */
+    addCompanion(companion: Companion): void {
+        this._companions.push(companion);
+    }
+    
+    /**
+     * Remove a companion from the context
+     */
+    removeCompanion(companion: Companion): void {
+        const index = this._companions.indexOf(companion);
+        if (index > -1) {
+            this._companions.splice(index, 1);
+        }
+    }
+    
+    /**
+     * Clear all companions
+     */
+    clearCompanions(): void {
+        this._companions = [];
+    }
+    
+    /**
+     * Get companion by kind
+     */
+    getCompanionByKind(kind: string): Companion | undefined {
+        return this._companions.find(c => c.companionKind === kind);
     }
 
 }

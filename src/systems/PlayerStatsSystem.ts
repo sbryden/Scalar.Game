@@ -4,11 +4,11 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/GameContext';
-import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
 import levelStatsTracker from './LevelStatsTracker';
-import type { PlayerStats, Difficulty } from '../types/game';
+import type { PlayerStats, Difficulty, CompanionKind, CompanionState } from '../types/game';
 
 type LevelUpCallback = (level: number) => void;
 type GameOverCallback = () => void;
@@ -199,7 +199,8 @@ export class PlayerStatsSystem {
             maxStamina: STAMINA_CONFIG.startingMaxStamina,
             fuel: FUEL_CONFIG.startingFuel,
             maxFuel: FUEL_CONFIG.startingMaxFuel,
-            hasWolfCompanion: false
+            hasWolfCompanion: false,
+            companions: new Map<CompanionKind, CompanionState>()
         };
         
         // Reset stamina system
@@ -244,6 +245,146 @@ export class PlayerStatsSystem {
      */
     grantWolfCompanion(): void {
         this.stats.hasWolfCompanion = true;
+    }
+    
+    /**
+     * Get companion state for a specific kind
+     */
+    getCompanionState(kind: CompanionKind): CompanionState | undefined {
+        return this.stats.companions?.get(kind);
+    }
+    
+    /**
+     * Get all active companions (alive = true)
+     */
+    getActiveCompanions(): CompanionState[] {
+        if (!this.stats.companions) return [];
+        return Array.from(this.stats.companions.values()).filter(c => c.alive);
+    }
+    
+    /**
+     * Calculate max HP for a companion at current player level
+     */
+    getCompanionMaxHP(kind: CompanionKind): number {
+        const config = COMPANION_CONFIG[kind];
+        const basePlayerHP = XP_CONFIG.progression.startingMaxHealth +
+            (this.stats.level - 1) * XP_CONFIG.progression.healthIncreasePerLevel;
+        return Math.floor(basePlayerHP * config.baseHealthFactor);
+    }
+    
+    /**
+     * Calculate max stamina for a companion at current player level
+     */
+    getCompanionMaxStamina(kind: CompanionKind): number {
+        const config = COMPANION_CONFIG[kind];
+        if ('stamina' in config) {
+            return config.stamina.startingMaxStamina +
+                (this.stats.level - 1) * config.stamina.staminaIncreasePerLevel;
+        }
+        return 100; // Default
+    }
+    
+    /**
+     * Grant a companion to the player
+     * If already owned and alive, refreshes HP/stamina to 100%
+     * If dead this run, does nothing (no revival)
+     * If not owned yet, creates the companion state
+     */
+    grantCompanion(kind: CompanionKind): { spawned: boolean; refreshed: boolean } {
+        if (!this.stats.companions) {
+            this.stats.companions = new Map<CompanionKind, CompanionState>();
+        }
+        
+        const existing = this.stats.companions.get(kind);
+        
+        if (existing) {
+            // Already owned - check if dead this run
+            if (existing.diedThisRun) {
+                // Cannot revive within same run
+                return { spawned: false, refreshed: false };
+            }
+            
+            if (existing.alive) {
+                // Refresh HP and stamina to full
+                existing.currentHealth = existing.maxHealth;
+                existing.currentStamina = existing.maxStamina;
+                return { spawned: false, refreshed: true };
+            } else {
+                // Companion exists but is not currently alive and has not died this run
+                // Respawn and refresh instead of treating as a new unlock
+                existing.alive = true;
+                existing.currentHealth = existing.maxHealth;
+                existing.currentStamina = existing.maxStamina;
+                return { spawned: false, refreshed: true };
+            }
+        }
+        
+        // Create new companion state
+        const maxHP = this.getCompanionMaxHP(kind);
+        const maxStamina = this.getCompanionMaxStamina(kind);
+        
+        const companionState: CompanionState = {
+            kind,
+            alive: true,
+            diedThisRun: false,
+            currentHealth: maxHP,
+            maxHealth: maxHP,
+            currentStamina: maxStamina,
+            maxStamina: maxStamina
+        };
+        
+        this.stats.companions.set(kind, companionState);
+        
+        // Backwards compatibility
+        if (kind === 'wolf') {
+            this.stats.hasWolfCompanion = true;
+        }
+        
+        return { spawned: true, refreshed: false };
+    }
+    
+    /**
+     * Update companion state
+     */
+    updateCompanionState(kind: CompanionKind, updates: Partial<CompanionState>): void {
+        const state = this.stats.companions?.get(kind);
+        if (state) {
+            Object.assign(state, updates);
+        }
+    }
+    
+    /**
+     * Mark companion as dead (permanently for this run)
+     */
+    markCompanionDead(kind: CompanionKind): void {
+        const state = this.stats.companions?.get(kind);
+        if (state) {
+            state.alive = false;
+            state.diedThisRun = true;
+            state.currentHealth = 0;
+        }
+    }
+    
+    /**
+     * Clear all companion runtime flags on continue (player death)
+     * Keeps diedThisRun to prevent revival within same run
+     */
+    clearCompanionsOnContinue(): void {
+        if (!this.stats.companions) return;
+        
+        for (const state of this.stats.companions.values()) {
+            // Mark as not alive (entity destroyed), but keep diedThisRun flag
+            state.alive = false;
+        }
+    }
+    
+    /**
+     * Full companion reset (new run/biome)
+     * Clears diedThisRun flags so companions can be re-earned
+     */
+    resetCompanions(): void {
+        this.stats.companions?.clear();
+        this.stats.hasWolfCompanion = false;
     }
 }
 
