@@ -53,27 +53,109 @@ export const WOLF_COMPANION_CONFIG = {
     barBackgroundAlpha: 0.5,
     
     // Biome restriction
-    allowedBiomes: ['land'] as const
+    allowedBiomes: ['land'] as BiomeType[]
 } as const;
 
 /**
  * Future: Fish companion configuration (underwater biome)
  */
 export const FISH_COMPANION_CONFIG = {
+    // Visual
     texture: 'fish_companion',
+    scale: 0.15,
+    tint: {
+        normal: 0xffffff,
+        melee: 0x00ffff,
+        exhausted: 0x888888
+    },
+    
+    // Health scaling
     baseHealthFactor: 0.5,
-    allowedBiomes: ['water'] as const
-    // TODO: Add full config when fish companion is implemented
+    
+    // Stamina
+    stamina: {
+        startingMaxStamina: 100,
+        startingStamina: 100,
+        rechargeRate: 25,
+        consumptionRate: 60,
+        exhaustionThreshold: 20,
+        depletionPauseDuration: 2000,
+        staminaIncreasePerLevel: 5
+    },
+    
+    // Combat
+    baseDamage: 15,
+    damageScalePerLevel: 2,
+    meleeModeDamageReduction: 0.7,
+    
+    // Behavior
+    followDistance: 80,
+    followSpeed: 150,
+    attackRange: 60,
+    
+    // Visual bars
+    barWidth: 40,
+    barHeight: 4,
+    barOffsetY: -30,
+    barSpacing: 6,
+    healthBarColor: 0x00ff00,
+    staminaBarColor: 0x00ffff,
+    barBackgroundColor: 0x000000,
+    barBackgroundAlpha: 0.5,
+    
+    // Biome restriction
+    allowedBiomes: ['water'] as BiomeType[]
 } as const;
 
 /**
  * Future: Hawk companion configuration (air biome)
  */
 export const HAWK_COMPANION_CONFIG = {
+    // Visual
     texture: 'hawk_companion',
+    scale: 0.15,
+    tint: {
+        normal: 0xffffff,
+        melee: 0x00ffff,
+        exhausted: 0x888888
+    },
+    
+    // Health scaling
     baseHealthFactor: 0.5,
-    allowedBiomes: ['air'] as const
-    // TODO: Add full config when hawk companion is implemented
+    
+    // Stamina
+    stamina: {
+        startingMaxStamina: 100,
+        startingStamina: 100,
+        rechargeRate: 25,
+        consumptionRate: 60,
+        exhaustionThreshold: 20,
+        depletionPauseDuration: 2000,
+        staminaIncreasePerLevel: 5
+    },
+    
+    // Combat
+    baseDamage: 15,
+    damageScalePerLevel: 2,
+    meleeModeDamageReduction: 0.7,
+    
+    // Behavior
+    followDistance: 80,
+    followSpeed: 150,
+    attackRange: 60,
+    
+    // Visual bars
+    barWidth: 40,
+    barHeight: 4,
+    barOffsetY: -30,
+    barSpacing: 6,
+    healthBarColor: 0x00ff00,
+    staminaBarColor: 0x00ffff,
+    barBackgroundColor: 0x000000,
+    barBackgroundAlpha: 0.5,
+    
+    // Biome restriction
+    allowedBiomes: ['air'] as BiomeType[]
 } as const;
 
 /**
@@ -102,5 +184,5 @@ export function getCompanionConfig(kind: CompanionKind) {
  */
 export function isCompanionAllowedInBiome(kind: CompanionKind, biome: BiomeType): boolean {
     const config = getCompanionConfig(kind);
-    return config.allowedBiomes.includes(biome as any);
+    return config.allowedBiomes.includes(biome);
 }
