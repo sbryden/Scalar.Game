@@ -39,6 +39,7 @@ export class CombatSystem {
     private bossesDefeated: number = 0;
     private totalBosses: number = 1; // Default to 1 for normal mode
     private nextSpawnerBossId: number = 0;
+    private allBossesDefeated: boolean = false; // Track if all bosses are defeated (flag spawned)
 
     /**
      * Set callback for when a boss is defeated
@@ -73,6 +74,7 @@ export class CombatSystem {
         this.bossesDefeated = 0;
         this.totalBosses = 1;
         this.nextSpawnerBossId = 0;
+        this.allBossesDefeated = false;
     }
     
     /**
@@ -669,6 +671,55 @@ export class CombatSystem {
     }
     
     /**
+     * Clear all remaining enemies without spawning XP orbs
+     * Called when all bosses are defeated
+     */
+    clearAllEnemies(): void {
+        if (!gameState.enemies) return;
+        
+        const enemies = gameState.enemies.children.entries as Enemy[];
+        enemies.forEach(enemy => {
+            if (!enemy.isDead && enemy.active) {
+                // Mark as dead to skip XP orb spawning
+                enemy.isDead = true;
+                
+                // Destroy health bars
+                if (enemy.healthBar) enemy.healthBar.destroy();
+                if (enemy.healthBarBg) enemy.healthBarBg.destroy();
+                
+                // Disable physics
+                if (enemy.body) {
+                    enemy.body.setVelocity(0, 0);
+                    enemy.body.setEnable(false);
+                }
+                
+                // Spawn floating skull death effect
+                const skull = enemy.scene.add.image(enemy.x, enemy.y, 'dead_skull');
+                skull.setDepth(150);
+                skull.setScale(0.3);
+                
+                enemy.scene.tweens.add({
+                    targets: skull,
+                    y: skull.y - 100,
+                    alpha: 0,
+                    duration: 2000,
+                    ease: 'Linear',
+                    onComplete: () => skull.destroy()
+                });
+                
+                // Fade out and destroy enemy
+                enemy.scene.tweens.add({
+                    targets: enemy,
+                    alpha: 0,
+                    duration: 1000,
+                    ease: 'Linear',
+                    onComplete: () => enemy.destroy()
+                });
+            }
+        });
+    }
+    
+    /**
      * Kill an enemy and spawn XP orb
      */
     killEnemy(enemy: Enemy): void {
@@ -755,8 +806,14 @@ export class CombatSystem {
                         console.log(`Spawner boss fully defeated (${this.bossesDefeated}/${this.totalBosses})`);
                         
                         // Check if all bosses are defeated
-                        if (this.bossesDefeated >= this.totalBosses) {
-                            console.log('All bosses defeated, level complete!');
+                        if (this.bossesDefeated >= this.totalBosses && !this.allBossesDefeated) {
+                            console.log('All bosses defeated! Clearing remaining enemies and spawning flag...');
+                            this.allBossesDefeated = true;
+                            
+                            // Clear all remaining enemies without XP drops
+                            this.clearAllEnemies();
+                            
+                            // Trigger callback (scene will spawn flag)
                             this.onBossDefeat();
                         }
                     }
@@ -805,8 +862,14 @@ export class CombatSystem {
                 console.log(`Boss defeated (${this.bossesDefeated}/${this.totalBosses})`);
                 
                 // Check if all bosses are defeated
-                if (this.bossesDefeated >= this.totalBosses) {
-                    console.log('All bosses defeated, level complete!');
+                if (this.bossesDefeated >= this.totalBosses && !this.allBossesDefeated) {
+                    console.log('All bosses defeated! Clearing remaining enemies and spawning flag...');
+                    this.allBossesDefeated = true;
+                    
+                    // Clear all remaining enemies without XP drops
+                    this.clearAllEnemies();
+                    
+                    // Trigger callback (scene will spawn flag)
                     this.onBossDefeat();
                 }
             }
