@@ -42,3 +42,6 @@ coverage/
 # Misc
 .cache/
 *.tsbuildinfo
+
+# Auto-generated files
+src/assets-manifest.ts
