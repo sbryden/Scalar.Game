@@ -96,21 +96,34 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ## 🤖 Companion System (Champions)
 
-### Base Champion System
-**Priority: Medium**
-- Champions are AI companions that fight alongside player
-- Biome-specific (can't use water champion on land)
-- Only one champion active at a time
-- Champion AI: follow player, auto-attack enemies
-- Champion health and revival mechanics
-- Selection system (details to be determined: at start, unlocked, or collected)
+### ✅ Base Champion System  
+**Status: PARTIALLY COMPLETED** - Foundation implemented
+- ✅ Champions are AI companions that fight alongside player
+- ✅ Biome-specific (land wolf only works on land; can't use in underwater biome)
+- ✅ Multiple companions can be active simultaneously (if player collects different companion orbs)
+- ✅ Champion AI: follow player, auto-attack nearby enemies
+- ✅ Champion health and stamina bars displayed above companion (enemy-style)
+- ✅ Companion HP scales with player level (½ of player base HP)
+- ✅ Permanent death within a run (no revival once HP reaches zero)
+- ✅ Companion orbs can refresh HP/stamina if companion is still alive
+- ✅ Companions persist across size-scale transitions within same biome (micro/normal/macro)
+- ✅ Unlock system: companions unlocked by defeating specific bosses (wolf from wolf_boss)
 
-### Land Champion: Mechanical Wolf
-- Wolf sprite and animations
-- Melee attack behavior
+### ✅ Land Champion: Mechanical Wolf  
+**Status: IMPLEMENTED**
+- ✅ Wolf sprite and HP/stamina display bars
+- ✅ Melee attack behavior using shield-like mechanics
+  - Stamina-based melee mode with faster depletion than player shield (1.5x consumption rate)
+  - 70% damage reduction when in melee mode
+  - Auto-toggles melee mode when enemies are within attack range (60 units)
+  - Visual tinting (cyan when in melee, gray when exhausted)
+- ✅ Follow player behavior maintaining 80-unit distance
+- ✅ Auto-attacks nearby enemies when in melee mode
+- ✅ Level-scaled damage: base 15 + 2 per player level
+- ✅ Orb refresh mechanic: picking up additional wolf orbs restores HP and stamina to 100% if alive
+- ✅ Permanent death: if wolf dies, it cannot be revived for the rest of the run
 - (future) Digging mechanic: periodically digs mounds of dirt/gravel
-- Occasionally uncovers XP orbs or upgrade parts
-- Defensive support abilities - auto attacks near by enemies, draws aggro from enemies it is attacking
+- (future) Occasionally uncovers XP orbs or upgrade parts
 - (future) Howl ability to stun nearby enemies
 
 ### Water Champion: Mechanical Fish
