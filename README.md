@@ -48,6 +48,22 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 - **Momentum-Based Combat**: Velocity affects ramming damage; melee mode enhances damage and reduces damage taken
 - **Visual Feedback**: Camera shake, enemy color flashes, health bars, impact effects
 - **Magnetization**: XP orbs automatically pulled toward player
+
+### 🐺 **Companion System** (NEW!)
+- **Mechanical Wolf Companion**: Unlock by defeating the wolf tank boss
+- **Biome-Specific**: Wolf companion only available in land environments
+- **AI Behavior**: Follows player and auto-attacks nearby enemies
+- **Shield-Like Melee**: Uses stamina-based melee mode with faster depletion than player
+- **Level-Scaled Stats**: HP = ½ player base HP, damage scales with player level
+- **HP & Stamina Bars**: Visual feedback displayed above companion (enemy-style)
+- **Companion Orbs**: 
+  - **XP Orbs** (golden circles) grant experience and level progression
+  - **Companion Orbs** (larger wolf sprites) unlock or refresh companions
+  - Collecting additional wolf orbs restores HP/stamina to 100%
+- **Permanent Death**: If companion dies, it cannot be revived for the rest of that run
+- **Multi-Companion Support**: Multiple different companions can be active simultaneously
+- **Size Persistence**: Companions stay with you when scaling micro/normal/macro within same biome
+
 - **Dynamic HUD**: Improved horizontal top bar with labeled stat indicators (HP, STA, FUEL, XP) using pixel-friendly styling, real-time player level, and map level display
 - **Dynamic Backgrounds**: Procedurally generated backgrounds with 5 seeded variations per map level, featuring mountains, clouds, fish schools, coral, bioluminescent plankton, and more
 
@@ -162,11 +178,12 @@ This project auto-deploys to GitHub Pages:
 ## 🗺️ What's Next?
 
 Check out our [ROADMAP.md](ROADMAP.md) for planned features including:
-- **Macro Scale**: Third scale tier with giant enemies
-- **Air Biome**: Complete flying environment with wind mechanics
-- **Champion Companions**: AI buddies that fight alongside you
+- **Air Biome**: Complete flying environment with wind mechanics and aerial combat
+- **More Champions**: Fish companion for underwater, Hawk companion for air biome
+- **Champion Upgrades**: Additional abilities like digging for treasures and stun attacks
 - **High Score System**: Local and cloud-based leaderboards
 - **Enhanced Audio**: Music and sound effects for all biomes
+- **Difficulty Overhaul**: Rebalance Normal/Hard modes, add Easy and Brutal difficulties
 - And much more!
 
 ## 🤝 Contributing

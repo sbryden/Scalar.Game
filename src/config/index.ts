@@ -52,3 +52,14 @@ export {
     LEVEL_SYSTEM_CONFIG,
     BOSS_MODE_CONFIG
 } from './progression';
+
+// Companions
+export {
+    COMPANION_CONFIG,
+    WOLF_COMPANION_CONFIG,
+    FISH_COMPANION_CONFIG,
+    HAWK_COMPANION_CONFIG,
+    getCompanionConfig,
+    isCompanionAllowedInBiome
+} from './companions';
+export type { BiomeType } from './companions';

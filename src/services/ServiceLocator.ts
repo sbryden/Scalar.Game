@@ -38,6 +38,7 @@ type ServiceKey =
     | 'enemyManager'
     | 'projectileManager'
     | 'xpOrbManager'
+    | 'companionManager'
     // Systems
     | 'combatSystem'
     | 'spawnSystem'

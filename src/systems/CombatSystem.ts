@@ -8,7 +8,8 @@ import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/GameContext';
 import enemyManager from '../managers/EnemyManager';
-import type { Player, Enemy, Projectile } from '../types/game';
+import { getCompanionManager } from '../managers/CompanionManager';
+import type { Player, Enemy, Projectile, Companion } from '../types/game';
 
 /**
  * Union type for entities that can deal or receive damage
@@ -852,6 +853,61 @@ export class CombatSystem {
         levelStatsTracker.recordDamageTaken(damage);
         
         playerStatsSystem.takeDamage(damage);
+    }
+    
+    /**
+     * Handle companion-enemy collision (companion melee attack)
+     */
+    handleCompanionEnemyCollision(companion: Companion, enemy: Enemy, currentTime: number): void {
+        if (!companion.isMeleeMode || enemy.isDead) {
+            return;
+        }
+        
+        // Check if we can damage this enemy (prevent rapid repeated hits)
+        if (enemy.lastDamageTime && currentTime - enemy.lastDamageTime < 500) {
+            return; // 500ms cooldown between hits from same companion
+        }
+        
+        // Apply damage
+        const damage = companion.damage;
+        enemy.health -= damage;
+        enemy.lastDamageTime = currentTime;
+        
+        // Visual feedback
+        enemy.setTint(0xff0000);
+        enemy.scene.time.delayedCall(100, () => {
+            if (enemy.active) {
+                enemy.clearTint();
+            }
+        });
+        
+        // Track damage dealt
+        levelStatsTracker.recordDamageDealt(damage);
+        
+        // Check if enemy died
+        if (enemy.health <= 0 && !enemy.isDead) {
+            this.killEnemy(enemy);
+        }
+    }
+    
+    /**
+     * Handle enemy projectile hitting a companion
+     */
+    handleEnemyProjectileHitCompanion(projectile: Projectile, companion: Companion, currentTime: number): void {
+        const companionManager = getCompanionManager();
+        if (!companionManager) return;
+        
+        // Apply damage (with shield reduction if in melee mode)
+        const damage = projectile.damage;
+        companionManager.takeDamage(companion, damage);
+        
+        // Destroy projectile
+        projectile.destroy();
+        
+        // Visual feedback (camera shake if taking significant damage)
+        if (damage > 20 && companion.scene) {
+            companion.scene.cameras.main.shake(100, 0.005);
+        }
     }
     
     /**
