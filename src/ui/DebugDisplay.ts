@@ -23,7 +23,9 @@ export class DebugDisplay {
     }
     
     create(): void {
-        this.debugText = this.scene.add.text(10, 10, '', {
+        const cameraHeight = this.scene.cameras.main.height;
+        
+        this.debugText = this.scene.add.text(10, cameraHeight - 30, '', {
             fontSize: '16px',
             color: '#ffffff',
             backgroundColor: '#000000',
