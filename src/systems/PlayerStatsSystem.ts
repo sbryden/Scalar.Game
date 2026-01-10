@@ -139,7 +139,7 @@ export class PlayerStatsSystem {
             
             // Update level text UI
             if (gameState.levelText) {
-                gameState.levelText.setText(`LEVEL ${this.stats.level}`);
+                gameState.levelText.setText(`LEVEL: ${this.stats.level}`);
             }
             
             console.log(`Level Up! Now level ${this.stats.level}`);

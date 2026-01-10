@@ -263,7 +263,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected createUI(): void {
         // Create HUD
         this.hud = new HUD(this);
-        gameState.levelText = this.hud.levelText;
+        gameState.levelText = this.hud.xpLabel;
 
         // Create Game Over Screen
         this.gameOverScreen = new GameOverScreen(this);
