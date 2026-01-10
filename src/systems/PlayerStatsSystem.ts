@@ -4,7 +4,7 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/GameContext';
-import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, getOptions } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
 import levelStatsTracker from './LevelStatsTracker';
@@ -26,10 +26,12 @@ export class PlayerStatsSystem {
         // Initialize fuel system
         initializeFuelSystem(FUEL_CONFIG);
         
+        const options = getOptions();
+        
         this.stats = {
             level: XP_CONFIG.progression.startingLevel,
-            maxHealth: XP_CONFIG.progression.startingMaxHealth,
-            health: XP_CONFIG.progression.startingHealth,
+            maxHealth: options.startingHP,
+            health: options.startingHP,
             xp: XP_CONFIG.progression.startingXP,
             xpToLevel: XP_CONFIG.progression.startingXPToLevel,
             stamina: STAMINA_CONFIG.startingStamina,
@@ -53,6 +55,8 @@ export class PlayerStatsSystem {
     initializeDifficulty(difficulty: Difficulty): void {
         this.difficulty = difficulty;
         
+        const options = getOptions();
+        
         if (difficulty === 'godMode') {
             // Set near-infinite health
             this.stats.maxHealth = COMBAT_CONFIG.godMode.health;
@@ -63,8 +67,8 @@ export class PlayerStatsSystem {
             staminaSystem.increaseMaxStamina(COMBAT_CONFIG.godMode.health - staminaSystem.getState().max);
         } else {
             // Restore normal health values
-            this.stats.maxHealth = XP_CONFIG.progression.startingMaxHealth;
-            this.stats.health = XP_CONFIG.progression.startingHealth;
+            this.stats.maxHealth = options.startingHP;
+            this.stats.health = options.startingHP;
             
             // Restore normal stamina values based on current level progression
             const staminaSystem = getStaminaSystem();
@@ -189,10 +193,12 @@ export class PlayerStatsSystem {
      * Reset stats to initial state
      */
     reset(): void {
+        const options = getOptions();
+        
         this.stats = {
             level: XP_CONFIG.progression.startingLevel,
-            maxHealth: XP_CONFIG.progression.startingMaxHealth,
-            health: XP_CONFIG.progression.startingHealth,
+            maxHealth: options.startingHP,
+            health: options.startingHP,
             xp: XP_CONFIG.progression.startingXP,
             xpToLevel: XP_CONFIG.progression.startingXPToLevel,
             stamina: STAMINA_CONFIG.startingStamina,
@@ -267,7 +273,8 @@ export class PlayerStatsSystem {
      */
     getCompanionMaxHP(kind: CompanionKind): number {
         const config = COMPANION_CONFIG[kind];
-        const basePlayerHP = XP_CONFIG.progression.startingMaxHealth +
+        const options = getOptions();
+        const basePlayerHP = options.startingHP +
             (this.stats.level - 1) * XP_CONFIG.progression.healthIncreasePerLevel;
         return Math.floor(basePlayerHP * config.baseHealthFactor);
     }

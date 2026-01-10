@@ -75,6 +75,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
+    
+    // Level completion state
+    private isLevelCompleting: boolean = false;
 
     constructor(sceneKey: SceneKey) {
         super({ key: sceneKey });
@@ -206,6 +209,19 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Update camera
         this.cameraManager.update();
+        
+        // Check for player-flag collision
+        if (gameState.levelCompleteFlag && this.player && !this.isLevelCompleting) {
+            const distance = Phaser.Math.Distance.Between(
+                this.player.x, this.player.y,
+                gameState.levelCompleteFlag.x, gameState.levelCompleteFlag.y
+            );
+            
+            if (distance < 50) { // Collision threshold
+                this.isLevelCompleting = true;
+                this.handleFlagReached();
+            }
+        }
     }
 
     shutdown(): void {
@@ -469,9 +485,142 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     }
 
     protected handleLevelComplete(): void {
-        console.log('Level Complete - Boss Defeated!');
+        console.log('Level Complete - All Bosses Defeated! Spawning flag...');
+        this.spawnLevelCompleteFlag();
+    }
+    
+    /**
+     * Spawn the level complete flag near the end of the map
+     */
+    protected spawnLevelCompleteFlag(): void {
+        // Flag spawns at a fixed distance from the end of the map
+        const flagX = WORLD_WIDTH - 300; // 300 pixels from the end
+        const flagY = 650; // Near the ground
+        
+        const flagTextureKey = 'level_complete_flag';
+        
+        // Generate the flag texture once per scene, if it does not already exist
+        if (!this.textures.exists(flagTextureKey)) {
+            const flag = this.add.graphics();
+            flag.fillStyle(0xFFD700, 1); // Gold color
+            flag.fillRect(0, 0, 5, 60); // Pole (1/4 of 20 = 5 pixels wide)
+            flag.fillStyle(0xFF0000, 1); // Red flag
+            flag.fillTriangle(5, 0, 5, 40, 70, 20); // Triangular flag starting from pole edge
+            flag.generateTexture(flagTextureKey, 80, 70);
+            flag.destroy();
+        }
+        
+        // Create the flag as a sprite
+        const flagSprite = this.physics.add.sprite(flagX, flagY, flagTextureKey);
+        flagSprite.setScale(1.5);
+        flagSprite.setDepth(100);
+        
+        // Store flag reference in gameState
+        gameState.levelCompleteFlag = flagSprite;
+        
+        // Add a bounce animation to make it noticeable
+        this.tweens.add({
+            targets: flagSprite,
+            y: flagY - 20,
+            duration: 500,
+            ease: 'Sine.inOut',
+            yoyo: true,
+            repeat: -1
+        });
+        
+        console.log(`Flag spawned at (${flagX}, ${flagY})`);
+    }
+    
+    /**
+     * Handle player reaching the level complete flag
+     */
+    protected handleFlagReached(): void {
+        if (!gameState.levelCompleteFlag) return;
+        
+        console.log('Player reached the flag!');
+        
+        // Destroy the flag
+        gameState.levelCompleteFlag.destroy();
+        gameState.levelCompleteFlag = null;
+        
+        // End level timer
         levelStatsTracker.endLevel(this.time.now);
-        this.levelCompleteScreen.show();
+        
+        // Play firework animation, then show level complete screen
+        this.createFireworkAnimation(() => {
+            this.levelCompleteScreen.show();
+        });
+    }
+    
+    /**
+     * Create a firework celebration animation
+     * @param onComplete - Callback to execute when animation finishes
+     */
+    protected createFireworkAnimation(onComplete: () => void): void {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+        
+        // Create multiple bursts for a more impressive effect
+        const burstCount = 5;
+        let burstsCompleted = 0;
+        
+        const createBurst = (delay: number, color: number) => {
+            this.time.delayedCall(delay, () => {
+                // Central flash
+                const flash = this.add.circle(centerX, centerY, 50, color, 1);
+                flash.setDepth(3000);
+                flash.setScrollFactor(0); // Fixed to camera
+                
+                this.tweens.add({
+                    targets: flash,
+                    scale: 3,
+                    alpha: 0,
+                    duration: 800,
+                    ease: 'Cubic.out',
+                    onComplete: () => flash.destroy()
+                });
+                
+                // Particle burst
+                const particleCount = 30;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (Math.PI * 2 * i) / particleCount;
+                    const distance = 150 + Math.random() * 100;
+                    
+                    const particle = this.add.circle(centerX, centerY, 8, color, 1);
+                    particle.setDepth(3000);
+                    particle.setScrollFactor(0);
+                    
+                    const targetX = centerX + Math.cos(angle) * distance;
+                    const targetY = centerY + Math.sin(angle) * distance;
+                    
+                    this.tweens.add({
+                        targets: particle,
+                        x: targetX,
+                        y: targetY,
+                        alpha: 0,
+                        scale: 0.5,
+                        duration: 1000 + Math.random() * 500,
+                        ease: 'Cubic.out',
+                        onComplete: () => particle.destroy()
+                    });
+                }
+                
+                // Camera shake for impact
+                this.cameras.main.shake(200, 0.01);
+                
+                burstsCompleted++;
+                if (burstsCompleted >= burstCount) {
+                    // All bursts complete, call the callback
+                    this.time.delayedCall(1000, onComplete);
+                }
+            });
+        };
+        
+        // Create firework bursts with different colors and delays
+        const colors = [0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF];
+        colors.forEach((color, index) => {
+            createBurst(index * 200, color);
+        });
     }
 
     protected handleNextLevel(): void {
@@ -486,6 +635,12 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Clear saved enemies to spawn fresh enemies for new level
         gameState.savedEnemies[config.sceneKey] = [];
+        
+        // Clear flag if it exists
+        if (gameState.levelCompleteFlag) {
+            gameState.levelCompleteFlag.destroy();
+            gameState.levelCompleteFlag = null;
+        }
 
         this.scene.restart();
     }
@@ -501,6 +656,12 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
         gameState.savedEnemies[config.sceneKey] = [];
+        
+        // Clear flag if it exists
+        if (gameState.levelCompleteFlag) {
+            gameState.levelCompleteFlag.destroy();
+            gameState.levelCompleteFlag = null;
+        }
 
         this.scene.restart();
     }

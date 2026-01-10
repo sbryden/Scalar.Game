@@ -2,7 +2,7 @@
  * Underwater Macro Scene  
  * Deep ocean gameplay scene with massive sea creatures
  */
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../config';
+import { WORLD_WIDTH, WORLD_HEIGHT, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateUnderwaterBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -14,9 +14,10 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'UnderwaterMacroScene',
-            gravity: 80, // Very low gravity for deep ocean macro scale
+            gravity: options.macroWaterGravity,
             playerTexture: 'sub_1',
             playerScale: 0.35, // Larger for macro scale
             playerBounce: 0.1,
