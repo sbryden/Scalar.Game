@@ -60,13 +60,32 @@ async function generateManifest() {
         
         console.log(`Found ${pngFiles.length} PNG file(s)`);
         
-        // Generate asset keys (basename without .png extension)
-        const assetKeys = pngFiles.map(file => {
-            const key = basename(file, '.png');
-            return key;
+        // Check for duplicate basenames (would cause key collisions)
+        const basenames = pngFiles.map(file => basename(file, '.png'));
+        const duplicates = basenames.filter((name, index) => basenames.indexOf(name) !== index);
+        if (duplicates.length > 0) {
+            throw new Error(
+                `Duplicate asset basenames detected: ${[...new Set(duplicates)].join(', ')}. ` +
+                'Asset files in different subdirectories cannot have the same basename.'
+            );
+        }
+        
+        // Generate asset entries with sanitized keys
+        const assetEntries = pngFiles.map(file => {
+            // Use relative path from assets dir (without extension) as key
+            const key = file.replace(/\.png$/i, '');
+            
+            // Sanitize key for safe inclusion in TypeScript
+            // Only allow alphanumeric, underscore, hyphen, forward slash
+            const sanitizedKey = key.replace(/[^a-zA-Z0-9_\-/]/g, '_');
+            
+            return {
+                key: sanitizedKey,
+                path: file
+            };
         });
         
-        // Generate TypeScript content
+        // Generate TypeScript content with sanitized keys
         const tsContent = `/**
  * Auto-generated asset manifest
  * 
@@ -77,12 +96,24 @@ async function generateManifest() {
  */
 
 /**
- * Array of all PNG asset keys found in the assets directory
- * Each key corresponds to a .png file: {key}.png
+ * Asset manifest entry
  */
-export const ASSET_KEYS: readonly string[] = [
-${assetKeys.map(key => `    '${key}'`).join(',\n')}
+interface AssetEntry {
+    readonly key: string;
+    readonly path: string;
+}
+
+/**
+ * Array of all PNG asset entries found in the assets directory
+ */
+export const ASSET_ENTRIES: readonly AssetEntry[] = [
+${assetEntries.map(entry => `    { key: '${entry.key.replace(/'/g, "\\'")}', path: '${entry.path.replace(/'/g, "\\'")}' }`).join(',\n')}
 ] as const;
+
+/**
+ * Array of asset keys for convenient iteration
+ */
+export const ASSET_KEYS: readonly string[] = ASSET_ENTRIES.map(e => e.key);
 
 /**
  * Asset key type for type-safe asset references
@@ -93,11 +124,11 @@ export type AssetKey = typeof ASSET_KEYS[number];
         await writeFile(OUTPUT_FILE, tsContent, 'utf8');
         
         console.log(`✓ Generated manifest: ${OUTPUT_FILE}`);
-        console.log(`✓ Exported ${assetKeys.length} asset key(s)`);
+        console.log(`✓ Exported ${assetEntries.length} asset(s)`);
         
-        // Log all asset keys for verification
-        console.log('\nAsset keys:');
-        assetKeys.forEach(key => console.log(`  - ${key}`));
+        // Log all asset entries for verification
+        console.log('\nAsset entries:');
+        assetEntries.forEach(entry => console.log(`  - ${entry.key} -> ${entry.path}`));
         
     } catch (error) {
         console.error('Error generating asset manifest:', error);
