@@ -3,7 +3,7 @@
  * Manages all enemy-related functionality including spawning, AI, and behavior.
  * Singleton pattern for consistent state management across the game.
  */
-import { ENEMY_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, BOSS_TEXTURE_CONFIG } from "../config";
+import { ENEMY_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG } from "../config";
 import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
@@ -48,8 +48,8 @@ class EnemyManager {
         
         // Guard against unknown enemy types
         if (!config) {
-            console.error(`Unknown enemy type: ${enemyType}`);
-            throw new Error(`Unknown enemy type: ${enemyType}`);
+            console.error(`Unknown enemy type: ${enemyType}. Falling back to 'generic'.`);
+            return this.spawnEnemy(scene, x, y, 'generic');
         }
         
         // Check if this is a boss enemy
@@ -81,8 +81,8 @@ class EnemyManager {
         const finalSpeedMultiplier = difficultySpeedMultiplier * levelSpeedMultiplier;
         const finalDamageMultiplier = levelDamageMultiplier;
         
-        // Select appropriate texture based on enemy type
-        const texture = this.selectEnemyTexture(enemyType);
+        // Select texture - handle both single textures and weighted variants
+        const texture = this.selectEnemyTexture(config.texture);
         
         const enemy = scene.add.sprite(x, y, texture) as Enemy;
         // Boss enemies are scaled according to config
@@ -275,44 +275,45 @@ class EnemyManager {
     }
 
     /**
-     * Select a texture for an enemy based on weighted random selection.
-     * Supports both boss textures (with multiple weighted options) and regular enemy textures.
+     * Select a texture for an enemy.
+     * Handles both single textures and arrays of weighted texture variants.
      * 
-     * @param enemyType - The type of enemy
-     * @returns The texture key to use for the enemy sprite
+     * @param textureConfig - Either a string texture key or array of weighted variants
+     * @returns The selected texture key
      */
-    private selectEnemyTexture(enemyType: string): string {
-        // Check if this enemy type has weighted texture options (boss enemies)
-        if (BOSS_TEXTURE_CONFIG[enemyType]) {
-            const options = BOSS_TEXTURE_CONFIG[enemyType];
+    private selectEnemyTexture(textureConfig: string | Array<{ texture: string; weight: number }>): string {
+        // If it's a string, return it directly
+        if (typeof textureConfig === 'string') {
+            return textureConfig;
+        }
+        
+        // If it's an array, do weighted random selection
+        if (Array.isArray(textureConfig)) {
+            if (textureConfig.length === 0) {
+                console.error('Empty texture variant array');
+                return 'enemy';
+            }
+            
+            if (textureConfig.length === 1) {
+                return textureConfig[0]!.texture;
+            }
+            
             const random = Math.random();
             let cumulativeWeight = 0;
             
-            for (const option of options) {
-                cumulativeWeight += option.weight;
+            for (const variant of textureConfig) {
+                cumulativeWeight += variant.weight;
                 if (random < cumulativeWeight) {
-                    return option.texture;
+                    return variant.texture;
                 }
             }
+            
             // Fallback to last option if no match (shouldn't happen with proper weights)
-            return options[options.length - 1]?.texture ?? "enemy";
+            return textureConfig[textureConfig.length - 1]!.texture;
         }
         
-        // Regular (non-boss) enemy textures
-        if (enemyType === "micro") {
-            return "bacteria";
-        } else if (enemyType === "fish") {
-            // 25% chance for water_enemy_fish_1.png, 75% chance for water_enemy_needle_fish_1.png
-            return Math.random() < 0.25 ? "water_enemy_fish_1" : "water_enemy_needle_fish_1";
-        } else if (enemyType === "water_swimming_micro") {
-            return "bacteria"; // Use bacteria for water_swimming_micro
-        } else if (enemyType === "crab") {
-            return "water_enemy_crab_1";
-        } else if (enemyType === "rock_minion") {
-            return "rock_minion_1";
-        } else {
-            return "enemy"; // Default fallback
-        }
+        console.error('Invalid texture config:', textureConfig);
+        return 'enemy';
     }
 
     /**
