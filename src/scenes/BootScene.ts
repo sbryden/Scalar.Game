@@ -30,14 +30,6 @@ export default class BootScene extends Phaser.Scene {
             this.load.image(entry.key, `/Scalar.Game/${entry.path}`);
         }
         
-        // LEGACY COMPATIBILITY: Load 'enemy' as an alias for 'rockgiant'
-        // This alias is maintained for backward compatibility with existing code
-        // that references the 'enemy' texture key. The 'rockgiant' texture is
-        // already loaded above from the manifest, so this creates a duplicate
-        // texture entry under a different key. Consider refactoring code to use
-        // 'rockgiant' directly and removing this alias in a future update.
-        this.load.image('enemy', '/Scalar.Game/rockgiant.png');
-        
         // Optional: Add loading progress bar
         this.createLoadingBar();
     }
@@ -76,6 +68,16 @@ export default class BootScene extends Phaser.Scene {
     create() {
         // Register all singleton services with the ServiceLocator
         this.initializeServices();
+        
+        // LEGACY COMPATIBILITY: Create 'enemy' as an alias for 'rockgiant' texture
+        // This avoids loading the same asset twice while maintaining backward compatibility
+        // with existing code that references the 'enemy' texture key.
+        // Consider refactoring code to use 'rockgiant' directly and removing this alias.
+        if (this.textures.exists('rockgiant') && !this.textures.exists('enemy')) {
+            const rockgiantTexture = this.textures.get('rockgiant');
+            const sourceImage = rockgiantTexture.getSourceImage() as HTMLImageElement;
+            this.textures.addImage('enemy', sourceImage);
+        }
         
         // Once loading is complete, start the menu scene
         this.scene.start('MenuScene');
