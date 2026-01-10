@@ -9,7 +9,7 @@ import levelProgressionSystem from './LevelProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
 import { getCompanionManager } from '../managers/CompanionManager';
 import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
-import type { XPOrb, CompanionKind } from '../types/game';
+import type { XPOrb, CompanionKind, Companion } from '../types/game';
 
 /**
  * Spawn point data structure
@@ -112,7 +112,7 @@ export class SpawnSystem {
                     const companionState = playerStatsSystem.getCompanionState(xpOrb.companionKind);
                     if (companionManager && companionState) {
                         // Find existing companion sprite and update its stats
-                        const existingCompanion = gameContext.companions.find(c => c.companionKind === xpOrb.companionKind);
+                        const existingCompanion = gameState.companions.find((c: Companion) => c.companionKind === xpOrb.companionKind);
                         if (existingCompanion) {
                             existingCompanion.health = companionState.currentHealth;
                             existingCompanion.stamina = companionState.currentStamina;

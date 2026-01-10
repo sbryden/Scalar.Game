@@ -7,6 +7,7 @@ import gameContext from '../utils/GameContext';
 import { getPlayerStatsSystem } from '../systems/PlayerStatsSystem';
 import { COMPANION_CONFIG, WOLF_COMPANION_CONFIG, type BiomeType } from '../config';
 import type { Companion, CompanionKind, CompanionState, Enemy, Projectile } from '../types/game';
+import combatSystem from '../systems/CombatSystem';
 
 export class CompanionManager {
     private scene: Phaser.Scene;
@@ -455,8 +456,7 @@ export class CompanionManager {
                 return;
             }
             
-            // Import combatSystem dynamically to avoid circular dependencies
-            const combatSystem = require('../systems/CombatSystem').default;
+            // Handle companion-enemy collision
             combatSystem.handleCompanionEnemyCollision(companionObj, enemy, this.scene.time.now);
         }, undefined, this.scene);
         
@@ -481,8 +481,7 @@ export class CompanionManager {
             
             // Only enemy projectiles damage companions
             if (projectile.isEnemyProjectile) {
-                // Import combatSystem dynamically to avoid circular dependencies
-                const combatSystem = require('../systems/CombatSystem').default;
+                // Handle enemy projectile hitting companion
                 combatSystem.handleEnemyProjectileHitCompanion(projectile, companionObj, this.scene.time.now);
             }
         }, undefined, this.scene);
