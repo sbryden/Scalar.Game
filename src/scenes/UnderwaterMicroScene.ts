@@ -2,7 +2,7 @@
  * Underwater Micro Scene
  * Microscopic underwater scene with swimming micro organisms
  */
-import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateUnderwaterMicroBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -14,9 +14,10 @@ export default class UnderwaterMicroScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'UnderwaterMicroScene',
-            gravity: 50, // Very light gravity for micro underwater
+            gravity: options.microWaterGravity,
             playerTexture: 'sub_1',
             playerScale: 0.15, // Smaller for micro scale
             playerBounce: 0.1,

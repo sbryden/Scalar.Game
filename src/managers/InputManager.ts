@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
 import playerManager from './PlayerManager';
 import projectileManager from './ProjectileManager';
-import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, PHYSICS_CONFIG } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, PHYSICS_CONFIG, getOptions } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
@@ -94,7 +94,8 @@ export class InputManager {
         const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
-        const jumpPower = PHYSICS_CONFIG.player.jumpPower * sizeConfig.jumpMultiplier;
+        const options = getOptions();
+        const jumpPower = options.playerJumpHeight * sizeConfig.jumpMultiplier;
         body.setVelocityY(-jumpPower);
         body.setVelocityX(currentVelocityX);
     }
@@ -175,7 +176,8 @@ export class InputManager {
     handleLandMovement(): void {
         if (!gameState.player || !gameState.player.body) return;
         
-        const baseSpeed = 160;
+        const options = getOptions();
+        const baseSpeed = options.playerSpeed;
         const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
         
@@ -203,7 +205,8 @@ export class InputManager {
      * Handle underwater submarine movement with thrust controls
      */
     handleUnderwaterMovement(): void {
-        const baseSpeed = 140; // Slightly slower in water
+        const options = getOptions();
+        const baseSpeed = options.playerSpeed * 0.875; // Slightly slower in water (140/160 ratio)
         const thrustPower = 150; // Vertical thrust power
         const sizeConfig = SIZE_CONFIG[playerManager.getPlayerSize()];
         if (!sizeConfig) return;
