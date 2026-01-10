@@ -130,8 +130,6 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         this.initializeGameState();
         this.createUI();
         this.restoreOrSpawnEnemies();
-        this.setupManagers();
-        this.createDebugText();
         
         // Initialize and register companion manager for this scene
         const companionManager = initializeCompanionManager(this);
@@ -139,6 +137,10 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         
         // Respawn companions if they should be active in this scene
         companionManager.respawnCompanions();
+
+        // Setup managers (includes collision setup, now aware of companions)
+        this.setupManagers();
+        this.createDebugText();
     }
 
     update(): void {
@@ -199,7 +201,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Update companions
         const companionManager = getCompanionManager();
         if (companionManager) {
-            companionManager.update(this.time.now - (this.time.now - 16)); // delta in ms
+            companionManager.update(this.game.loop.delta); // delta in ms
         }
 
         // Update camera

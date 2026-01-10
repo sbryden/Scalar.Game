@@ -2,7 +2,7 @@
  * Combat System
  * Handles damage calculations and combat logic
  */
-import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG, WOLF_COMPANION_CONFIG } from '../config';
+import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
@@ -855,7 +855,8 @@ export class CombatSystem {
         playerStatsSystem.takeDamage(damage);
     }
     
-    /**     * Handle companion-enemy collision (companion melee attack)
+    /**
+     * Handle companion-enemy collision (companion melee attack)
      */
     handleCompanionEnemyCollision(companion: Companion, enemy: Enemy, currentTime: number): void {
         if (!companion.isMeleeMode || enemy.isDead) {
@@ -909,7 +910,8 @@ export class CombatSystem {
         }
     }
     
-    /**     * Calculate damage with potential modifiers
+    /**
+     * Calculate damage with potential modifiers
      * @param baseDamage - Base damage value before modifiers
      * @param attacker - Entity dealing damage (Player, Enemy, or Projectile)
      * @param target - Entity receiving damage (Player, Enemy, or Projectile)
