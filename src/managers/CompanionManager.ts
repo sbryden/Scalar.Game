@@ -5,7 +5,7 @@
 import Phaser from 'phaser';
 import gameContext from '../utils/GameContext';
 import { getPlayerStatsSystem } from '../systems/PlayerStatsSystem';
-import { COMPANION_CONFIG, WOLF_COMPANION_CONFIG, BiomeType } from '../config';
+import { COMPANION_CONFIG, WOLF_COMPANION_CONFIG, type BiomeType } from '../config';
 import type { Companion, CompanionKind, CompanionState, Enemy } from '../types/game';
 
 export class CompanionManager {
@@ -29,7 +29,7 @@ export class CompanionManager {
 
         // Check biome restrictions
         const currentBiome = this.getCurrentBiome();
-        if (config.allowedBiomes && !config.allowedBiomes.includes(currentBiome as any)) {
+        if (config.allowedBiomes && !config.allowedBiomes.includes(currentBiome)) {
             console.log(`Companion ${kind} not allowed in biome ${currentBiome}`);
             return null;
         }
