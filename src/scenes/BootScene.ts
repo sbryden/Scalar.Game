@@ -16,7 +16,6 @@ import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import magnetismSystem from '../systems/MagnetismSystem';
-import { initializeCompanionManager } from '../managers/CompanionManager';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {

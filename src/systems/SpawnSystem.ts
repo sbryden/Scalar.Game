@@ -106,8 +106,21 @@ export class SpawnSystem {
                         companionManager.spawnCompanion(xpOrb.companionKind, companionState);
                     }
                 } else if (result.refreshed) {
-                    // Existing companion refreshed
+                    // Existing companion refreshed - sync sprite with updated stats
                     console.log(`${xpOrb.companionKind} companion HP and stamina restored!`);
+                    const companionManager = getCompanionManager();
+                    const companionState = playerStatsSystem.getCompanionState(xpOrb.companionKind);
+                    if (companionManager && companionState) {
+                        // Find existing companion sprite and update its stats
+                        const existingCompanion = gameContext.companions.find(c => c.companionKind === xpOrb.companionKind);
+                        if (existingCompanion) {
+                            existingCompanion.health = companionState.currentHealth;
+                            existingCompanion.stamina = companionState.currentStamina;
+                        } else {
+                            // Companion doesn't exist in scene, spawn it
+                            companionManager.spawnCompanion(xpOrb.companionKind, companionState);
+                        }
+                    }
                 } else {
                     // Companion is dead this run - cannot revive
                     console.log(`${xpOrb.companionKind} companion cannot be revived this run`);
