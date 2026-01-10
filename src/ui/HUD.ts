@@ -12,14 +12,17 @@ export class HUD {
     scene: Phaser.Scene;
     healthBar: Phaser.GameObjects.Rectangle | null;
     healthBarBackground: Phaser.GameObjects.Rectangle | null;
+    healthLabel: Phaser.GameObjects.Text | null;
     xpBar: Phaser.GameObjects.Rectangle | null;
     xpBarBackground: Phaser.GameObjects.Rectangle | null;
+    xpLabel: Phaser.GameObjects.Text | null;
     staminaBar: Phaser.GameObjects.Rectangle | null;
     staminaBarBackground: Phaser.GameObjects.Rectangle | null;
+    staminaLabel: Phaser.GameObjects.Text | null;
     fuelBar: Phaser.GameObjects.Rectangle | null;
     fuelBarBackground: Phaser.GameObjects.Rectangle | null;
+    fuelLabel: Phaser.GameObjects.Text | null;
     fuelCooldownText: Phaser.GameObjects.Text | null;
-    levelText: Phaser.GameObjects.Text | null;
     mapLevelText: Phaser.GameObjects.Text | null;
     bossCountText: Phaser.GameObjects.Text | null;
     pauseButton: Phaser.GameObjects.Text | null;
@@ -32,14 +35,17 @@ export class HUD {
         this.scene = scene;
         this.healthBar = null;
         this.healthBarBackground = null;
+        this.healthLabel = null;
         this.xpBar = null;
         this.xpBarBackground = null;
+        this.xpLabel = null;
         this.staminaBar = null;
         this.staminaBarBackground = null;
+        this.staminaLabel = null;
         this.fuelBar = null;
         this.fuelBarBackground = null;
+        this.fuelLabel = null;
         this.fuelCooldownText = null;
-        this.levelText = null;
         this.mapLevelText = null;
         this.bossCountText = null;
         this.pauseButton = null;
@@ -53,87 +59,125 @@ export class HUD {
     create(): void {
         const cameraWidth = this.scene.cameras.main.width;
         const cameraHeight = this.scene.cameras.main.height;
-        const barWidth = 100;
-        const barHeight = 8;
-        const barCenterX = cameraWidth / 2;
-        const healthBarY = 30;
-        const xpBarY = 50;
-        const staminaBarY = 70;
-        const fuelBarY = 90;
         
-        // Health bar
-        this.healthBarBackground = this.scene.add.rectangle(barCenterX, healthBarY, barWidth, barHeight, 0x333333);
-        this.healthBar = this.scene.add.rectangle(barCenterX, healthBarY, barWidth, barHeight, 0xFF0000);
+        // Horizontal top bar layout configuration
+        const margin = 80; // Left/right margins
+        const totalBarWidth = cameraWidth - (margin * 2);
+        const slotWidth = totalBarWidth / 4; // 4 slots: HP, STA, FUEL, XP
+        const barHeight = 10;
+        const labelY = 8;
+        const barY = 32; // Increased spacing for bigger labels
+        const barWidthInSlot = slotWidth - 20; // Leave padding between slots
+        
+        // Label style (pixel-friendly: bold, white with black stroke)
+        const labelStyle = {
+            fontSize: '18px',
+            color: '#FFFFFF',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
+        };
+        
+        // Calculate slot positions (HP, STA, FUEL, XP order)
+        const slot1X = margin + slotWidth * 0.5; // HP slot
+        const slot2X = margin + slotWidth * 1.5; // STA slot
+        const slot3X = margin + slotWidth * 2.5; // FUEL slot
+        const slot4X = margin + slotWidth * 3.5; // XP slot
+        
+        // --- HEALTH SLOT (HP) ---
+        this.healthLabel = this.scene.add.text(slot1X, labelY, 'HP', labelStyle);
+        this.healthLabel.setOrigin(0.5, 0);
+        this.healthLabel.setDepth(1000);
+        this.healthLabel.setScrollFactor(0);
+        
+        this.healthBarBackground = this.scene.add.rectangle(slot1X, barY, barWidthInSlot, barHeight, 0x333333);
+        this.healthBar = this.scene.add.rectangle(slot1X, barY, barWidthInSlot, barHeight, 0xFF0000);
         this.healthBarBackground.setDepth(1000);
         this.healthBar.setDepth(1000);
         this.healthBarBackground.setScrollFactor(0);
         this.healthBar.setScrollFactor(0);
         
-        // XP bar
-        this.xpBarBackground = this.scene.add.rectangle(barCenterX, xpBarY, barWidth, barHeight, 0x333333);
-        this.xpBar = this.scene.add.rectangle(barCenterX, xpBarY, barWidth, barHeight, 0x00FF00);
-        this.xpBarBackground.setDepth(1000);
-        this.xpBar.setDepth(1000);
-        this.xpBarBackground.setScrollFactor(0);
-        this.xpBar.setScrollFactor(0);
+        // --- STAMINA SLOT (STA) ---
+        this.staminaLabel = this.scene.add.text(slot2X, labelY, 'STA', labelStyle);
+        this.staminaLabel.setOrigin(0.5, 0);
+        this.staminaLabel.setDepth(1000);
+        this.staminaLabel.setScrollFactor(0);
         
-        // Stamina bar
-        this.staminaBarBackground = this.scene.add.rectangle(barCenterX, staminaBarY, barWidth, barHeight, 0x333333);
-        this.staminaBar = this.scene.add.rectangle(barCenterX, staminaBarY, barWidth, barHeight, STAMINA_UI_CONFIG.colors.normal);
+        this.staminaBarBackground = this.scene.add.rectangle(slot2X, barY, barWidthInSlot, barHeight, 0x333333);
+        this.staminaBar = this.scene.add.rectangle(slot2X, barY, barWidthInSlot, barHeight, STAMINA_UI_CONFIG.colors.normal);
         this.staminaBarBackground.setDepth(1000);
         this.staminaBar.setDepth(1000);
         this.staminaBarBackground.setScrollFactor(0);
         this.staminaBar.setScrollFactor(0);
         
-        // Fuel bar
-        this.fuelBarBackground = this.scene.add.rectangle(barCenterX, fuelBarY, barWidth, barHeight, 0x333333);
-        this.fuelBar = this.scene.add.rectangle(barCenterX, fuelBarY, barWidth, barHeight, FUEL_UI_CONFIG.colors.normal);
+        // --- FUEL SLOT (FUEL) ---
+        this.fuelLabel = this.scene.add.text(slot3X, labelY, 'FUEL', labelStyle);
+        this.fuelLabel.setOrigin(0.5, 0);
+        this.fuelLabel.setDepth(1000);
+        this.fuelLabel.setScrollFactor(0);
+        
+        this.fuelBarBackground = this.scene.add.rectangle(slot3X, barY, barWidthInSlot, barHeight, 0x333333);
+        this.fuelBar = this.scene.add.rectangle(slot3X, barY, barWidthInSlot, barHeight, FUEL_UI_CONFIG.colors.normal);
         this.fuelBarBackground.setDepth(1000);
         this.fuelBar.setDepth(1000);
         this.fuelBarBackground.setScrollFactor(0);
         this.fuelBar.setScrollFactor(0);
         
-        // Fuel cooldown text (shown during initial cooldown)
-        this.fuelCooldownText = this.scene.add.text(barCenterX + 60, fuelBarY - 4, '', {
+        // Fuel cooldown text (shown during initial cooldown, positioned near fuel bar)
+        this.fuelCooldownText = this.scene.add.text(slot3X, barY + 15, '', {
             fontSize: '12px',
             color: '#FFD700',
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
         });
+        this.fuelCooldownText.setOrigin(0.5, 0);
         this.fuelCooldownText.setDepth(1000);
         this.fuelCooldownText.setScrollFactor(0);
         this.fuelCooldownText.setVisible(false);
         
-        // Level text (player level)
-        this.levelText = this.scene.add.text(50, 20, 'LEVEL 1', {
-            fontSize: '24px',
-            color: '#FFFFFF',
-            fontStyle: 'bold'
-        });
-        this.levelText.setDepth(1000);
-        this.levelText.setScrollFactor(0);
+        // --- XP SLOT (LEVEL) ---
+        this.xpLabel = this.scene.add.text(slot4X, labelY, 'LEVEL: 1', labelStyle);
+        this.xpLabel.setOrigin(0.5, 0);
+        this.xpLabel.setDepth(1000);
+        this.xpLabel.setScrollFactor(0);
         
-        // Map level text
+        this.xpBarBackground = this.scene.add.rectangle(slot4X, barY, barWidthInSlot, barHeight, 0x333333);
+        this.xpBar = this.scene.add.rectangle(slot4X, barY, barWidthInSlot, barHeight, 0x00FF00);
+        this.xpBarBackground.setDepth(1000);
+        this.xpBar.setDepth(1000);
+        this.xpBarBackground.setScrollFactor(0);
+        this.xpBar.setScrollFactor(0);
+        
+        // --- AUXILIARY HUD ELEMENTS ---
+        
+        // Map level text - positioned at bottom right
         const mapLevel = levelProgressionSystem.getCurrentLevel();
-        this.mapLevelText = this.scene.add.text(50, 50, `MAP ${mapLevel}`, {
-            fontSize: '20px',
+        this.mapLevelText = this.scene.add.text(cameraWidth - 15, cameraHeight - 15, `MAP ${mapLevel}`, {
+            fontSize: '16px',
             color: '#FFD700',
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
         });
+        this.mapLevelText.setOrigin(1, 1); // Anchor to bottom right
         this.mapLevelText.setDepth(1000);
         this.mapLevelText.setScrollFactor(0);
         
-        // Boss count text (only visible in boss mode)
-        this.bossCountText = this.scene.add.text(50, 80, '', {
-            fontSize: '20px',
+        // Boss count text (only visible in boss mode) - positioned on the left side
+        this.bossCountText = this.scene.add.text(15, 50, '', {
+            fontSize: '16px',
             color: '#FF6B6B',
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
         });
         this.bossCountText.setDepth(1000);
         this.bossCountText.setScrollFactor(0);
         this.bossCountText.setVisible(false);
         
         // Pause button (top-right corner)
-        this.pauseButton = this.scene.add.text(cameraWidth - 50, 20, '⏸️', {
+        this.pauseButton = this.scene.add.text(cameraWidth - 40, 15, '⏸️', {
             fontSize: '32px',
             color: '#FFFFFF'
         });
@@ -182,21 +226,20 @@ export class HUD {
      * Update health, XP, stamina, and fuel bars based on player stats
      */
     update(playerStats: PlayerStats): void {
-        const barWidth = 100;
+        const cameraWidth = this.scene.cameras.main.width;
+        const margin = 80;
+        const totalBarWidth = cameraWidth - (margin * 2);
+        const slotWidth = totalBarWidth / 4;
+        const barWidthInSlot = slotWidth - 20;
         
         // Update health bar
         const healthPercent = playerStats.health / playerStats.maxHealth;
-        this.healthBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.healthBar?.setDisplayOrigin(barWidthInSlot / 2, 5);
         this.healthBar?.setScale(healthPercent, 1);
-        
-        // Update XP bar
-        const xpPercent = playerStats.xp / playerStats.xpToLevel;
-        this.xpBar?.setDisplayOrigin(barWidth / 2, 4);
-        this.xpBar?.setScale(xpPercent, 1);
         
         // Update stamina bar
         const staminaPercent = playerStats.stamina / playerStats.maxStamina;
-        this.staminaBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.staminaBar?.setDisplayOrigin(barWidthInSlot / 2, 5);
         this.staminaBar?.setScale(staminaPercent, 1);
         
         // Color code stamina bar based on percentage
@@ -214,7 +257,7 @@ export class HUD {
         // Update fuel bar
         const fuelSystem = getFuelSystem();
         const fuelPercent = fuelSystem.getFuelPercent();
-        this.fuelBar?.setDisplayOrigin(barWidth / 2, 4);
+        this.fuelBar?.setDisplayOrigin(barWidthInSlot / 2, 5);
         this.fuelBar?.setScale(fuelPercent, 1);
         
         // Get fuel system state for cooldown display
@@ -240,6 +283,14 @@ export class HUD {
             // Normal - gold
             this.fuelBar?.setFillStyle(FUEL_UI_CONFIG.colors.normal);
         }
+        
+        // Update XP bar
+        const xpPercent = playerStats.xp / playerStats.xpToLevel;
+        this.xpBar?.setDisplayOrigin(barWidthInSlot / 2, 5);
+        this.xpBar?.setScale(xpPercent, 1);
+        
+        // Update XP label to show current player level
+        this.xpLabel?.setText(`LEVEL: ${playerStats.level}`);
         
         // Update map level text
         const mapLevel = levelProgressionSystem.getCurrentLevel();
@@ -269,14 +320,17 @@ export class HUD {
     destroy(): void {
         if (this.healthBar) this.healthBar.destroy();
         if (this.healthBarBackground) this.healthBarBackground.destroy();
+        if (this.healthLabel) this.healthLabel.destroy();
         if (this.xpBar) this.xpBar.destroy();
         if (this.xpBarBackground) this.xpBarBackground.destroy();
+        if (this.xpLabel) this.xpLabel.destroy();
         if (this.staminaBar) this.staminaBar.destroy();
         if (this.staminaBarBackground) this.staminaBarBackground.destroy();
+        if (this.staminaLabel) this.staminaLabel.destroy();
         if (this.fuelBar) this.fuelBar.destroy();
         if (this.fuelBarBackground) this.fuelBarBackground.destroy();
+        if (this.fuelLabel) this.fuelLabel.destroy();
         if (this.fuelCooldownText) this.fuelCooldownText.destroy();
-        if (this.levelText) this.levelText.destroy();
         if (this.mapLevelText) this.mapLevelText.destroy();
         if (this.bossCountText) this.bossCountText.destroy();
         if (this.pauseButton) this.pauseButton.destroy();
