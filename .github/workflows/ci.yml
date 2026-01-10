@@ -26,6 +26,9 @@ jobs:
           rm -f package-lock.json
           npm install --no-audit
       
+      - name: Generate assets manifest
+        run: npm run generate-manifest
+      
       - name: Run TypeScript type checking
         run: npx tsc
       
