@@ -2,7 +2,7 @@
  * Main Game Macro Scene
  * Giant-scale gameplay scene for land environment with massive enemies
  */
-import { WORLD_WIDTH, SPAWN_CONFIG } from '../config';
+import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateSkyBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -14,9 +14,10 @@ export default class MainGameMacroScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'MainGameMacroScene',
-            gravity: 450, // Heavier gravity for macro scale
+            gravity: options.macroLandGravity,
             playerTexture: 'car_1',
             playerScale: 0.35, // Larger scale for macro
             playerBounce: 0.2,

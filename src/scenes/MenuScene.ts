@@ -106,13 +106,16 @@ export default class MenuScene extends Phaser.Scene {
         this.createStartButton(width / 2, 545);
         
         // Boss Mode checkbox
-        this.createBossModeCheckbox(width / 2, 605);
+        this.createBossModeCheckbox(width / 2, 595);
         
         // God Mode checkbox
-        this.createGodModeCheckbox(width / 2, 640);
+        this.createGodModeCheckbox(width / 2, 630);
+        
+        // Hacks button (bottom right, below robot image)
+        this.createOptionsButton(width * 0.8, height - 60);
         
         // Instructions
-        const instructions = this.add.text(width / 2, 685, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F/K - Fire', {
+        const instructions = this.add.text(width / 2, 675, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F/K - Fire', {
             fontSize: '16px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff'
@@ -121,7 +124,7 @@ export default class MenuScene extends Phaser.Scene {
         instructions.setAlpha(0.6);
         
         // Build number
-        const buildNumber = this.add.text(width / 2, 715, `Build: ${BUILD_NUMBER}`, {
+        const buildNumber = this.add.text(width / 2, 705, `Build: ${BUILD_NUMBER}`, {
             fontSize: '12px',
             fontFamily: 'Arial, sans-serif',
             color: '#888888'
@@ -515,6 +518,35 @@ export default class MenuScene extends Phaser.Scene {
             } else {
                 this.scene.start('MainGameScene');
             }
+        });
+    }
+    
+    createOptionsButton(centerX: number, y: number): void {
+        const buttonWidth = 200;
+        const buttonHeight = 50;
+        
+        const optionsButton = this.add.rectangle(centerX, y, buttonWidth, buttonHeight, 0x8e44ad);
+        const optionsText = this.add.text(centerX, y, 'HACKS', {
+            fontSize: '22px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        optionsText.setOrigin(0.5);
+        
+        optionsButton.setInteractive({ useHandCursor: true });
+        optionsButton.on('pointerover', () => {
+            optionsButton.setFillStyle(0x9b59b6);
+            optionsButton.setScale(1.05);
+            optionsText.setScale(1.05);
+        });
+        optionsButton.on('pointerout', () => {
+            optionsButton.setFillStyle(0x8e44ad);
+            optionsButton.setScale(1);
+            optionsText.setScale(1);
+        });
+        optionsButton.on('pointerdown', () => {
+            this.scene.start('OptionsScene');
         });
     }
 }

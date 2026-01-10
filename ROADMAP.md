@@ -8,6 +8,21 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ## 🎯 Core Mechanics Enhancements
 
+### ✅ Flag-Based Level Completion
+**Status: COMPLETED**
+- ✅ Changed level completion flow - bosses no longer immediately end the level
+- ✅ When all bosses are defeated:
+  - All remaining enemies are destroyed without dropping XP orbs
+  - A golden flag spawns at a fixed distance from the map's end (300 pixels)
+- ✅ Flag has a bouncing animation to attract player attention
+- ✅ Player must reach the flag to complete the level
+- ✅ Firework celebration animation plays when flag is reached:
+  - 5 colorful particle bursts radiating from screen center
+  - Camera shake effects for impact
+  - 1-second delay before stats screen displays
+- ✅ Works with both normal mode (single boss) and boss mode (multiple bosses)
+- ✅ Proper cleanup on level restart/replay
+
 ### ✅ Improved HUD & Stat Display
 **Status: COMPLETED**
 - ✅ Redesigned vertical stat bars into horizontal top bar layout

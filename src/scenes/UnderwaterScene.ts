@@ -2,7 +2,7 @@
  * Underwater Scene
  * Submarine gameplay scene with lighter gravity
  */
-import { WORLD_WIDTH } from '../config';
+import { WORLD_WIDTH, getOptions } from '../config';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import { generateUnderwaterBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
@@ -14,9 +14,10 @@ export default class UnderwaterScene extends BaseGameScene {
     }
 
     protected getSceneConfig(): SceneConfig {
+        const options = getOptions();
         return {
             sceneKey: 'UnderwaterScene',
-            gravity: 100, // Lighter gravity for underwater (1/3 of normal)
+            gravity: options.waterGravity,
             playerTexture: 'sub_1',
             playerScale: 0.25,
             playerBounce: 0.1,

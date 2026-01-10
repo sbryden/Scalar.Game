@@ -3,6 +3,16 @@
  * Barrel export for all configuration modules
  */
 
+// Options
+export {
+    getOptions,
+    saveOptions,
+    resetOptions,
+    getDefaultOptions,
+    loadOptions
+} from './options';
+export type { GameOptions } from './options';
+
 // World and scene
 export {
     WORLD_WIDTH,
