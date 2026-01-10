@@ -5,7 +5,8 @@
 import gameState from '../utils/GameContext';
 import enemyManager from './EnemyManager';
 import combatSystem from '../systems/CombatSystem';
-import type { Player, Enemy, Projectile } from '../types/game';
+import { getCompanionManager } from './CompanionManager';
+import type { Player, Enemy, Projectile, Companion } from '../types/game';
 
 export class CollisionManager {
     scene: Phaser.Scene;
@@ -108,6 +109,9 @@ export class CollisionManager {
         
         // Player-Enemy collision (bidirectional damage and knockback)
         this.setupPlayerEnemyCollision();
+        
+        // Companion collisions
+        this.setupCompanionCollisions();
     }
     
     /**
@@ -143,5 +147,68 @@ export class CollisionManager {
             
             combatSystem.handlePlayerEnemyCollision(playerObj, enemy, this.scene.time.now);
         }, undefined, this.scene);
+    }
+    
+    /**
+     * Setup companion collision handlers
+     */
+    setupCompanionCollisions(): void {
+        const { enemies, projectiles } = gameState;
+        const companions = gameState.companions;
+        
+        if (!enemies || !projectiles || companions.length === 0) {
+            return;
+        }
+        
+        // For each companion, set up collisions
+        companions.forEach(companion => {
+            // Companion-Enemy collision (melee damage)
+            this.scene.physics.add.overlap(companion, enemies, (obj1, obj2) => {
+                const isEnemy = (obj: unknown): obj is Enemy => {
+                    return obj !== null && typeof obj === 'object' && 'health' in obj && 'enemyType' in obj;
+                };
+                
+                let companionObj: Companion;
+                let enemy: Enemy;
+                
+                if (isEnemy(obj1)) {
+                    enemy = obj1;
+                    companionObj = obj2 as Companion;
+                } else if (isEnemy(obj2)) {
+                    enemy = obj2;
+                    companionObj = obj1 as Companion;
+                } else {
+                    return;
+                }
+                
+                // Companion damages enemy
+                combatSystem.handleCompanionEnemyCollision(companionObj, enemy, this.scene.time.now);
+            }, undefined, this.scene);
+            
+            // Companion-Enemy Projectile collision (companion takes damage)
+            this.scene.physics.add.overlap(companion, projectiles, (obj1, obj2) => {
+                const isProjectile = (obj: unknown): obj is Projectile => {
+                    return obj !== null && typeof obj === 'object' && 'damage' in obj && 'spawnX' in obj;
+                };
+                
+                let companionObj: Companion;
+                let projectile: Projectile;
+                
+                if (isProjectile(obj1)) {
+                    projectile = obj1;
+                    companionObj = obj2 as Companion;
+                } else if (isProjectile(obj2)) {
+                    projectile = obj2;
+                    companionObj = obj1 as Companion;
+                } else {
+                    return;
+                }
+                
+                // Only enemy projectiles damage companions
+                if (projectile.isEnemyProjectile) {
+                    combatSystem.handleEnemyProjectileHitCompanion(projectile, companionObj, this.scene.time.now);
+                }
+            }, undefined, this.scene);
+        });
     }
 }
