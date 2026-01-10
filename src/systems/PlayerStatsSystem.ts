@@ -309,6 +309,13 @@ export class PlayerStatsSystem {
                 existing.currentHealth = existing.maxHealth;
                 existing.currentStamina = existing.maxStamina;
                 return { spawned: false, refreshed: true };
+            } else {
+                // Companion exists but is not currently alive and has not died this run
+                // Respawn and refresh instead of treating as a new unlock
+                existing.alive = true;
+                existing.currentHealth = existing.maxHealth;
+                existing.currentStamina = existing.maxStamina;
+                return { spawned: false, refreshed: true };
             }
         }
         

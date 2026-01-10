@@ -6,7 +6,7 @@ import Phaser from 'phaser';
 import gameContext from '../utils/GameContext';
 import { getPlayerStatsSystem } from '../systems/PlayerStatsSystem';
 import { COMPANION_CONFIG, WOLF_COMPANION_CONFIG, type BiomeType } from '../config';
-import type { Companion, CompanionKind, CompanionState, Enemy } from '../types/game';
+import type { Companion, CompanionKind, CompanionState, Enemy, Projectile } from '../types/game';
 
 export class CompanionManager {
     private scene: Phaser.Scene;
@@ -29,7 +29,7 @@ export class CompanionManager {
 
         // Check biome restrictions
         const currentBiome = this.getCurrentBiome();
-        if (config.allowedBiomes && !config.allowedBiomes.includes(currentBiome)) {
+        if (config.allowedBiomes && !config.allowedBiomes.some(biome => biome === currentBiome)) {
             console.log(`Companion ${kind} not allowed in biome ${currentBiome}`);
             return null;
         }
@@ -43,7 +43,7 @@ export class CompanionManager {
 
         // Set up physics
         companion.setCollideWorldBounds(true);
-        companion.setScale(config.scale);
+        companion.setScale(config.scale ?? 1);
         
         // Initialize companion properties
         companion.companionKind = kind;
@@ -67,11 +67,26 @@ export class CompanionManager {
             companion.damage = 10; // Default
         }
 
-        // Create health and stamina bars
-        this.createCompanionBars(companion, config);
+        // Create health and stamina bars only if config has required bar properties
+        if (
+            config &&
+            typeof config.barWidth === 'number' &&
+            typeof config.barHeight === 'number' &&
+            typeof config.barOffsetY === 'number' &&
+            typeof config.barSpacing === 'number' &&
+            typeof config.healthBarColor === 'number' &&
+            typeof config.staminaBarColor === 'number' &&
+            typeof config.barBackgroundColor === 'number' &&
+            typeof config.barBackgroundAlpha === 'number'
+        ) {
+            this.createCompanionBars(companion, config);
+        }
 
         // Add to game context
         gameContext.addCompanion(companion);
+        
+        // Set up collision handlers for this companion
+        this.setupCompanionCollision(companion);
 
         console.log(`Spawned ${kind} companion with ${companion.health}/${companion.maxHealth} HP`);
         return companion;
@@ -144,17 +159,18 @@ export class CompanionManager {
      */
     private updateCompanionBars(companion: Companion): void {
         const config = COMPANION_CONFIG[companion.companionKind];
-        const barWidth = config.barWidth || 40;
         const barSpacing = config.barSpacing || 6;
 
         // Health bar position and scale
-        const healthRatio = companion.health / companion.maxHealth;
+        const maxHealth = companion.maxHealth;
+        const healthRatio = maxHealth > 0 ? companion.health / maxHealth : 0;
         companion.healthBarBg.setPosition(companion.x, companion.y + companion.barOffsetY);
         companion.healthBar.setPosition(companion.x, companion.y + companion.barOffsetY);
         companion.healthBar.setScale(healthRatio, 1);
 
         // Stamina bar position and scale
-        const staminaRatio = companion.stamina / companion.maxStamina;
+        const maxStamina = companion.maxStamina;
+        const staminaRatio = maxStamina > 0 ? companion.stamina / maxStamina : 0;
         companion.staminaBarBg.setPosition(companion.x, companion.y + companion.barOffsetY + barSpacing);
         companion.staminaBar.setPosition(companion.x, companion.y + companion.barOffsetY + barSpacing);
         companion.staminaBar.setScale(staminaRatio, 1);
@@ -325,15 +341,25 @@ export class CompanionManager {
      */
     private updateVisualState(companion: Companion): void {
         const config = COMPANION_CONFIG[companion.companionKind];
-        
-        if (!('tint' in config)) return;
+        const tintConfig = (config as { tint?: { exhausted?: number; melee?: number; normal?: number } }).tint;
 
-        if (companion.isExhausted) {
-            companion.setTint(config.tint.exhausted);
-        } else if (companion.isMeleeMode) {
-            companion.setTint(config.tint.melee);
-        } else {
-            companion.setTint(config.tint.normal);
+        // If no tint configuration exists for this companion, clear any existing tint and exit
+        if (!tintConfig) {
+            if (typeof (companion as any).clearTint === 'function') {
+                (companion as any).clearTint();
+            }
+            return;
+        }
+
+        if (companion.isExhausted && tintConfig.exhausted !== undefined) {
+            companion.setTint(tintConfig.exhausted);
+        } else if (companion.isMeleeMode && tintConfig.melee !== undefined) {
+            companion.setTint(tintConfig.melee);
+        } else if (tintConfig.normal !== undefined) {
+            companion.setTint(tintConfig.normal);
+        } else if (typeof (companion as any).clearTint === 'function') {
+            // Fallback if no appropriate tint value is configured
+            (companion as any).clearTint();
         }
     }
 
@@ -398,6 +424,68 @@ export class CompanionManager {
         for (const companionState of activeCompanions) {
             this.spawnCompanion(companionState.kind, companionState);
         }
+    }
+
+    /**
+     * Set up collision handlers for a single companion
+     */
+    private setupCompanionCollision(companion: Companion): void {
+        const { enemies, projectiles } = gameContext;
+        
+        if (!enemies || !projectiles) {
+            return;
+        }
+        
+        // Companion-Enemy collision (melee damage)
+        this.scene.physics.add.overlap(companion, enemies, (obj1, obj2) => {
+            const isEnemy = (obj: unknown): obj is Enemy => {
+                return obj !== null && typeof obj === 'object' && 'health' in obj && 'enemyType' in obj;
+            };
+            
+            let companionObj: Companion;
+            let enemy: Enemy;
+            
+            if (isEnemy(obj1)) {
+                enemy = obj1;
+                companionObj = obj2 as Companion;
+            } else if (isEnemy(obj2)) {
+                enemy = obj2;
+                companionObj = obj1 as Companion;
+            } else {
+                return;
+            }
+            
+            // Import combatSystem dynamically to avoid circular dependencies
+            const combatSystem = require('../systems/CombatSystem').default;
+            combatSystem.handleCompanionEnemyCollision(companionObj, enemy, this.scene.time.now);
+        }, undefined, this.scene);
+        
+        // Companion-Enemy Projectile collision (companion takes damage)
+        this.scene.physics.add.overlap(companion, projectiles, (obj1, obj2) => {
+            const isProjectile = (obj: unknown): obj is Projectile => {
+                return obj !== null && typeof obj === 'object' && 'damage' in obj && 'spawnX' in obj;
+            };
+            
+            let companionObj: Companion;
+            let projectile: Projectile;
+            
+            if (isProjectile(obj1)) {
+                projectile = obj1;
+                companionObj = obj2 as Companion;
+            } else if (isProjectile(obj2)) {
+                projectile = obj2;
+                companionObj = obj1 as Companion;
+            } else {
+                return;
+            }
+            
+            // Only enemy projectiles damage companions
+            if (projectile.isEnemyProjectile) {
+                // Import combatSystem dynamically to avoid circular dependencies
+                const combatSystem = require('../systems/CombatSystem').default;
+                combatSystem.handleEnemyProjectileHitCompanion(projectile, companionObj, this.scene.time.now);
+            }
+        }, undefined, this.scene);
     }
 
     /**
