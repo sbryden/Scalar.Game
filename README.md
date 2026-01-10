@@ -48,7 +48,7 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 - **Momentum-Based Combat**: Velocity affects ramming damage; melee mode enhances damage and reduces damage taken
 - **Visual Feedback**: Camera shake, enemy color flashes, health bars, impact effects
 - **Magnetization**: XP orbs automatically pulled toward player
-- **Dynamic HUD**: Real-time health, XP, stamina, fuel, player level, and map level display
+- **Dynamic HUD**: Improved horizontal top bar with labeled stat indicators (HP, STA, FUEL, XP) using pixel-friendly styling, real-time player level, and map level display
 - **Dynamic Backgrounds**: Procedurally generated backgrounds with 5 seeded variations per map level, featuring mountains, clouds, fish schools, coral, bioluminescent plankton, and more
 
 ## Quick Start
