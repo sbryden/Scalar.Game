@@ -16,6 +16,7 @@ import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import magnetismSystem from '../systems/MagnetismSystem';
+import { initializeCompanionManager } from '../managers/CompanionManager';
 
 export default class BootScene extends Phaser.Scene {
     constructor() {
@@ -73,6 +74,9 @@ export default class BootScene extends Phaser.Scene {
         // Load special orb images
         this.load.image('wolf_orb', '/Scalar.Game/wolf_orb.png');
         
+        // Load companion images
+        this.load.image('wolf_companion', '/Scalar.Game/wolf_companion.png');
+        
         // Load menu assets
         this.load.image('secure_robot', '/Scalar.Game/secure_robot.png');
         
@@ -128,6 +132,7 @@ export default class BootScene extends Phaser.Scene {
      * 
      * Note: StaminaSystem and FuelSystem require config initialization
      * and are registered via PlayerStatsSystem.initializeDifficulty()
+     * CompanionManager is scene-specific and registered per-scene
      */
     private initializeServices(): void {
         // Managers
@@ -135,6 +140,7 @@ export default class BootScene extends Phaser.Scene {
         Services.register('projectileManager', projectileManager);
         Services.register('xpOrbManager', xpOrbManager);
         Services.register('enemyManager', enemyManager);
+        // Note: CompanionManager will be registered in BaseGameScene
 
         // Systems
         Services.register('combatSystem', combatSystem);
