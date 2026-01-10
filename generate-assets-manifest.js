@@ -10,7 +10,7 @@
  */
 
 import { readdir, writeFile } from 'fs/promises';
-import { join, basename, extname } from 'path';
+import { join, basename, extname, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -34,8 +34,8 @@ async function findPngFiles(dir) {
             const subFiles = await findPngFiles(fullPath);
             files.push(...subFiles);
         } else if (entry.isFile() && extname(entry.name).toLowerCase() === '.png') {
-            // Get relative path from assets directory
-            const relativePath = fullPath.substring(ASSETS_DIR.length + 1);
+            // Get relative path from assets directory (cross-platform safe)
+            const relativePath = relative(ASSETS_DIR, fullPath);
             files.push(relativePath);
         }
     }
@@ -75,14 +75,19 @@ async function generateManifest() {
             // Use relative path from assets dir (without extension) as key
             const key = file.replace(/\.png$/i, '');
             
+            // Normalize path separators to forward slash for consistency
+            const normalizedKey = key.replace(/\\/g, '/');
+            
             // Sanitize key for safe inclusion in TypeScript
             // Only allow alphanumeric, underscore, hyphen, forward slash
-            const sanitizedKey = key.replace(/[^a-zA-Z0-9_\-/]/g, '_');
+            // Note: Forward slashes are allowed to support subdirectories.
+            // If you need object property access, consider replacing '/' with '_'
+            const sanitizedKey = normalizedKey.replace(/[^a-zA-Z0-9_\-/]/g, '_');
             
             return {
                 key: sanitizedKey,
-                path: file,
-                originalKey: key
+                path: file.replace(/\\/g, '/'), // Normalize path separators
+                originalKey: normalizedKey
             };
         });
         
