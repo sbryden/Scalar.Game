@@ -174,6 +174,12 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - ✅ God Mode hidden in production builds (only visible when BUILD_NUMBER is 'dev')
 - ✅ Unified getDifficultyConfig() function for consistent multiplier access
 
+### Hacks Menu: Persistence & Flow
+**Priority: High**
+- After selecting hacks and pressing Save, automatically return to Main Menu
+- Persist hack/difficulty toggles when exiting hacks (god mode, boss mode, hard/brutal, etc.)
+- Preserve the player’s current main menu selection when returning from hacks
+
 ### Menu System Additions
 - **FIND Section**: Glossary/dictionary explaining game mechanics
 - **Settings Menu**: 
@@ -196,12 +202,19 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
   - Display personal best on menu
   - High score table in level complete screen
   - Score breakdown by category
+  - Keep micro/normal/macro world kill points as separate categories (do not erase on screen changes)
 - **Phase 2 - Cloud Integration**:
   - Cloud-based storage
   - Global leaderboards
   - Friends leaderboards
   - Cross-device persistence
   - Social features
+
+### Max Level Mechanic: Super Mech Overdrive
+**Priority: Very Low** (Far future, rough concept)
+- When player reaches max level, allow a choice to “drain power” and transform into a super mech
+- Define tradeoffs (temporary? reduces stats afterward? consumes XP/fuel? locks out champions?)
+- Needs a full design pass: controls, duration, balance, visuals, and UI presentation
 
 ### Level Progression Choice System
 **Priority: Low** (Far future, rough concept)
@@ -251,6 +264,11 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Environmental interaction in boss fights
 - Mid-boss encounters
 
+### Boss Concepts (Backlog)
+**Priority: Low** (Some are rough concepts)
+- Snake boss: projectile-focused patterns (needs design: telegraphs, projectile types, arena interaction)
+- Harpoon boss: likely water-biome boss concept (needs design: harpoon physics, dodge windows, counterplay)
+
 ### Environmental Features
 **Land Enhancements:**
 - Massive dirt/gravel mountains at micro scale
@@ -279,6 +297,14 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Lighting and atmospheric effects
 - Weather systems per biome
 - Trail effects for projectiles
+- “Flash drop” effect at run start (rough concept; needs refinement)
+
+### Environment Art Pass
+**Priority: Medium**
+- Giant water visuals/graphics pass (macro-scale readability)
+- Background improvements (parallax/atmosphere consistency across biomes)
+- Normal land graphics pass (cohesive tiles/props and improved readability)
+- Flag graphics polish (sprite/animation pass)
 
 ### Audio System
 **Priority: Medium**
@@ -331,6 +357,7 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Better level-up notifications
 - Upgrade selection screen
 - Smooth transitions between screens
+- Fix score points overlap in UI (e.g., add a "See more" / expand control)
 
 ### Critical Hit System
 - Implement weak point detection
@@ -397,6 +424,7 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 - Cross-browser compatibility
 - Mobile control exploration (potential)
 - Playtesting feedback integration
+- Boss balance: reduce wolf boss damage output ("less damage")
 
 ---
 
@@ -409,6 +437,6 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ---
 
-**Last Updated**: January 2026
+**Last Updated**: January 26, 2026
 
 For current game features, see [README.md](README.md)
