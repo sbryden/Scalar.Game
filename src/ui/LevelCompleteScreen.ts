@@ -1,6 +1,6 @@
 /**
  * Level Complete Screen
- * Displays when player defeats the boss with replay or exit options
+ * Displays when player defeats the boss with next-level or exit options
  */
 import Phaser from 'phaser';
 import levelStatsTracker from '../systems/LevelStatsTracker';
@@ -14,11 +14,9 @@ export class LevelCompleteScreen {
     statsText: Phaser.GameObjects.Text | null;
     messageText: Phaser.GameObjects.Text | null;
     nKey: Phaser.Input.Keyboard.Key | null;
-    rKey: Phaser.Input.Keyboard.Key | null;
     mKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
     onNextLevel: (() => void) | null;
-    onReplay: (() => void) | null;
     onExit: (() => void) | null;
 
     constructor(scene: Phaser.Scene) {
@@ -29,11 +27,9 @@ export class LevelCompleteScreen {
         this.statsText = null;
         this.messageText = null;
         this.nKey = null;
-        this.rKey = null;
         this.mKey = null;
         this.isVisible = false;
         this.onNextLevel = null;
-        this.onReplay = null;
         this.onExit = null;
     }
 
@@ -98,7 +94,7 @@ export class LevelCompleteScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 100,
-            'Press N for Next Level\nPress R to Replay\nPress M to Exit to Main Menu',
+            'Press N for Next Level\nPress M to Exit to Main Menu',
             {
                 fontSize: '24px',
                 color: '#FFFFFF',
@@ -113,21 +109,14 @@ export class LevelCompleteScreen {
         this.messageText.setScrollFactor(0);
         this.messageText.setVisible(false);
 
-        // Setup keyboard input for N, R and M
+        // Setup keyboard input for N and M
         this.nKey = this.scene.input.keyboard!.addKey('N');
-        this.rKey = this.scene.input.keyboard!.addKey('R');
         this.mKey = this.scene.input.keyboard!.addKey('M');
 
-        // Add listeners for N, R and M keys
+        // Add listeners for N and M keys
         this.nKey.on('down', () => {
             if (this.isVisible) {
                 this.handleNextLevel();
-            }
-        });
-
-        this.rKey.on('down', () => {
-            if (this.isVisible) {
-                this.handleReplay();
             }
         });
 
@@ -229,21 +218,6 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Handle replay (R key)
-     */
-    handleReplay(): void {
-        this.hide();
-        
-        // Resume physics
-        this.scene.physics.resume();
-
-        // Call replay callback if set
-        if (this.onReplay) {
-            this.onReplay();
-        }
-    }
-
-    /**
      * Handle exit (M key)
      */
     handleExit(): void {
@@ -263,13 +237,6 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Set the replay callback
-     */
-    setReplayCallback(callback: () => void): void {
-        this.onReplay = callback;
-    }
-
-    /**
      * Set the exit callback
      */
     setExitCallback(callback: () => void): void {
@@ -282,9 +249,6 @@ export class LevelCompleteScreen {
     destroy(): void {
         if (this.nKey) {
             this.nKey.removeAllListeners();
-        }
-        if (this.rKey) {
-            this.rKey.removeAllListeners();
         }
         if (this.mKey) {
             this.mKey.removeAllListeners();
