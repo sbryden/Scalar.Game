@@ -30,10 +30,16 @@ export interface LevelStats {
 export class LevelStatsTracker {
     private stats: LevelStats;
     private isLevelActive: boolean;
+    private cumulativeScore: number;
+    private currentLevel: number | null;
+    private hasCommittedCurrentLevel: boolean;
 
     constructor() {
         this.stats = this.createEmptyStats();
         this.isLevelActive = false;
+        this.cumulativeScore = 0;
+        this.currentLevel = null;
+        this.hasCommittedCurrentLevel = false;
     }
 
     /**
@@ -59,9 +65,17 @@ export class LevelStatsTracker {
     /**
      * Start tracking a new level
      */
-    startLevel(startTime: number): void {
-        this.stats = this.createEmptyStats();
-        this.stats.levelStartTime = startTime;
+    startLevel(startTime: number, level: number): void {
+        const isNewLevel = this.currentLevel !== level;
+        const shouldResetStats = isNewLevel || !this.isLevelActive || this.stats.levelStartTime === 0;
+
+        if (shouldResetStats) {
+            this.stats = this.createEmptyStats();
+            this.stats.levelStartTime = startTime;
+            this.currentLevel = level;
+            this.hasCommittedCurrentLevel = false;
+        }
+
         this.isLevelActive = true;
     }
 
@@ -71,6 +85,14 @@ export class LevelStatsTracker {
     endLevel(endTime: number): void {
         this.stats.levelEndTime = endTime;
         this.isLevelActive = false;
+
+        // Commit this level's score to the run total exactly once
+        const levelForScore = this.currentLevel ?? 1;
+        if (!this.hasCommittedCurrentLevel) {
+            const levelScore = this.calculateScore(levelForScore);
+            this.cumulativeScore += levelScore.totalScore;
+            this.hasCommittedCurrentLevel = true;
+        }
     }
 
     /**
@@ -159,6 +181,19 @@ export class LevelStatsTracker {
     }
 
     /**
+     * Get total run score (committed levels plus in-progress level)
+     */
+    getCumulativeScore(currentLevel: number): number {
+        // If we are actively tracking the same level, include the live score
+        const isActiveSameLevel = this.isLevelActive && this.currentLevel === currentLevel && !this.hasCommittedCurrentLevel;
+        if (isActiveSameLevel) {
+            const liveScore = this.calculateScore(currentLevel).totalScore;
+            return this.cumulativeScore + liveScore;
+        }
+        return this.cumulativeScore;
+    }
+
+    /**
      * Get completion time in seconds
      */
     getCompletionTime(): number {
@@ -189,8 +224,28 @@ export class LevelStatsTracker {
      * Reset all stats
      */
     reset(): void {
+        this.resetRun();
+    }
+
+    /**
+     * Reset only the current level's stats while keeping the run total
+     */
+    resetLevelStats(): void {
         this.stats = this.createEmptyStats();
         this.isLevelActive = false;
+        this.hasCommittedCurrentLevel = false;
+        this.currentLevel = null;
+    }
+
+    /**
+     * Full reset for a brand-new run (clears cumulative score)
+     */
+    resetRun(): void {
+        this.stats = this.createEmptyStats();
+        this.isLevelActive = false;
+        this.cumulativeScore = 0;
+        this.currentLevel = null;
+        this.hasCommittedCurrentLevel = false;
     }
 
     /**
