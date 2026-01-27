@@ -331,13 +331,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
             this.handleLevelComplete();
         });
 
-        // Set up next level, replay and exit callbacks
+        // Set up next level and exit callbacks
         this.levelCompleteScreen.setNextLevelCallback(() => {
             this.handleNextLevel();
-        });
-
-        this.levelCompleteScreen.setReplayCallback(() => {
-            this.handleReplay();
         });
 
         this.levelCompleteScreen.setExitCallback(() => {
@@ -646,25 +642,6 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
 
         // Clear saved enemies to spawn fresh enemies for new level
-        gameState.savedEnemies[config.sceneKey] = [];
-        
-        // Clear flag if it exists
-        if (gameState.levelCompleteFlag) {
-            gameState.levelCompleteFlag.destroy();
-            gameState.levelCompleteFlag = null;
-        }
-
-        this.scene.restart();
-    }
-
-    protected handleReplay(): void {
-        const config = this.getSceneConfig();
-        console.log('Replaying level');
-        
-        // Full reset of companions for new run
-        playerStatsSystem.resetCompanions();
-
-        gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
         gameState.savedEnemies[config.sceneKey] = [];
         
         // Clear flag if it exists
