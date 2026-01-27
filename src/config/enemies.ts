@@ -674,7 +674,6 @@ export interface DifficultyConfig {
     readonly enemyDamageMultiplier: number;
     readonly playerDamageMultiplier: number;
     readonly xpMultiplier: number;
-    // TODO: Apply resourceDropMultiplier in the loot/resource drop logic so that
-    //       resource drop rates actually vary by difficulty as documented.
+    // Multiplier that controls how resource drop rates scale with difficulty.
     readonly resourceDropMultiplier: number;
 }
