@@ -515,6 +515,10 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         flagSprite.setScale(1.5);
         flagSprite.setDepth(100);
         
+        // Prevent flag from falling due to gravity
+        flagSprite.body.setAllowGravity(false);
+        flagSprite.body.setImmovable(true);
+        
         // Store flag reference in gameState
         gameState.levelCompleteFlag = flagSprite;
         
