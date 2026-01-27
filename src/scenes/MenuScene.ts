@@ -218,12 +218,12 @@ export default class MenuScene extends Phaser.Scene {
         this.optionsContainer.setVisible(false);
         this.optionsContainer.setDepth(200); // Higher depth to appear above environment dropdown
         
-        // Create options - 4 difficulty levels with descriptions
+        // Create options - 4 difficulty levels
         const options = [
-            { value: 'easy', label: 'Easy', description: 'Relaxed experience' },
-            { value: 'normal', label: 'Normal', description: 'Balanced gameplay' },
-            { value: 'hard', label: 'Hard', description: 'Greater challenge' },
-            { value: 'brutal', label: 'Brutal', description: 'Extreme difficulty' }
+            { value: 'easy', label: 'Easy' },
+            { value: 'normal', label: 'Normal' },
+            { value: 'hard', label: 'Hard' },
+            { value: 'brutal', label: 'Brutal' }
         ];
         
         this.optionElements = [];
