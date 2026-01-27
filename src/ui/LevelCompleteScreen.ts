@@ -153,6 +153,7 @@ export class LevelCompleteScreen {
             
             // Calculate score
             const score = levelStatsTracker.calculateScore(currentLevel);
+            const runTotalScore = Math.round(levelStatsTracker.getCumulativeScore(currentLevel));
             
             // Build stats display text with score breakdown
             const statsDisplay = [
@@ -179,13 +180,12 @@ export class LevelCompleteScreen {
             }
             
             statsDisplay.push('');
-            statsDisplay.push(`TOTAL SCORE: ${Math.round(score.totalScore)}`);
+            statsDisplay.push(`LEVEL SCORE: ${Math.round(score.totalScore)} pts`);
+            statsDisplay.push(`RUN TOTAL: ${runTotalScore} pts`);
             statsDisplay.push('');
-            statsDisplay.push('--- Other Stats ---');
             statsDisplay.push(`Projectiles Fired: ${stats.projectilesFired}`);
             statsDisplay.push(`Deaths: ${stats.deaths}`);
-            statsDisplay.push(`Damage Dealt: ${Math.round(stats.damageDealt)}`);
-            statsDisplay.push(`Damage Taken: ${Math.round(stats.damageTaken)}`);
+            statsDisplay.push(`Damage: dealt ${Math.round(stats.damageDealt)} / taken ${Math.round(stats.damageTaken)}`);
             
             this.statsText.setText(statsDisplay.join('\n'));
             
