@@ -3,7 +3,7 @@
  * Manages all enemy-related functionality including spawning, AI, and behavior.
  * Singleton pattern for consistent state management across the game.
  */
-import { ENEMY_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG } from "../config";
+import { ENEMY_CONFIG, PHYSICS_CONFIG, VISUAL_CONFIG, DETECTION_CONFIG, getDifficultyConfig } from "../config";
 import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
@@ -55,31 +55,24 @@ class EnemyManager {
         // Check if this is a boss enemy
         const isBoss = enemyType.startsWith('boss_');
         
-        // Apply difficulty multipliers
+        // Apply difficulty multipliers using unified config
         const difficulty = playerStatsSystem.difficulty;
-        let difficultyHealthMultiplier = 1;
-        let difficultySpeedMultiplier = 1;
-        let lineOfSightMultiplier = 1;
+        const difficultyConfig = getDifficultyConfig(difficulty);
         
-        if (difficulty === 'easy') {
-            difficultyHealthMultiplier = EASY_MODE_CONFIG.enemyHealthMultiplier;
-            difficultySpeedMultiplier = EASY_MODE_CONFIG.enemySpeedMultiplier;
-            lineOfSightMultiplier = EASY_MODE_CONFIG.enemyLineOfSightMultiplier;
-        } else if (difficulty === 'hard') {
-            difficultyHealthMultiplier = HARD_MODE_CONFIG.enemyHealthMultiplier;
-            difficultySpeedMultiplier = HARD_MODE_CONFIG.enemySpeedMultiplier;
-            lineOfSightMultiplier = HARD_MODE_CONFIG.enemyLineOfSightMultiplier;
-        }
+        const difficultyHealthMultiplier = difficultyConfig.enemyHealthMultiplier;
+        const difficultySpeedMultiplier = difficultyConfig.enemySpeedMultiplier;
+        const difficultyDamageMultiplier = difficultyConfig.enemyDamageMultiplier;
+        const lineOfSightMultiplier = difficultyConfig.enemyLineOfSightMultiplier;
         
         // Apply level-based multipliers (these stack with difficulty multipliers)
         const levelHealthMultiplier = levelProgressionSystem.getEnemyHealthMultiplier();
         const levelDamageMultiplier = levelProgressionSystem.getEnemyDamageMultiplier();
         const levelSpeedMultiplier = levelProgressionSystem.getEnemySpeedMultiplier();
         
-        // Combine all multipliers (damage not affected by difficulty, only by level)
+        // Combine all multipliers (damage now includes both difficulty and level)
         const finalHealthMultiplier = difficultyHealthMultiplier * levelHealthMultiplier;
         const finalSpeedMultiplier = difficultySpeedMultiplier * levelSpeedMultiplier;
-        const finalDamageMultiplier = levelDamageMultiplier;
+        const finalDamageMultiplier = difficultyDamageMultiplier * levelDamageMultiplier;
         
         // Select texture - handle both single textures and weighted variants
         const texture = this.selectEnemyTexture(config.texture);
