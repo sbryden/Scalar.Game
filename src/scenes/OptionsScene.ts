@@ -74,7 +74,10 @@ export default class OptionsScene extends Phaser.Scene {
                 color: '#00ff88'
             });
             confirm.setOrigin(0.5);
-            this.time.delayedCall(1000, () => confirm.destroy());
+            this.time.delayedCall(1000, () => {
+                confirm.destroy();
+                this.scene.start('MenuScene');
+            });
         });
         
         // Reset button
