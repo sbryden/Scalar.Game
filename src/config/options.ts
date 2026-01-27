@@ -20,9 +20,9 @@ export interface GameOptions {
 
 // Default values
 const DEFAULT_OPTIONS: GameOptions = {
-    playerSpeed: 160,
+    playerSpeed: 225,
     playerJumpHeight: 200,
-    playerProjectileSpeed: 300,
+    playerProjectileSpeed: 325,
     playerProjectileDamage: 10,
     landGravity: 300,
     waterGravity: 100,
