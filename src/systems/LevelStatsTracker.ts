@@ -74,9 +74,6 @@ export class LevelStatsTracker {
             this.stats.levelStartTime = startTime;
             this.currentLevel = level;
             this.hasCommittedCurrentLevel = false;
-        } else if (this.stats.levelStartTime === 0) {
-            // Resume tracking without losing accumulated stats when swapping scenes
-            this.stats.levelStartTime = startTime;
         }
 
         this.isLevelActive = true;
