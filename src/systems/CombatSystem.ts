@@ -283,11 +283,8 @@ export class CombatSystem {
         
         // Get base damage and apply difficulty multiplier for player damage
         const baseDamage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
-        let damage = baseDamage;
-        if (!playerStatsSystem.isGodMode()) {
-            const difficultyConfig = getDifficultyConfig(playerStatsSystem.difficulty);
-            damage *= difficultyConfig.playerDamageMultiplier;
-        }
+        const playerDamageMultiplier = playerStatsSystem.isGodMode() ? 1 : getDifficultyConfig(playerStatsSystem.difficulty).playerDamageMultiplier;
+        const damage = baseDamage * playerDamageMultiplier;
         enemy.health -= damage;
         
         // Track damage dealt
