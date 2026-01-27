@@ -29,9 +29,11 @@ export {
     BOSS_TEXTURE_CONFIG,
     DETECTION_CONFIG,
     EASY_MODE_CONFIG,
-    HARD_MODE_CONFIG
+    NORMAL_MODE_CONFIG,
+    HARD_MODE_CONFIG,
+    BRUTAL_MODE_CONFIG
 } from './enemies';
-export type { EnemyStats, TextureVariant } from './enemies';
+export type { EnemyStats, TextureVariant, DifficultyConfig } from './enemies';
 
 // Combat
 export {
@@ -73,3 +75,30 @@ export {
     isCompanionAllowedInBiome
 } from './companions';
 export type { BiomeType } from './companions';
+
+// Utility functions
+import { EASY_MODE_CONFIG, NORMAL_MODE_CONFIG, HARD_MODE_CONFIG, BRUTAL_MODE_CONFIG, type DifficultyConfig } from './enemies';
+import type { Difficulty } from '../types/game';
+
+/**
+ * Get the configuration object for a given difficulty level
+ * @param difficulty - The difficulty level
+ * @returns The corresponding difficulty configuration
+ */
+export function getDifficultyConfig(difficulty: Difficulty): DifficultyConfig {
+    switch (difficulty) {
+        case 'easy':
+            return EASY_MODE_CONFIG;
+        case 'normal':
+            return NORMAL_MODE_CONFIG;
+        case 'hard':
+            return HARD_MODE_CONFIG;
+        case 'brutal':
+            return BRUTAL_MODE_CONFIG;
+        case 'godMode':
+            // God mode uses easy config for enemies (player is invincible anyway)
+            return EASY_MODE_CONFIG;
+        default:
+            return NORMAL_MODE_CONFIG;
+    }
+}

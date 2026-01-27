@@ -603,18 +603,76 @@ export const DETECTION_CONFIG = {
     maxLineOfSightScreenPercent: 1.0
 } as const;
 
-// Easy mode enemy modifiers
+/**
+ * Difficulty Mode Configurations
+ * 
+ * Each difficulty affects:
+ * - enemyHealthMultiplier: How much HP enemies have
+ * - enemySpeedMultiplier: How fast enemies move
+ * - enemyLineOfSightMultiplier: How far enemies can detect the player
+ * - enemySpawnMultiplier: Enemy density (number of spawns)
+ * - enemyDamageMultiplier: How much damage enemies deal to the player
+ * - playerDamageMultiplier: How much damage the player deals to enemies
+ * - xpMultiplier: XP gain rate
+ * - resourceDropMultiplier: Chance of resource/orb drops
+ */
+
+// Easy mode - Player advantages, one-shot most enemies
 export const EASY_MODE_CONFIG = {
-    enemyHealthMultiplier: 0.7,
-    enemySpeedMultiplier: 0.8,
-    enemyLineOfSightMultiplier: 0.7,
-    enemySpawnMultiplier: 0.6
+    enemyHealthMultiplier: 0.4,        // Enemies have 40% HP (easier to kill)
+    enemySpeedMultiplier: 0.7,         // Enemies move slower
+    enemyLineOfSightMultiplier: 0.5,   // Enemies detect player from shorter range
+    enemySpawnMultiplier: 0.5,         // 50% enemy density
+    enemyDamageMultiplier: 0.5,        // Enemies deal half damage
+    playerDamageMultiplier: 2.0,       // Player deals double damage
+    xpMultiplier: 0.8,                 // Slightly less XP (easier game)
+    resourceDropMultiplier: 1.5        // More resource drops
 } as const;
 
-// Hard mode enemy modifiers
-export const HARD_MODE_CONFIG = {
-    enemyHealthMultiplier: 1.5,
-    enemySpeedMultiplier: 1.3,
-    enemyLineOfSightMultiplier: 1.5,
-    enemySpawnMultiplier: 1.5
+// Normal mode - Balanced gameplay (rebalanced to be more accessible)
+export const NORMAL_MODE_CONFIG = {
+    enemyHealthMultiplier: 1.0,        // Standard enemy HP
+    enemySpeedMultiplier: 1.0,         // Standard enemy speed
+    enemyLineOfSightMultiplier: 1.0,   // Standard detection range
+    enemySpawnMultiplier: 1.0,         // Standard enemy density
+    enemyDamageMultiplier: 1.0,        // Standard enemy damage
+    playerDamageMultiplier: 1.0,       // Standard player damage
+    xpMultiplier: 1.0,                 // Standard XP
+    resourceDropMultiplier: 1.0        // Standard drops
 } as const;
+
+// Hard mode - Tougher enemies, fewer resources (rebalanced from previous values)
+export const HARD_MODE_CONFIG = {
+    enemyHealthMultiplier: 1.3,        // 30% more HP (reduced from 1.5)
+    enemySpeedMultiplier: 1.15,        // 15% faster (reduced from 1.3)
+    enemyLineOfSightMultiplier: 1.3,   // Better detection (reduced from 1.5)
+    enemySpawnMultiplier: 1.3,         // 30% more enemies (reduced from 1.5)
+    enemyDamageMultiplier: 1.25,       // 25% more damage
+    playerDamageMultiplier: 0.9,       // Player deals slightly less damage
+    xpMultiplier: 1.25,                // More XP reward for the challenge
+    resourceDropMultiplier: 0.8        // Fewer resource drops
+} as const;
+
+// Brutal mode - Extreme challenge, high risk/high reward
+export const BRUTAL_MODE_CONFIG = {
+    enemyHealthMultiplier: 2.0,        // Double enemy HP
+    enemySpeedMultiplier: 1.4,         // 40% faster enemies
+    enemyLineOfSightMultiplier: 2.0,   // Double detection range
+    enemySpawnMultiplier: 1.8,         // 80% more enemies
+    enemyDamageMultiplier: 2.0,        // Double enemy damage
+    playerDamageMultiplier: 0.75,      // Player deals 25% less damage
+    xpMultiplier: 2.0,                 // Double XP reward
+    resourceDropMultiplier: 0.5        // Half resource drops
+} as const;
+
+// Type for difficulty config - use number instead of literal types
+export interface DifficultyConfig {
+    readonly enemyHealthMultiplier: number;
+    readonly enemySpeedMultiplier: number;
+    readonly enemyLineOfSightMultiplier: number;
+    readonly enemySpawnMultiplier: number;
+    readonly enemyDamageMultiplier: number;
+    readonly playerDamageMultiplier: number;
+    readonly xpMultiplier: number;
+    readonly resourceDropMultiplier: number;
+}
