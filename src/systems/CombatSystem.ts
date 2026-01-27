@@ -926,15 +926,23 @@ export class CombatSystem {
             return;
         }
         
+        // Track per-companion damage time (not shared with player)
+        if (!enemy.companionLastDamageTime) {
+            enemy.companionLastDamageTime = {};
+        }
+        
+        const companionId = companion.companionKind;
+        const lastHit = enemy.companionLastDamageTime[companionId];
+        
         // Check if we can damage this enemy (prevent rapid repeated hits)
-        if (enemy.lastDamageTime && currentTime - enemy.lastDamageTime < 500) {
+        if (lastHit && currentTime - lastHit < 500) {
             return; // 500ms cooldown between hits from same companion
         }
         
         // Apply damage
         const damage = companion.damage;
         enemy.health -= damage;
-        enemy.lastDamageTime = currentTime;
+        enemy.companionLastDamageTime[companionId] = currentTime;
         
         // Visual feedback
         enemy.setTint(0xff0000);
