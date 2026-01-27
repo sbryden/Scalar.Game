@@ -674,5 +674,6 @@ export interface DifficultyConfig {
     readonly enemyDamageMultiplier: number;
     readonly playerDamageMultiplier: number;
     readonly xpMultiplier: number;
+    // Multiplier that controls how resource drop rates scale with difficulty.
     readonly resourceDropMultiplier: number;
 }
