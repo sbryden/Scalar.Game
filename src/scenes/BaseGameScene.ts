@@ -119,8 +119,8 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Reset spawner boss tracking
         combatSystem.resetSpawnerTracking();
 
-        // Start tracking level stats
-        levelStatsTracker.startLevel(this.time.now);
+        // Start tracking level stats (keep run totals across scene swaps)
+        levelStatsTracker.startLevel(this.time.now, levelProgressionSystem.getCurrentLevel());
 
         // Set scene-specific gravity
         this.physics.world.gravity.y = config.gravity;
@@ -419,6 +419,10 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         const config = this.getSceneConfig();
         console.log('Player chose to continue');
 
+        // Game over resets the run score
+        levelStatsTracker.resetRun();
+        levelStatsTracker.startLevel(this.time.now, levelProgressionSystem.getCurrentLevel());
+
         // Reset player stats
         playerStatsSystem.reset();
         
@@ -477,6 +481,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleQuit(): void {
         console.log('Player chose to quit');
         playerStatsSystem.reset();
+        levelStatsTracker.resetRun();
         
         // Full reset of companions for new run
         playerStatsSystem.resetCompanions();
@@ -636,7 +641,6 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         console.log('Advancing to next level');
 
         levelProgressionSystem.advanceToNextLevel();
-        levelStatsTracker.reset();
 
         // Reset player position to start
         gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
@@ -656,8 +660,6 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleReplay(): void {
         const config = this.getSceneConfig();
         console.log('Replaying level');
-
-        levelStatsTracker.reset();
         
         // Full reset of companions for new run
         playerStatsSystem.resetCompanions();
