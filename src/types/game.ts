@@ -188,8 +188,13 @@ export interface SavedEnemy {
 
 /**
  * Game difficulty levels
+ * - easy: One-shot most enemies, player advantages
+ * - normal: Balanced gameplay
+ * - hard: Fewer resources, tougher enemies
+ * - brutal: Extreme challenge, high risk/high reward
+ * - godMode: Debug mode with invincibility (hidden in production)
  */
-export type Difficulty = 'easy' | 'normal' | 'hard' | 'godMode';
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'brutal' | 'godMode';
 
 /**
  * Player size states

@@ -9,6 +9,13 @@ import levelProgressionSystem from '../systems/LevelProgressionSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import { BUILD_NUMBER } from '../buildInfo';
 
+/**
+ * Check if running in production mode (hides debug features like God Mode)
+ */
+function isProductionMode(): boolean {
+    return BUILD_NUMBER !== 'dev';
+}
+
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
     selectedEnvironment!: string;
@@ -108,8 +115,10 @@ export default class MenuScene extends Phaser.Scene {
         // Boss Mode checkbox
         this.createBossModeCheckbox(width / 2, 595);
         
-        // God Mode checkbox
-        this.createGodModeCheckbox(width / 2, 630);
+        // God Mode checkbox - only show in development mode
+        if (!isProductionMode()) {
+            this.createGodModeCheckbox(width / 2, 630);
+        }
         
         // Hacks button (bottom right, below robot image)
         this.createOptionsButton(width * 0.8, height - 60);
@@ -208,11 +217,12 @@ export default class MenuScene extends Phaser.Scene {
         this.optionsContainer.setVisible(false);
         this.optionsContainer.setDepth(200); // Higher depth to appear above environment dropdown
         
-        // Create options
+        // Create options - 4 difficulty levels with descriptions
         const options = [
-            { value: 'easy', label: 'Easy' },
-            { value: 'normal', label: 'Normal' },
-            { value: 'hard', label: 'Hard' }
+            { value: 'easy', label: 'Easy', description: 'Relaxed experience' },
+            { value: 'normal', label: 'Normal', description: 'Balanced gameplay' },
+            { value: 'hard', label: 'Hard', description: 'Greater challenge' },
+            { value: 'brutal', label: 'Brutal', description: 'Extreme difficulty' }
         ];
         
         this.optionElements = [];

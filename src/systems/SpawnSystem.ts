@@ -8,7 +8,7 @@ import playerStatsSystem from './PlayerStatsSystem';
 import levelProgressionSystem from './LevelProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
 import { getCompanionManager } from '../managers/CompanionManager';
-import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, EASY_MODE_CONFIG, HARD_MODE_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG } from '../config';
+import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG, getDifficultyConfig } from '../config';
 import type { XPOrb, CompanionKind, Companion } from '../types/game';
 
 /**
@@ -294,15 +294,10 @@ export class SpawnSystem {
         
         const spawnPoints: SpawnPoint[] = [];
         
-        // Apply difficulty multiplier
+        // Apply difficulty multiplier using unified config
         const difficulty = playerStatsSystem.difficulty;
-        let difficultyMultiplier = 1;
-        
-        if (difficulty === 'easy') {
-            difficultyMultiplier = EASY_MODE_CONFIG.enemySpawnMultiplier;
-        } else if (difficulty === 'hard') {
-            difficultyMultiplier = HARD_MODE_CONFIG.enemySpawnMultiplier;
-        }
+        const difficultyConfig = getDifficultyConfig(difficulty);
+        const difficultyMultiplier = difficultyConfig.enemySpawnMultiplier;
         
         // Apply level-based multiplier (stacks with difficulty)
         const levelMultiplier = levelProgressionSystem.getEnemyCountMultiplier();
