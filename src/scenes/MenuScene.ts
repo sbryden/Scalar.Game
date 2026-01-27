@@ -613,10 +613,12 @@ export default class MenuScene extends Phaser.Scene {
                 godMode: boolean;
             }>;
 
-            if (typeof parsed.selectedDifficulty === 'string') {
+            const validDifficulties = new Set(['easy', 'normal', 'hard', 'brutal']);
+            if (typeof parsed.selectedDifficulty === 'string' && validDifficulties.has(parsed.selectedDifficulty)) {
                 this.selectedDifficulty = parsed.selectedDifficulty;
             }
-            if (typeof parsed.selectedEnvironment === 'string') {
+            const allowedEnvironments = ['land', 'water', 'air'] as const;
+            if (typeof parsed.selectedEnvironment === 'string' && allowedEnvironments.includes(parsed.selectedEnvironment as (typeof allowedEnvironments)[number])) {
                 this.selectedEnvironment = parsed.selectedEnvironment;
             }
             if (typeof parsed.bossMode === 'boolean') {
