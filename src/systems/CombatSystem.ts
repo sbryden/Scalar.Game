@@ -2,7 +2,7 @@
  * Combat System
  * Handles damage calculations and combat logic
  */
-import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG } from '../config';
+import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG, getDifficultyConfig } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
 import levelStatsTracker from './LevelStatsTracker';
 import spawnSystem from './SpawnSystem';
@@ -281,7 +281,13 @@ export class CombatSystem {
             return;
         }
         
-        const damage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
+        // Get base damage and apply difficulty multiplier for player damage
+        const baseDamage = projectile.damage || PROJECTILE_CONFIG.basic.damage;
+        let damage = baseDamage;
+        if (!playerStatsSystem.isGodMode()) {
+            const difficultyConfig = getDifficultyConfig(playerStatsSystem.difficulty);
+            damage *= difficultyConfig.playerDamageMultiplier;
+        }
         enemy.health -= damage;
         
         // Track damage dealt
@@ -450,6 +456,12 @@ export class CombatSystem {
             // else: Player moving away or stationary - deals no damage
             
             if (playerDamage > 0) {
+                // Apply difficulty multiplier for player damage (except god mode)
+                if (!playerStatsSystem.isGodMode()) {
+                    const difficultyConfig = getDifficultyConfig(playerStatsSystem.difficulty);
+                    playerDamage *= difficultyConfig.playerDamageMultiplier;
+                }
+                
                 // Round damage for cleaner values
                 playerDamage = Math.round(playerDamage);
                 

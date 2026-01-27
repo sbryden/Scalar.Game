@@ -4,7 +4,7 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/GameContext';
-import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, getOptions } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, getOptions, getDifficultyConfig } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
 import levelStatsTracker from './LevelStatsTracker';
@@ -115,9 +115,14 @@ export class PlayerStatsSystem {
     
     /**
      * Add XP to player and check for level up
+     * XP is scaled by difficulty multiplier
      */
     gainXP(amount: number): void {
-        this.stats.xp += amount;
+        // Apply difficulty XP multiplier
+        const difficultyConfig = getDifficultyConfig(this.difficulty);
+        const scaledXP = Math.round(amount * difficultyConfig.xpMultiplier);
+        
+        this.stats.xp += scaledXP;
         this.checkLevelUp();
     }
     
