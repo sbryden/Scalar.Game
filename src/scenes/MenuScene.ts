@@ -36,6 +36,8 @@ export default class MenuScene extends Phaser.Scene {
     environmentOptionsContainer!: Phaser.GameObjects.Container;
     environmentOptionElements!: Array<{ bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }>;
 
+    private static readonly MENU_PREFS_STORAGE_KEY = 'scalar_game_menu_prefs';
+
     constructor() {
         super({ key: 'MenuScene' });
         this.selectedDifficulty = 'normal';
@@ -47,11 +49,9 @@ export default class MenuScene extends Phaser.Scene {
     }
     
     create(): void {
-        // Reset to default selections every time menu is shown
-        this.selectedDifficulty = 'normal';
-        this.selectedEnvironment = 'land';
-        this.bossMode = false;
-        this.godMode = false;
+        // Restore last-used selections (difficulty/environment/boss/god) so returning
+        // from Hacks doesn't wipe menu state.
+        this.loadMenuPreferences();
         
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -196,7 +196,8 @@ export default class MenuScene extends Phaser.Scene {
         this.dropdownBox.setStrokeStyle(2, 0x3498db);
         
         // Selected text
-        this.selectedText = this.add.text(-dropdownWidth / 2 + 15, 0, 'Normal', {
+        const selectedDifficultyLabel = this.getDifficultyLabel(this.selectedDifficulty);
+        this.selectedText = this.add.text(-dropdownWidth / 2 + 15, 0, selectedDifficultyLabel, {
             fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff'
@@ -285,6 +286,7 @@ export default class MenuScene extends Phaser.Scene {
     selectOption(value: string, label: string): void {
         this.selectedDifficulty = value;
         this.selectedText.setText(label);
+        this.saveMenuPreferences();
         this.toggleDropdown();
     }
     
@@ -301,7 +303,8 @@ export default class MenuScene extends Phaser.Scene {
         this.environmentDropdownBox.setStrokeStyle(2, 0x3498db);
         
         // Selected text
-        this.environmentSelectedText = this.add.text(-dropdownWidth / 2 + 15, 0, 'Land', {
+        const selectedEnvironmentLabel = this.getEnvironmentLabel(this.selectedEnvironment);
+        this.environmentSelectedText = this.add.text(-dropdownWidth / 2 + 15, 0, selectedEnvironmentLabel, {
             fontSize: '20px',
             fontFamily: 'Arial, sans-serif',
             color: '#ffffff'
@@ -394,6 +397,7 @@ export default class MenuScene extends Phaser.Scene {
     selectEnvironmentOption(value: string, label: string): void {
         this.selectedEnvironment = value;
         this.environmentSelectedText.setText(label);
+        this.saveMenuPreferences();
         this.toggleEnvironmentDropdown();
     }
 
@@ -414,7 +418,7 @@ export default class MenuScene extends Phaser.Scene {
             fontStyle: 'bold'
         });
         checkmark.setOrigin(0.5);
-        checkmark.setVisible(false);
+        checkmark.setVisible(this.bossMode);
         
         // Label
         const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'Boss Mode', {
@@ -434,6 +438,7 @@ export default class MenuScene extends Phaser.Scene {
         checkbox.on('pointerdown', () => {
             this.bossMode = !this.bossMode;
             checkmark.setVisible(this.bossMode);
+            this.saveMenuPreferences();
         });
     }
     
@@ -454,7 +459,7 @@ export default class MenuScene extends Phaser.Scene {
             fontStyle: 'bold'
         });
         checkmark.setOrigin(0.5);
-        checkmark.setVisible(false);
+        checkmark.setVisible(this.godMode);
         
         // Label
         const label = this.add.text(centerX - 80 + checkboxSize / 2 + spacing, y, 'God Mode', {
@@ -474,6 +479,7 @@ export default class MenuScene extends Phaser.Scene {
         checkbox.on('pointerdown', () => {
             this.godMode = !this.godMode;
             checkmark.setVisible(this.godMode);
+            this.saveMenuPreferences();
         });
     }
     
@@ -556,7 +562,92 @@ export default class MenuScene extends Phaser.Scene {
             optionsText.setScale(1);
         });
         optionsButton.on('pointerdown', () => {
+            this.saveMenuPreferences();
             this.scene.start('OptionsScene');
         });
+    }
+
+    private getDifficultyLabel(value: string): string {
+        switch (value) {
+            case 'easy':
+                return 'Easy';
+            case 'hard':
+                return 'Hard';
+            case 'brutal':
+                return 'Brutal';
+            case 'normal':
+            default:
+                return 'Normal';
+        }
+    }
+
+    private getEnvironmentLabel(value: string): string {
+        switch (value) {
+            case 'water':
+                return 'Water';
+            case 'air':
+                return 'Air (Coming Soon)';
+            case 'land':
+            default:
+                return 'Land';
+        }
+    }
+
+    private loadMenuPreferences(): void {
+        // Defaults
+        this.selectedDifficulty = 'normal';
+        this.selectedEnvironment = 'land';
+        this.bossMode = false;
+        this.godMode = false;
+
+        try {
+            const stored = localStorage.getItem(MenuScene.MENU_PREFS_STORAGE_KEY);
+            if (!stored) {
+                return;
+            }
+
+            const parsed = JSON.parse(stored) as Partial<{
+                selectedDifficulty: string;
+                selectedEnvironment: string;
+                bossMode: boolean;
+                godMode: boolean;
+            }>;
+
+            if (typeof parsed.selectedDifficulty === 'string') {
+                this.selectedDifficulty = parsed.selectedDifficulty;
+            }
+            if (typeof parsed.selectedEnvironment === 'string') {
+                this.selectedEnvironment = parsed.selectedEnvironment;
+            }
+            if (typeof parsed.bossMode === 'boolean') {
+                this.bossMode = parsed.bossMode;
+            }
+            if (typeof parsed.godMode === 'boolean') {
+                this.godMode = parsed.godMode;
+            }
+        } catch {
+            // Ignore malformed storage and keep defaults
+        }
+
+        // Respect production-mode restriction for God Mode.
+        if (isProductionMode()) {
+            this.godMode = false;
+        }
+    }
+
+    private saveMenuPreferences(): void {
+        try {
+            localStorage.setItem(
+                MenuScene.MENU_PREFS_STORAGE_KEY,
+                JSON.stringify({
+                    selectedDifficulty: this.selectedDifficulty,
+                    selectedEnvironment: this.selectedEnvironment,
+                    bossMode: this.bossMode,
+                    godMode: this.godMode
+                })
+            );
+        } catch {
+            // Ignore storage errors (e.g., disabled storage)
+        }
     }
 }
