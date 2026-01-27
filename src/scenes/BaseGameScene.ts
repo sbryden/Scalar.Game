@@ -217,7 +217,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
                 gameState.levelCompleteFlag.x, gameState.levelCompleteFlag.y
             );
             
-            if (distance < 50) { // Collision threshold
+            if (distance < 100) { // Collision threshold (increased for easier collection)
                 this.isLevelCompleting = true;
                 this.handleFlagReached();
             }
@@ -518,6 +518,10 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Prevent flag from falling due to gravity
         flagSprite.body.setAllowGravity(false);
         flagSprite.body.setImmovable(true);
+        
+        // Increase the physics body size for easier collection
+        flagSprite.body.setSize(120, 120);
+        flagSprite.body.setOffset(-20, -25);
         
         // Store flag reference in gameState
         gameState.levelCompleteFlag = flagSprite;

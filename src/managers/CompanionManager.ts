@@ -227,7 +227,7 @@ export class CompanionManager {
     private updateMovement(companion: Companion, player: Phaser.Physics.Arcade.Sprite, delta: number): void {
         const config = COMPANION_CONFIG[companion.companionKind];
         const followDistance = config.followDistance || 80;
-        const followSpeed = config.followSpeed || 150;
+        const followSpeed = config.followSpeed || 250; // Default to 250 to match player speed
 
         const dx = player.x - companion.x;
         const dy = player.y - companion.y;

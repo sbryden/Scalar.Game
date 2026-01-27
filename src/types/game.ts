@@ -47,6 +47,7 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     chaseTarget?: Phaser.Physics.Arcade.Sprite;
     lastDamageTime?: number;
     lastPlayerDamageTime?: number;
+    companionLastDamageTime?: Record<string, number>; // Track damage cooldown per companion
     stunVelocity?: { x: number; y: number };
     // Spawner boss properties
     isSpawnerBoss?: boolean;

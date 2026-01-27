@@ -39,7 +39,7 @@ export const WOLF_COMPANION_CONFIG = {
     
     // Behavior
     followDistance: 80, // Distance to maintain from player
-    followSpeed: 150,
+    followSpeed: 250, // Fast enough to keep up with player (base 225 + buffer)
     attackRange: 60, // Range to engage enemies in melee
     
     // Visual bars
@@ -90,7 +90,7 @@ export const FISH_COMPANION_CONFIG = {
     
     // Behavior
     followDistance: 80,
-    followSpeed: 150,
+    followSpeed: 250, // Fast enough to keep up with player (base 225 + buffer)
     attackRange: 60,
     
     // Visual bars
@@ -141,7 +141,7 @@ export const HAWK_COMPANION_CONFIG = {
     
     // Behavior
     followDistance: 80,
-    followSpeed: 150,
+    followSpeed: 250, // Fast enough to keep up with player (base 225 + buffer)
     attackRange: 60,
     
     // Visual bars
