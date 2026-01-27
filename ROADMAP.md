@@ -176,9 +176,9 @@ The roadmap is organized by feature area rather than timeline, allowing for flex
 
 ### Hacks Menu: Persistence & Flow
 **Priority: High**
-- After selecting hacks and pressing Save, automatically return to Main Menu
-- Persist hack/difficulty toggles when exiting hacks (god mode, boss mode, hard/brutal, etc.)
-- Preserve the player’s current main menu selection when returning from hacks
+- ✅ After selecting hacks and pressing Save, automatically return to Main Menu
+- ✅ Persist hack/difficulty toggles when exiting hacks (god mode, boss mode, hard/brutal, etc.)
+- ✅ Preserve the player’s current main menu selection when returning from hacks
 
 ### Menu System Additions
 - **FIND Section**: Glossary/dictionary explaining game mechanics
