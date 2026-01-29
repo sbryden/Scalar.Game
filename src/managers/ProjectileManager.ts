@@ -8,12 +8,40 @@ import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import levelStatsTracker from '../systems/LevelStatsTracker';
 import type { WASDKeys, Projectile, Enemy } from '../types/game';
+import type { TextureVariant } from '../config/enemies';
 
 class ProjectileManager {
     private lastProjectileTime: number = 0;
 
     constructor() {
         // No state to initialize - projectile data is managed through gameState.projectiles group
+    }
+
+    /**
+     * Select a random texture from a TextureVariant array based on weights.
+     * If a string is provided, returns it directly.
+     * 
+     * @param texture - Single texture string or array of weighted variants
+     * @returns Selected texture string
+     */
+    private selectTexture(texture: string | TextureVariant[]): string {
+        if (typeof texture === 'string') {
+            return texture;
+        }
+        
+        // Random weighted selection
+        const totalWeight = texture.reduce((sum, variant) => sum + variant.weight, 0);
+        let random = Math.random() * totalWeight;
+        
+        for (const variant of texture) {
+            random -= variant.weight;
+            if (random <= 0) {
+                return variant.texture;
+            }
+        }
+        
+        // Fallback to first texture if something goes wrong
+        return texture[0].texture;
     }
 
     /**
@@ -214,8 +242,11 @@ class ProjectileManager {
         const velocityX = Math.cos(angleToPlayer) * speed;
         const velocityY = Math.sin(angleToPlayer) * speed;
         
+        // Select texture (handle both string and array variants)
+        const textureKey = this.selectTexture(enemy.projectileTexture!);
+        
         // Spawn projectile from enemy position
-        const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture!) as Projectile;
+        const projectile = scene.add.image(enemy.x, enemy.y, textureKey) as Projectile;
         projectile.setOrigin(0.5, 0.5);
         projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
         
@@ -285,8 +316,11 @@ class ProjectileManager {
             const velocityX = Math.cos(projectileAngle) * speed;
             const velocityY = Math.sin(projectileAngle) * speed;
 
+            // Select texture (handle both string and array variants)
+            const textureKey = this.selectTexture(enemy.projectileTexture!);
+
             // Spawn projectile from enemy position
-            const projectile = scene.add.image(enemy.x, enemy.y, enemy.projectileTexture!) as Projectile;
+            const projectile = scene.add.image(enemy.x, enemy.y, textureKey) as Projectile;
             projectile.setOrigin(0.5, 0.5);
             projectile.setDepth(PHYSICS_CONFIG.projectile.depth);
 
