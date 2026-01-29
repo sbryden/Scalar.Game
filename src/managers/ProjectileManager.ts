@@ -48,7 +48,7 @@ class ProjectileManager {
         }
         
         // Fallback to last texture (handles floating point edge cases)
-        return texture[texture.length - 1].texture;
+        return texture[texture.length - 1]!.texture;
     }
 
     /**
