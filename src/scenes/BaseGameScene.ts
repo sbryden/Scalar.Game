@@ -220,11 +220,6 @@ export default abstract class BaseGameScene extends Phaser.Scene {
                 gameState.levelCompleteFlag.x, gameState.levelCompleteFlag.y
             );
             
-            // Debug: Log position when within visual range of flag
-            if (distance < 500) {
-                console.log(`Player distance to flag: ${distance.toFixed(0)}, isLevelCompleting: ${this.isLevelCompleting}`);
-            }
-            
             if (distance < 100) { // Collision threshold (increased for easier collection)
                 this.isLevelCompleting = true;
                 this.handleFlagReached();
