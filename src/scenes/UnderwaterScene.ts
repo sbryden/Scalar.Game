@@ -30,7 +30,7 @@ export default class UnderwaterScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_water_shark', 'boss_water_crab', 'boss_water_swimming'];
+        return ['boss_water_swimming', 'boss_water_crab'];
     }
 
     protected createBackground(): void {
@@ -68,7 +68,7 @@ export default class UnderwaterScene extends BaseGameScene {
     protected spawnSceneEnemies(bossMode: boolean): void {
         this.spawnWithMixedPoints(
             bossMode,
-            'boss_water_shark',
+            'boss_water_swimming',
             'boss_water_crab',
             'fish',
             'crab',

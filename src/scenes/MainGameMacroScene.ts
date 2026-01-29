@@ -30,7 +30,7 @@ export default class MainGameMacroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['golem_boss', 'bear_boss', 'spawner_boss_land'];
+        return ['boss_land_golem', 'boss_land_bear', 'spawner_boss_land'];
     }
 
     protected createBackground(): void {

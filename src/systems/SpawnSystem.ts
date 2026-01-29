@@ -78,7 +78,8 @@ export class SpawnSystem {
         
         // Disable gravity for orbs in underwater scenes
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         if (isUnderwater) {
             orb.body.setAllowGravity(false);
             // Give orbs a gentle floating motion
@@ -480,7 +481,8 @@ export class SpawnSystem {
         
         const stats = playerStatsSystem.getStats();
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         
         if (isUnderwater) {
             // Submarines: sub_1, sub_2, sub_3 (level 3+)

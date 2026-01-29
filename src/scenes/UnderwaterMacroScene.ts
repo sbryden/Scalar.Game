@@ -30,7 +30,7 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['whale_boss', 'giant_shark_boss', 'giant_crab_boss', 'sea_serpent_boss'];
+        return ['boss_water_whale', 'boss_water_giant_shark', 'boss_water_giant_crab', 'boss_water_sea_serpent'];
     }
 
     protected createBackground(): void {
@@ -128,8 +128,8 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     protected spawnSceneEnemies(bossMode: boolean): void {
         this.spawnWithMixedPoints(
             bossMode,
-            'boss_water_macro',
-            'boss_water_kraken',
+            'boss_water_whale',
+            'boss_water_giant_crab',
             'whale',
             'giant_crab',
             0.7 // 70% whales, 30% crabs
