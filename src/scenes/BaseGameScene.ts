@@ -415,6 +415,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         const config = this.getSceneConfig();
         console.log('Player chose to continue');
 
+        // Reset level completing flag so player can collect the flag again
+        this.isLevelCompleting = false;
+
         // Game over resets the run score
         levelStatsTracker.resetRun();
         levelStatsTracker.startLevel(this.time.now, levelProgressionSystem.getCurrentLevel());
