@@ -29,19 +29,26 @@ class ProjectileManager {
             return texture;
         }
         
-        // Random weighted selection
-        const totalWeight = texture.reduce((sum, variant) => sum + variant.weight, 0);
-        let random = Math.random() * totalWeight;
+        // Handle empty array edge case
+        if (texture.length === 0) {
+            console.error('Empty texture variant array provided');
+            return 'enemy'; // Fallback to default texture
+        }
         
+        // Random weighted selection with proper distribution
+        const totalWeight = texture.reduce((sum, variant) => sum + variant.weight, 0);
+        const random = Math.random() * totalWeight;
+        
+        let accumulatedWeight = 0;
         for (const variant of texture) {
-            random -= variant.weight;
-            if (random <= 0) {
+            accumulatedWeight += variant.weight;
+            if (random < accumulatedWeight) {
                 return variant.texture;
             }
         }
         
-        // Fallback to first texture if something goes wrong
-        return texture[0].texture;
+        // Fallback to last texture (handles floating point edge cases)
+        return texture[texture.length - 1].texture;
     }
 
     /**
