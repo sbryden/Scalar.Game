@@ -18,7 +18,7 @@ export default class UnderwaterMicroScene extends BaseGameScene {
         return {
             sceneKey: 'UnderwaterMicroScene',
             gravity: options.microWaterGravity,
-            playerTexture: 'sub_1',
+            playerTexture: 'water/sub_1',
             playerScale: 0.15, // Smaller for micro scale
             playerBounce: 0.1,
             playerDrag: { x: 70, y: 70 }, // More drag for micro environment
@@ -30,7 +30,7 @@ export default class UnderwaterMicroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_water_micro'];
+        return ['boss_water_swimming_micro', 'boss_water_crab_micro'];
     }
 
     protected createBackground(): void {

@@ -69,13 +69,13 @@ export default class BootScene extends Phaser.Scene {
         // Register all singleton services with the ServiceLocator
         this.initializeServices();
         
-        // LEGACY COMPATIBILITY: Create 'enemy' as an alias for 'rockgiant' texture
+        // LEGACY COMPATIBILITY: Create 'enemy' as an alias for 'land/macro/rockgiant' texture
         // This avoids loading the same asset twice while maintaining backward compatibility.
         // 
         // Future enhancement: If more aliases are needed, consider moving this to a
-        // configuration object like: const ASSET_ALIASES = { 'enemy': 'rockgiant', ... }
-        if (this.textures.exists('rockgiant') && !this.textures.exists('enemy')) {
-            const rockgiantTexture = this.textures.get('rockgiant');
+        // configuration object like: const ASSET_ALIASES = { 'enemy': 'land/macro/rockgiant', ... }
+        if (this.textures.exists('land/macro/rockgiant') && !this.textures.exists('enemy')) {
+            const rockgiantTexture = this.textures.get('land/macro/rockgiant');
             const sourceImage = rockgiantTexture.getSourceImage() as HTMLImageElement;
             this.textures.addImage('enemy', sourceImage);
         }

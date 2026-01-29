@@ -18,7 +18,7 @@ export default class MainGameMacroScene extends BaseGameScene {
         return {
             sceneKey: 'MainGameMacroScene',
             gravity: options.macroLandGravity,
-            playerTexture: 'car_1',
+            playerTexture: 'land/car_1',
             playerScale: 0.35, // Larger scale for macro
             playerBounce: 0.2,
             playerDrag: { x: 0, y: 0 },
@@ -30,7 +30,7 @@ export default class MainGameMacroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_land_macro'];
+        return ['golem_boss', 'bear_boss', 'spawner_boss_land'];
     }
 
     protected createBackground(): void {

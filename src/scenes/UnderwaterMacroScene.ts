@@ -18,7 +18,7 @@ export default class UnderwaterMacroScene extends BaseGameScene {
         return {
             sceneKey: 'UnderwaterMacroScene',
             gravity: options.macroWaterGravity,
-            playerTexture: 'sub_1',
+            playerTexture: 'water/sub_1',
             playerScale: 0.35, // Larger for macro scale
             playerBounce: 0.1,
             playerDrag: { x: 40, y: 40 }, // Slight drag
@@ -30,7 +30,7 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_water_macro', 'boss_water_kraken'];
+        return ['whale_boss', 'giant_shark_boss', 'giant_crab_boss', 'sea_serpent_boss'];
     }
 
     protected createBackground(): void {

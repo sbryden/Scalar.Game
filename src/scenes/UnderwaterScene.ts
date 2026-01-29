@@ -18,7 +18,7 @@ export default class UnderwaterScene extends BaseGameScene {
         return {
             sceneKey: 'UnderwaterScene',
             gravity: options.waterGravity,
-            playerTexture: 'sub_1',
+            playerTexture: 'water/sub_1',
             playerScale: 0.25,
             playerBounce: 0.1,
             playerDrag: { x: 50, y: 50 }, // Water drag
@@ -30,7 +30,7 @@ export default class UnderwaterScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_water_shark', 'boss_water_crab'];
+        return ['boss_water_shark', 'boss_water_crab', 'boss_water_swimming'];
     }
 
     protected createBackground(): void {

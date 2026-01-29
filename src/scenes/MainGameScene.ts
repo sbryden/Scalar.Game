@@ -19,7 +19,7 @@ export default class MainGameScene extends BaseGameScene {
         return {
             sceneKey: 'MainGameScene',
             gravity: options.landGravity,
-            playerTexture: 'car_1',
+            playerTexture: 'land/car_1',
             playerScale: 0.25,
             playerBounce: 0.2,
             playerDrag: { x: 0, y: 0 },
@@ -31,7 +31,7 @@ export default class MainGameScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_land', 'spawner_boss_land', 'boss_wolf_tank'];
+        return ['boss_land', 'boss_wolf_tank'];
     }
 
     protected createBackground(): void {

@@ -18,7 +18,7 @@ export default class MicroScene extends BaseGameScene {
         return {
             sceneKey: 'MicroScene',
             gravity: options.microLandGravity,
-            playerTexture: 'car_1',
+            playerTexture: 'land/car_1',
             playerScale: 0.15, // Smaller scale for micro
             playerBounce: 0.2,
             playerDrag: { x: 0, y: 0 },

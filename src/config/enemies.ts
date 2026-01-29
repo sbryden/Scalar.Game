@@ -73,8 +73,8 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
     },
     boss_land: {
         texture: [
-            { texture: 'snake_boss', weight: 0.5 },
-            { texture: 'rockgiant', weight: 0.5 }
+            { texture: 'land/normal/snake_boss', weight: 0.5 },
+            { texture: 'land/macro/rockgiant', weight: 0.5 }
         ],
         width: 90,
         height: 90,
@@ -88,22 +88,8 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
     },
-    spawner_boss_land: {
-        texture: 'rock_car_with_minions',
-        width: 90,
-        height: 90,
-        color: 0xFF4500,
-        speed: 80,
-        health: 150,
-        damage: 15,
-        xpReward: 230,
-        patrolDistance: 400,
-        knockbackResistance: 2.0,
-        lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.3
-    },
     boss_wolf_tank: {
-        texture: 'wolf_boss',
+        texture: 'land/normal/wolf_boss',
         width: 120,
         height: 120,
         color: 0x808080,
@@ -116,31 +102,17 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.4,
         hasRangedAbility: true,
-        projectileTexture: 'wolf_boss_bullet',
+        projectileTexture: 'land/normal/wolf_boss_bullet',
         projectileDamage: 30,
         projectileSpeed: 350,
         projectileCooldown: 2000,
         burstCount: 3,
         burstDelay: 100
     },
-    rock_minion: {
-        texture: 'rock_minion_1',
-        width: 25,
-        height: 25,
-        color: 0x8B4513,
-        speed: 90,
-        health: 37.5,
-        damage: 8,
-        xpReward: 0,
-        patrolDistance: 250,
-        knockbackResistance: 0.8,
-        lineOfSightMultiplier: 5.0,
-        chaseSpeedMultiplier: 1.6
-    },
 
     // === MICRO SCALE LAND ENEMIES ===
     micro: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 30,
         height: 30,
         color: 0x00FF88,
@@ -154,7 +126,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     spawner_micro: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 30,
         height: 30,
         color: 0xFF8800,
@@ -168,7 +140,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     micro_minion: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 18,  // 60% of 30
         height: 18,
         color: 0x00FF88,
@@ -183,8 +155,8 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
     },
     boss_land_micro: {
         texture: [
-            { texture: 'zombie_blob', weight: 0.8 },
-            { texture: 'micromonkeyboss', weight: 0.2 }
+            { texture: 'water/micro/zombie_blob', weight: 0.8 },
+            { texture: 'land/micro/micromonkeyboss', weight: 0.2 }
         ],
         width: 90,
         height: 90,
@@ -202,8 +174,8 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
     // === NORMAL SCALE WATER ENEMIES ===
     fish: {
         texture: [
-            { texture: 'water_enemy_fish_1', weight: 0.25 },
-            { texture: 'water_enemy_needle_fish_1', weight: 0.75 }
+            { texture: 'water/normal/water_enemy_fish_1', weight: 0.25 },
+            { texture: 'water/normal/water_enemy_needle_fish_1', weight: 0.75 }
         ],
         width: 30,
         height: 30,
@@ -219,8 +191,8 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
     },
     boss_water_swimming: {
         texture: [
-            { texture: 'water_enemy_fish_1', weight: 0.25 },
-            { texture: 'water_enemy_needle_fish_1', weight: 0.75 }
+            { texture: 'water/normal/water_enemy_fish_1', weight: 0.25 },
+            { texture: 'water/normal/water_enemy_needle_fish_1', weight: 0.75 }
         ],
         width: 90,
         height: 90,
@@ -235,7 +207,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     boss_water_shark: {
-        texture: 'sharkboss',
+        texture: 'water/normal/sharkboss',
         width: 90,
         height: 90,
         color: 0x1E90FF,
@@ -248,13 +220,13 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.4,
         hasRangedAbility: true,
-        projectileTexture: 'sharkpedo',
+        projectileTexture: 'water/normal/sharkpedo',
         projectileDamage: 50,
         projectileSpeed: 300,
         projectileCooldown: 3000
     },
     crab: {
-        texture: 'water_enemy_crab_1',
+        texture: 'water/normal/water_enemy_crab_1',
         width: 30,
         height: 30,
         color: 0xFF6347,
@@ -268,7 +240,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     boss_water_crab: {
-        texture: 'crabboss',
+        texture: 'water/normal/crabboss',
         width: 90,
         height: 90,
         color: 0xFF6347,
@@ -281,7 +253,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3,
         hasRangedAbility: true,
-        projectileTexture: 'bubble',
+        projectileTexture: 'water/normal/bubble',
         projectileDamage: 10,
         projectileSpeed: 200,
         projectileCooldown: 2000
@@ -289,7 +261,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
 
     // === MICRO SCALE WATER ENEMIES ===
     water_swimming_micro: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 20,
         height: 20,
         color: 0x7FFFD4,
@@ -303,7 +275,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     spawner_water_swimming_micro: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 20,
         height: 20,
         color: 0xFF8800,
@@ -317,7 +289,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     water_micro_minion: {
-        texture: 'bacteria',
+        texture: 'land/micro/bacteria',
         width: 12,  // 60% of 20
         height: 12,
         color: 0x7FFFD4,
@@ -331,7 +303,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.6
     },
     boss_water_swimming_micro: {
-        texture: 'micro_boss',
+        texture: 'water/micro/micro_boss',
         width: 60,
         height: 60,
         color: 0x7FFFD4,
@@ -345,7 +317,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     boss_water_crab_micro: {
-        texture: 'crabboss',
+        texture: 'water/normal/crabboss',
         width: 60,
         height: 60,
         color: 0xFF6347,
@@ -360,6 +332,34 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
     },
 
     // === MACRO SCALE LAND ENEMIES ===
+    spawner_boss_land: {
+        texture: 'land/macro/rock_car_with_minions',
+        width: 120,
+        height: 120,
+        color: 0xFF4500,
+        speed: 65,
+        health: 200,
+        damage: 25,
+        xpReward: 280,
+        patrolDistance: 450,
+        knockbackResistance: 3.0,
+        lineOfSightMultiplier: 8.0,
+        chaseSpeedMultiplier: 1.2
+    },
+    rock_minion: {
+        texture: 'land/macro/rock_minion_1',
+        width: 35,
+        height: 35,
+        color: 0x8B4513,
+        speed: 80,
+        health: 45,
+        damage: 12,
+        xpReward: 15,
+        patrolDistance: 300,
+        knockbackResistance: 1.5,
+        lineOfSightMultiplier: 5.0,
+        chaseSpeedMultiplier: 1.5
+    },
     golem: {
         texture: 'enemy',
         width: 60,
@@ -530,7 +530,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.6,
         hasRangedAbility: true,
-        projectileTexture: 'sharkpedo',
+        projectileTexture: 'water/normal/sharkpedo',
         projectileDamage: 60,
         projectileSpeed: 350,
         projectileCooldown: 2500
@@ -577,22 +577,22 @@ export const BOSS_TEXTURE_CONFIG: Record<string, Array<{ texture: string; weight
     // Migrated entries have been moved to inline texture arrays in ENEMY_CONFIG
     // These remaining entries are kept for backward compatibility until all enemies are migrated
     spawner_boss_land: [
-        { texture: 'rock_car_with_minions', weight: 1.0 }
+        { texture: 'land/macro/rock_car_with_minions', weight: 1.0 }
     ],
     boss_water_shark: [
-        { texture: 'sharkboss', weight: 1.0 }
+        { texture: 'water/normal/sharkboss', weight: 1.0 }
     ],
     boss_water_crab: [
-        { texture: 'crabboss', weight: 1.0 }
+        { texture: 'water/normal/crabboss', weight: 1.0 }
     ],
     boss_water_swimming_micro: [
-        { texture: 'micro_boss', weight: 1.0 }
+        { texture: 'water/micro/micro_boss', weight: 1.0 }
     ],
     boss_water_crab_micro: [
-        { texture: 'crabboss', weight: 1.0 }
+        { texture: 'water/normal/crabboss', weight: 1.0 }
     ],
     boss_wolf_tank: [
-        { texture: 'wolf_boss', weight: 1.0 }
+        { texture: 'land/normal/wolf_boss', weight: 1.0 }
     ]
 };
 
