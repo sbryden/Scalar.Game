@@ -20,10 +20,10 @@ This document analyzes all enemy configurations in the game and identifies textu
 |-------|-------|-------|------------|
 | **MainGameScene** | Normal | Land | `boss_land`, `boss_wolf_tank` |
 | **MicroScene** | Micro | Land | `boss_land_micro` |
-| **MainGameMacroScene** | Macro | Land | `golem_boss`, `bear_boss`, `spawner_boss_land` |
-| **UnderwaterScene** | Normal | Water | `boss_water_shark`, `boss_water_crab`, `boss_water_swimming` |
+| **MainGameMacroScene** | Macro | Land | `boss_land_golem`, `boss_land_bear`, `spawner_boss_land` |
+| **UnderwaterScene** | Normal | Water | `boss_water_swimming`, `boss_water_crab` |
 | **UnderwaterMicroScene** | Micro | Water | `boss_water_swimming_micro`, `boss_water_crab_micro` |
-| **UnderwaterMacroScene** | Macro | Water | `whale_boss`, `giant_shark_boss`, `giant_crab_boss`, `sea_serpent_boss` |
+| **UnderwaterMacroScene** | Macro | Water | `boss_water_whale`, `boss_water_giant_shark`, `boss_water_giant_crab`, `boss_water_sea_serpent` |
 
 ---
 

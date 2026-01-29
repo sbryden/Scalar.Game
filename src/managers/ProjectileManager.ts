@@ -42,7 +42,8 @@ class ProjectileManager {
         
         // Check if underwater for slower projectile speed
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         const speedMultiplier = isUnderwater ? PHYSICS_CONFIG.underwater.speedMultiplier : 1.0;
         
         const velocityX = options.playerProjectileSpeed * direction * speedMultiplier;

@@ -402,7 +402,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 6.0,
         chaseSpeedMultiplier: 1.4
     },
-    golem_boss: {
+    boss_land_golem: {
         texture: 'enemy',
         width: 120,
         height: 120,
@@ -416,7 +416,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.2
     },
-    bear_boss: {
+    boss_land_bear: {
         texture: 'enemy',
         width: 120,
         height: 120,
@@ -502,7 +502,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 6.0,
         chaseSpeedMultiplier: 1.4
     },
-    whale_boss: {
+    boss_water_whale: {
         texture: 'enemy',
         width: 140,
         height: 140,
@@ -516,7 +516,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.3
     },
-    giant_shark_boss: {
+    boss_water_giant_shark: {
         texture: 'enemy',
         width: 140,
         height: 140,
@@ -535,7 +535,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         projectileSpeed: 350,
         projectileCooldown: 2500
     },
-    giant_crab_boss: {
+    boss_water_giant_crab: {
         texture: 'enemy',
         width: 140,
         height: 140,
@@ -549,7 +549,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         lineOfSightMultiplier: 8.0,
         chaseSpeedMultiplier: 1.2
     },
-    sea_serpent_boss: {
+    boss_water_sea_serpent: {
         texture: 'enemy',
         width: 140,
         height: 140,
