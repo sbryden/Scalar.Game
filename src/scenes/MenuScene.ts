@@ -113,7 +113,7 @@ export default class MenuScene extends Phaser.Scene {
         this.createStartButton(width / 2, 545);
         
         // Boss Mode checkbox
-        this.createBossModeCheckbox(width / 2, 595);
+        this.createBossModeCheckbox(width / 2, 600);
         
         // God Mode checkbox - only show in development mode
         if (!isProductionMode()) {
