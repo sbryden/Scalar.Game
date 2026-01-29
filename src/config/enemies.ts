@@ -39,7 +39,7 @@ export interface EnemyStats {
     lineOfSightMultiplier: number;
     chaseSpeedMultiplier: number;
     hasRangedAbility?: boolean;
-    projectileTexture?: string;
+    projectileTexture?: string | TextureVariant[];  // Single texture or array of weighted variants
     projectileDamage?: number;
     projectileSpeed?: number;
     projectileCooldown?: number;
@@ -72,10 +72,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     boss_land: {
-        texture: [
-            { texture: 'land/normal/snake_boss', weight: 0.5 },
-            { texture: 'land/macro/rockgiant', weight: 0.5 }
-        ],
+        texture: 'land/normal/snake_boss',
         width: 90,
         height: 90,
         color: 0xFF0000,
@@ -86,7 +83,19 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         patrolDistance: 400,
         knockbackResistance: 2.0,
         lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.3
+        chaseSpeedMultiplier: 1.3,
+        hasRangedAbility: true,
+        projectileTexture: [
+            { texture: 'land/normal/snakefire', weight: 0.25 },
+            { texture: 'land/normal/snakeice', weight: 0.25 },
+            { texture: 'land/normal/snakesmoke', weight: 0.25 },
+            { texture: 'land/normal/snakevines', weight: 0.25 }
+        ],
+        projectileDamage: 20,
+        projectileSpeed: 300,
+        projectileCooldown: 2500,
+        burstCount: 4,
+        burstDelay: 150
     },
     boss_wolf_tank: {
         texture: 'land/normal/wolf_boss',
@@ -190,10 +199,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     boss_water_swimming: {
-        texture: [
-            { texture: 'water/normal/water_enemy_fish_1', weight: 0.25 },
-            { texture: 'water/normal/water_enemy_needle_fish_1', weight: 0.75 }
-        ],
+        texture: 'water/normal/shark_1',
         width: 90,
         height: 90,
         color: 0x00BFFF,
@@ -261,7 +267,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
 
     // === MICRO SCALE WATER ENEMIES ===
     water_swimming_micro: {
-        texture: 'land/micro/bacteria',
+        texture: 'water/micro/baby_fish',
         width: 20,
         height: 20,
         color: 0x7FFFD4,
@@ -275,7 +281,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     spawner_water_swimming_micro: {
-        texture: 'land/micro/bacteria',
+        texture: 'water/micro/fish_to_fish',
         width: 20,
         height: 20,
         color: 0xFF8800,
@@ -289,7 +295,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     water_micro_minion: {
-        texture: 'land/micro/bacteria',
+        texture: 'water/micro/microfish2',
         width: 12,  // 60% of 20
         height: 12,
         color: 0x7FFFD4,
@@ -361,7 +367,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     golem: {
-        texture: 'enemy',
+        texture: 'land/macro/rocktower_minion',
         width: 60,
         height: 60,
         color: 0x696969,
@@ -375,7 +381,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.2
     },
     wolf_macro: {
-        texture: 'enemy',
+        texture: 'land/macro/rockgiant',
         width: 50,
         height: 50,
         color: 0x808080,
@@ -389,7 +395,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.6
     },
     bear: {
-        texture: 'enemy',
+        texture: 'land/jet_mech',
         width: 65,
         height: 65,
         color: 0x8B4513,
@@ -403,7 +409,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.4
     },
     boss_land_golem: {
-        texture: 'enemy',
+        texture: 'land/macro/rocktower',
         width: 120,
         height: 120,
         color: 0x2F4F4F,
@@ -414,10 +420,15 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         patrolDistance: 400,
         knockbackResistance: 3.5,
         lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.2
+        chaseSpeedMultiplier: 1.2,
+        hasRangedAbility: true,
+        projectileTexture: 'land/macro/rocktower_projectile',
+        projectileDamage: 40,
+        projectileSpeed: 280,
+        projectileCooldown: 3000
     },
     boss_land_bear: {
-        texture: 'enemy',
+        texture: 'land/macro/rockgiant',
         width: 120,
         height: 120,
         color: 0x654321,
@@ -433,7 +444,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
 
     // === MACRO SCALE WATER ENEMIES ===
     whale: {
-        texture: 'enemy',
+        texture: 'water/macro/water_enemy_giant_1',
         width: 80,
         height: 80,
         color: 0x4682B4,
@@ -447,7 +458,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     giant_shark: {
-        texture: 'enemy',
+        texture: 'water/normal/shark_1',
         width: 70,
         height: 70,
         color: 0x2F4F4F,
@@ -461,7 +472,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.5
     },
     sea_dragon: {
-        texture: 'enemy',
+        texture: 'water/macro/babykraken',
         width: 75,
         height: 75,
         color: 0x8B008B,
@@ -475,7 +486,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.4
     },
     giant_crab: {
-        texture: 'enemy',
+        texture: 'water/normal/water_enemy_crab_1',
         width: 60,
         height: 60,
         color: 0xDC143C,
@@ -489,7 +500,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     sea_serpent: {
-        texture: 'enemy',
+        texture: 'water/macro/mutant_kraken',
         width: 65,
         height: 65,
         color: 0x006400,
@@ -503,7 +514,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.4
     },
     boss_water_whale: {
-        texture: 'enemy',
+        texture: 'water/macro/water_enemy_giant_1',
         width: 140,
         height: 140,
         color: 0x191970,
@@ -517,7 +528,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         chaseSpeedMultiplier: 1.3
     },
     boss_water_giant_shark: {
-        texture: 'enemy',
+        texture: 'water/normal/sharkboss',
         width: 140,
         height: 140,
         color: 0x000080,
@@ -536,7 +547,7 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         projectileCooldown: 2500
     },
     boss_water_giant_crab: {
-        texture: 'enemy',
+        texture: 'water/normal/crabboss',
         width: 140,
         height: 140,
         color: 0x8B0000,
@@ -547,10 +558,15 @@ export const ENEMY_CONFIG: Record<string, EnemyStats> = {
         patrolDistance: 350,
         knockbackResistance: 4.5,
         lineOfSightMultiplier: 8.0,
-        chaseSpeedMultiplier: 1.2
+        chaseSpeedMultiplier: 1.2,
+        hasRangedAbility: true,
+        projectileTexture: 'water/normal/bubble',
+        projectileDamage: 25,
+        projectileSpeed: 250,
+        projectileCooldown: 2200
     },
     boss_water_sea_serpent: {
-        texture: 'enemy',
+        texture: 'water/macro/warning_kraken',
         width: 140,
         height: 140,
         color: 0x228B22,

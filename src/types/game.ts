@@ -3,6 +3,8 @@
  * Centralized type definitions for game objects and interfaces
  */
 import Phaser from 'phaser';
+import type { TextureVariant } from '../config/enemies';
+
 
 /**
  * Player sprite with custom properties
@@ -58,7 +60,7 @@ export interface Enemy extends Phaser.GameObjects.Sprite {
     parentSpawnerBossId?: string; // For minions to reference their parent
     // Ranged ability properties
     hasRangedAbility?: boolean;
-    projectileTexture?: string;
+    projectileTexture?: string | TextureVariant[];
     projectileDamage?: number;
     projectileSpeed?: number;
     projectileCooldown?: number;
