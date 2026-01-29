@@ -50,7 +50,7 @@ export class GameOverScreen {
         this.titleImage = this.scene.add.image(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height / 2 - 80,
-            'gameover_1'
+            'water/gameover_1'
         );
         this.titleImage.setOrigin(0.5);
         this.titleImage.setDepth(2001);

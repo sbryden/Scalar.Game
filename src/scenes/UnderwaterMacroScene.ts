@@ -18,7 +18,7 @@ export default class UnderwaterMacroScene extends BaseGameScene {
         return {
             sceneKey: 'UnderwaterMacroScene',
             gravity: options.macroWaterGravity,
-            playerTexture: 'sub_1',
+            playerTexture: 'water/sub_1',
             playerScale: 0.35, // Larger for macro scale
             playerBounce: 0.1,
             playerDrag: { x: 40, y: 40 }, // Slight drag
@@ -30,7 +30,7 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     }
 
     protected getBossTypes(): string[] {
-        return ['boss_water_macro', 'boss_water_kraken'];
+        return ['boss_water_whale', 'boss_water_giant_shark', 'boss_water_giant_crab', 'boss_water_sea_serpent'];
     }
 
     protected createBackground(): void {
@@ -128,8 +128,8 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     protected spawnSceneEnemies(bossMode: boolean): void {
         this.spawnWithMixedPoints(
             bossMode,
-            'boss_water_macro',
-            'boss_water_kraken',
+            'boss_water_whale',
+            'boss_water_giant_crab',
             'whale',
             'giant_crab',
             0.7 // 70% whales, 30% crabs

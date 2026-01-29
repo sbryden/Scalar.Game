@@ -10,7 +10,7 @@ import type { CompanionKind } from '../types/game';
  */
 export const WOLF_COMPANION_CONFIG = {
     // Visual
-    texture: 'wolf_companion',
+    texture: 'land/normal/wolf_companion',
     scale: 0.15,
     tint: {
         normal: 0xffffff,
@@ -61,7 +61,7 @@ export const WOLF_COMPANION_CONFIG = {
  */
 export const FISH_COMPANION_CONFIG = {
     // Visual
-    texture: 'fish_companion',
+    texture: 'water/normal/fish_companion',
     scale: 0.15,
     tint: {
         normal: 0xffffff,

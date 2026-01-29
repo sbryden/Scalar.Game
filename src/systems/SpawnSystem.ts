@@ -42,8 +42,9 @@ export class SpawnSystem {
         // Create appropriate orb visual
         let orb: XPOrb;
         if (isCompanion) {
-            // Companion orb uses wolf_orb sprite
-            orb = scene.add.sprite(x, y, 'wolf_orb') as any as XPOrb;
+            // Determine companion orb texture based on companion kind
+            const orbTexture = companionKind === 'wolf' ? 'land/normal/wolf_orb' : 'water/normal/fish_orb';
+            orb = scene.add.sprite(x, y, orbTexture) as any as XPOrb;
             orb.setScale(1.5); // Make it larger than regular orbs
         } else {
             // Regular XP orb is a circle
@@ -77,7 +78,8 @@ export class SpawnSystem {
         
         // Disable gravity for orbs in underwater scenes
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         if (isUnderwater) {
             orb.body.setAllowGravity(false);
             // Give orbs a gentle floating motion
@@ -479,7 +481,8 @@ export class SpawnSystem {
         
         const stats = playerStatsSystem.getStats();
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         
         if (isUnderwater) {
             // Submarines: sub_1, sub_2, sub_3 (level 3+)
@@ -489,12 +492,12 @@ export class SpawnSystem {
             } else if (stats.level >= XP_CONFIG.vehicleUpgrade.submarineLevel2Threshold) {
                 subLevel = 2;
             }
-            const subTexture = `sub_${subLevel}`;
+            const subTexture = `water/sub_${subLevel}`;
             gameState.player.setTexture(subTexture);
         } else {
             // Cars are car_1 through car_5 (levels 1-5)
             const carLevel = Math.min(stats.level, XP_CONFIG.vehicleUpgrade.maxCarLevel);
-            const carTexture = `car_${carLevel}`;
+            const carTexture = `land/car_${carLevel}`;
             gameState.player.setTexture(carTexture);
         }
     }

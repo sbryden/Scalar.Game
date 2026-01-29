@@ -42,7 +42,8 @@ class ProjectileManager {
         
         // Check if underwater for slower projectile speed
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
-                            gameState.currentSceneKey === 'UnderwaterMicroScene';
+                            gameState.currentSceneKey === 'UnderwaterMicroScene' ||
+                            gameState.currentSceneKey === 'UnderwaterMacroScene';
         const speedMultiplier = isUnderwater ? PHYSICS_CONFIG.underwater.speedMultiplier : 1.0;
         
         const velocityX = options.playerProjectileSpeed * direction * speedMultiplier;
@@ -56,7 +57,7 @@ class ProjectileManager {
         const projectileY = player.y - tankHeight / 2 + PHYSICS_CONFIG.projectile.heightRatio * tankHeight;
         
         // Create projectile (torpedo underwater, beam on land)
-        const projectileTexture = isUnderwater ? 'torpedo' : 'beam';
+        const projectileTexture = isUnderwater ? 'water/torpedo' : 'land/beam';
         const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
         projectile.setOrigin(0.5, 0.5);
         projectile.setDepth(PHYSICS_CONFIG.projectile.depth);

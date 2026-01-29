@@ -109,6 +109,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     create(): void {
         const config = this.getSceneConfig();
 
+        // Reset level completion state (important for scene.restart() which reuses the same instance)
+        this.isLevelCompleting = false;
+
         // Initialize difficulty if this is first time entering game
         const difficulty = this.registry.get('difficulty') || 'normal';
         if (!gameState.difficultyInitialized) {
@@ -414,6 +417,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleContinue(): void {
         const config = this.getSceneConfig();
         console.log('Player chose to continue');
+
+        // Reset level completing flag so player can collect the flag again
+        this.isLevelCompleting = false;
 
         // Game over resets the run score
         levelStatsTracker.resetRun();
