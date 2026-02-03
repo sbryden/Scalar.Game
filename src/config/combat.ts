@@ -133,8 +133,8 @@ export const GOD_MODE_CONFIG = {
 
 // Jet Mech power-up configuration
 export const JET_MECH_CONFIG = {
-    maxHealth: 1000,
-    healthDecayPerSecond: 1000 / 60, // ~16.67 HP/sec, depletes in 60 seconds
+    maxHealth: 500,
+    healthDecayPerSecond: 1000 / 60, // ~16.67 HP/sec, depletes in 30 seconds
     scale: 0.5, // Boss-sized (larger than normal player)
     thrustPower: 200, // Vertical thrust power (similar to underwater)
     projectileKey: 'land/jet_mech_projectile',

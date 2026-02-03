@@ -12,12 +12,14 @@ import type { PlayerStats, Difficulty, CompanionKind, CompanionState } from '../
 
 type LevelUpCallback = (level: number) => void;
 type GameOverCallback = () => void;
+type MechDeathCallback = () => void;
 
 export class PlayerStatsSystem {
     stats: PlayerStats;
     difficulty: Difficulty;
     onLevelUp: LevelUpCallback | null;
     onGameOver: GameOverCallback | null;
+    onMechDeath: MechDeathCallback | null;
 
     constructor() {
         // Initialize stamina system
@@ -43,6 +45,7 @@ export class PlayerStatsSystem {
         this.difficulty = 'normal';
         this.onLevelUp = null;
         this.onGameOver = null;
+        this.onMechDeath = null;
         
         // Sync fuel system with starting player level
         const fuelSystem = getFuelSystem();
@@ -173,6 +176,10 @@ export class PlayerStatsSystem {
             // Check if mech died from damage
             if (this.stats.mechHealth <= 0) {
                 this.deactivateJetMech();
+                // Trigger mech death callback for visual transformation
+                if (this.onMechDeath) {
+                    this.onMechDeath();
+                }
                 // Return player health since mech is now inactive
                 return this.stats.health;
             }
@@ -251,6 +258,13 @@ export class PlayerStatsSystem {
      */
     setGameOverCallback(callback: GameOverCallback): void {
         this.onGameOver = callback;
+    }
+    
+    /**
+     * Set callback for mech death events (called when mech HP reaches 0 from damage)
+     */
+    setMechDeathCallback(callback: MechDeathCallback): void {
+        this.onMechDeath = callback;
     }
     
     /**

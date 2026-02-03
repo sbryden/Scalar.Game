@@ -328,6 +328,11 @@ export default abstract class BaseGameScene extends Phaser.Scene {
             this.handleGameOver();
         });
 
+        // Set up mech death callback (when mech HP reaches 0 from damage)
+        playerStatsSystem.setMechDeathCallback(() => {
+            this.handleMechDeath();
+        });
+
         // Set up continue and quit callbacks
         this.gameOverScreen.setContinueCallback(() => {
             this.handleContinue();
