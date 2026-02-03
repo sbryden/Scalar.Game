@@ -56,6 +56,10 @@ class GameContext {
     private _difficultyInitialized: boolean = false;
     private _currentStage: number = 1;
     private _stageCompleteFlag: Phaser.GameObjects.Sprite | null = null;
+    
+    // Jet Mech pre-transformation state
+    private _preMechPlayerTexture: string | null = null;
+    private _preMechPlayerScale: number = 0.25;
 
     constructor() {
         // Initialize saved positions for all scenes
@@ -88,6 +92,8 @@ class GameContext {
     get difficultyInitialized(): boolean { return this._difficultyInitialized; }
     get currentStage(): number { return this._currentStage; }
     get stageCompleteFlag(): Phaser.GameObjects.Sprite | null { return this._stageCompleteFlag; }
+    get preMechPlayerTexture(): string | null { return this._preMechPlayerTexture; }
+    get preMechPlayerScale(): number { return this._preMechPlayerScale; }
 
     // Read-only access to saved state maps
     // Note: The Record itself is mutable to allow gameState.savedPositions[key] = value patterns
@@ -116,6 +122,8 @@ class GameContext {
     set difficultyInitialized(value: boolean) { this._difficultyInitialized = value; }
     set currentStage(value: number) { this._currentStage = Math.max(1, value); }
     set stageCompleteFlag(value: Phaser.GameObjects.Sprite | null) { this._stageCompleteFlag = value; }
+    set preMechPlayerTexture(value: string | null) { this._preMechPlayerTexture = value; }
+    set preMechPlayerScale(value: number) { this._preMechPlayerScale = value; }
 
     // ============================================
     // SCENE STATE METHODS

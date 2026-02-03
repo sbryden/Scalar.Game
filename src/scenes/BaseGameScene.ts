@@ -111,6 +111,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Reset stage completion state (important for scene.restart() which reuses the same instance)
         this.isStageCompleting = false;
+        
+        // Reset jet mech state on scene change
+        playerStatsSystem.resetJetMechState();
 
         // Initialize difficulty if this is first time entering game
         const difficulty = this.registry.get('difficulty') || 'normal';
@@ -212,6 +215,15 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         // Update camera
         this.cameraManager.update();
+        
+        // Update jet mech health decay (if active)
+        if (playerStatsSystem.isJetMechActive()) {
+            const mechStillActive = playerStatsSystem.updateMechHealth(this.game.loop.delta);
+            if (!mechStillActive) {
+                // Mech died - trigger respawn
+                this.handleMechDeath();
+            }
+        }
         
         // Check for player-flag collision
         if (gameState.stageCompleteFlag && this.player && !this.isStageCompleting) {
@@ -389,6 +401,38 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleGameOver(): void {
         console.log('Game Over - Showing screen...');
         this.gameOverScreen.show();
+    }
+    
+    /**
+     * Handle jet mech death - restore player and trigger respawn animation
+     */
+    protected handleMechDeath(): void {
+        console.log('Jet Mech destroyed! Restoring player...');
+        
+        // Restore player texture and scale
+        if (gameState.preMechPlayerTexture && this.player) {
+            this.player.setTexture(gameState.preMechPlayerTexture);
+            this.player.setScale(gameState.preMechPlayerScale);
+            
+            // Update physics body
+            if (this.player.body) {
+                this.player.body.updateFromGameObject();
+            }
+        }
+        
+        // Clear pre-mech state
+        gameState.preMechPlayerTexture = null;
+        
+        // Respawn player from top (same as death continue)
+        this.player.setPosition(this.player.x, 100);
+        this.player.setVelocity(0, 0);
+        
+        // Clear any tint
+        this.player.clearTint();
+        
+        // Grant brief immunity (2 seconds)
+        this.player.immuneUntil = this.time.now + 2000;
+        this.startImmunityFlash(this.player);
     }
 
     protected startImmunityFlash(player: Phaser.Physics.Arcade.Sprite): void {

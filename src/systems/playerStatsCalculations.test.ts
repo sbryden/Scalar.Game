@@ -41,29 +41,29 @@ describe('Player Stats Calculations', () => {
         });
 
         it('handles multiple level ups from large XP gain', () => {
-            // Starting: level 1, 0 XP, need 100 to level
-            // After level 2: need 150 XP (100 * 1.5)
-            // After level 3: need 225 XP (150 * 1.5)
-            // Total for level 3: 100 + 150 = 250
-            const result = calculateXPGain(1, 0, 100, 100, 250);
+            // Starting: level 1, 0 XP, need 750 to level
+            // After level 2: need 937 XP (750 * 1.25)
+            // After level 3: need 1171 XP (937 * 1.25)
+            // Total for level 3: 750 + 937 = 1687
+            const result = calculateXPGain(1, 0, 750, 100, 1687);
             
             expect(result.newLevel).toBe(3);
-            expect(result.newXP).toBe(0); // 250 - 100 - 150 = 0
+            expect(result.newXP).toBe(0); // 1687 - 750 - 937 = 0
             expect(result.levelsGained).toBe(2);
         });
 
         it('increases max health for each level gained', () => {
-            const result = calculateXPGain(1, 0, 100, 100, 250);
+            const result = calculateXPGain(1, 0, 750, 100, 1687);
             
             const expectedHealth = 100 + (XP_CONFIG.progression.healthIncreasePerLevel * 2);
             expect(result.newMaxHealth).toBe(expectedHealth);
         });
 
         it('scales XP requirement correctly', () => {
-            const result = calculateXPGain(1, 0, 100, 100, 100);
+            const result = calculateXPGain(1, 0, 750, 100, 750);
             
-            // After level up, XPToLevel should be 100 * 1.1 = 110
-            const expectedXPToLevel = Math.floor(100 * XP_CONFIG.progression.xpScalingFactor);
+            // After level up, XPToLevel should be 750 * 1.25 = 937
+            const expectedXPToLevel = Math.floor(750 * XP_CONFIG.progression.xpScalingFactor);
             expect(result.newXPToLevel).toBe(expectedXPToLevel);
         });
 
@@ -143,15 +143,15 @@ describe('Player Stats Calculations', () => {
         });
 
         it('accumulates XP correctly for level 3', () => {
-            // Level 2 needs 100, Level 3 needs 110
-            const expected = 100 + Math.floor(100 * XP_CONFIG.progression.xpScalingFactor);
+            // Level 2 needs 750, Level 3 needs 937 (750 * 1.25)
+            const expected = 750 + Math.floor(750 * XP_CONFIG.progression.xpScalingFactor);
             expect(calculateTotalXPForLevel(3)).toBe(expected);
         });
 
         it('handles higher levels with scaling', () => {
             // Calculate expected XP for level 5
             let expected = 0;
-            let xpToLevel = 100;
+            let xpToLevel = 750;
             for (let i = 1; i < 5; i++) {
                 expected += xpToLevel;
                 xpToLevel = Math.floor(xpToLevel * XP_CONFIG.progression.xpScalingFactor);

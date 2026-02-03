@@ -154,6 +154,12 @@ export interface PlayerStats {
     maxFuel: number;
     hasWolfCompanion?: boolean; // Deprecated: keeping for backwards compatibility
     companions?: Map<CompanionKind, CompanionState>;
+    // Jet Mech power-up state
+    isJetMechMode?: boolean;
+    mechHealth?: number;
+    mechMaxHealth?: number;
+    mechAbilityAvailable?: boolean;
+    mechAbilityExpiresAt?: number;
 }
 
 /**

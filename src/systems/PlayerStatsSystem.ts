@@ -4,7 +4,7 @@
  * Extracted from xpOrbs.js for better separation of concerns
  */
 import gameState from '../utils/GameContext';
-import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, getOptions, getDifficultyConfig } from '../config';
+import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, JET_MECH_CONFIG, getOptions, getDifficultyConfig } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
 import stageStatsTracker from './StageStatsTracker';
@@ -33,7 +33,7 @@ export class PlayerStatsSystem {
             maxHealth: options.startingHP,
             health: options.startingHP,
             xp: XP_CONFIG.progression.startingXP,
-            xpToLevel: XP_CONFIG.progression.startingXPToLevel,
+            xpToLevel: options.level1XP, // Use configurable level 1 XP requirement
             stamina: STAMINA_CONFIG.startingStamina,
             maxStamina: STAMINA_CONFIG.startingMaxStamina,
             fuel: FUEL_CONFIG.startingFuel,
@@ -162,8 +162,24 @@ export class PlayerStatsSystem {
     
     /**
      * Apply damage to player
+     * When mech is active, damage goes to mech health instead of player health
+     * @returns remaining health (mech health if active, player health otherwise)
      */
     takeDamage(amount: number): number {
+        // If mech is active, damage goes to mech health
+        if (this.stats.isJetMechMode && this.stats.mechHealth !== undefined && this.stats.mechHealth > 0) {
+            this.stats.mechHealth = Math.max(0, this.stats.mechHealth - amount);
+            
+            // Check if mech died from damage
+            if (this.stats.mechHealth <= 0) {
+                this.deactivateJetMech();
+                // Return player health since mech is now inactive
+                return this.stats.health;
+            }
+            
+            return this.stats.mechHealth;
+        }
+        
         // Don't apply damage if already dead
         if (this.stats.health <= 0) {
             return 0;
@@ -205,7 +221,7 @@ export class PlayerStatsSystem {
             maxHealth: options.startingHP,
             health: options.startingHP,
             xp: XP_CONFIG.progression.startingXP,
-            xpToLevel: XP_CONFIG.progression.startingXPToLevel,
+            xpToLevel: options.level1XP, // Use configurable level 1 XP requirement
             stamina: STAMINA_CONFIG.startingStamina,
             maxStamina: STAMINA_CONFIG.startingMaxStamina,
             fuel: FUEL_CONFIG.startingFuel,
@@ -256,6 +272,136 @@ export class PlayerStatsSystem {
      */
     grantWolfCompanion(): void {
         this.stats.hasWolfCompanion = true;
+    }
+    
+    // ============================================
+    // JET MECH POWER-UP METHODS
+    // ============================================
+    
+    /**
+     * Make jet mech ability available (called on level-up after level 2)
+     */
+    makeJetMechAvailable(): void {
+        // If mech is already active, refresh health instead
+        if (this.stats.isJetMechMode) {
+            this.stats.mechHealth = JET_MECH_CONFIG.maxHealth;
+            console.log('Jet Mech health refreshed to full!');
+            return;
+        }
+        
+        this.stats.mechAbilityAvailable = true;
+        this.stats.mechAbilityExpiresAt = Date.now() + (JET_MECH_CONFIG.abilityWindowSeconds * 1000);
+        console.log(`Jet Mech ability available for ${JET_MECH_CONFIG.abilityWindowSeconds} seconds!`);
+    }
+    
+    /**
+     * Check if jet mech ability is currently available to activate
+     */
+    isJetMechAvailable(): boolean {
+        if (!this.stats.mechAbilityAvailable) return false;
+        if (this.stats.isJetMechMode) return false; // Already active
+        if (this.stats.mechAbilityExpiresAt && Date.now() > this.stats.mechAbilityExpiresAt) {
+            // Expired
+            this.stats.mechAbilityAvailable = false;
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Check if jet mech is currently active
+     */
+    isJetMechActive(): boolean {
+        return this.stats.isJetMechMode || false;
+    }
+    
+    /**
+     * Activate jet mech power-up
+     */
+    activateJetMech(): void {
+        if (!this.isJetMechAvailable()) {
+            console.log('Jet Mech not available to activate');
+            return;
+        }
+        
+        this.stats.isJetMechMode = true;
+        this.stats.mechMaxHealth = JET_MECH_CONFIG.maxHealth;
+        this.stats.mechHealth = JET_MECH_CONFIG.maxHealth;
+        this.stats.mechAbilityAvailable = false;
+        this.stats.mechAbilityExpiresAt = undefined;
+        
+        console.log('Jet Mech ACTIVATED! HP:', this.stats.mechHealth);
+    }
+    
+    /**
+     * Deactivate jet mech power-up
+     * @returns true if mech was deactivated, false if already inactive
+     */
+    deactivateJetMech(): boolean {
+        // Guard against double-call
+        if (!this.stats.isJetMechMode) {
+            return false;
+        }
+        
+        this.stats.isJetMechMode = false;
+        this.stats.mechHealth = 0;
+        // Note: ability availability is NOT cleared here - it persists until used or expired
+        
+        console.log('Jet Mech DEACTIVATED!');
+        return true;
+    }
+    
+    /**
+     * Reset mech active state on scene change
+     * Preserves ability availability so player can still activate mech in new scene
+     */
+    resetJetMechState(): void {
+        // Only reset active mech state, preserve ability availability
+        this.stats.isJetMechMode = false;
+        this.stats.mechHealth = 0;
+        this.stats.mechMaxHealth = 0;
+        // DO NOT reset mechAbilityAvailable or mechAbilityExpiresAt - these persist across scenes
+    }
+    
+    /**
+     * Update mech health (called each frame when mech is active)
+     * Handles health decay over time
+     * @param deltaMs - Time elapsed since last frame in milliseconds
+     * @returns true if mech is still active, false if mech died
+     */
+    updateMechHealth(deltaMs: number): boolean {
+        if (!this.stats.isJetMechMode || !this.stats.mechHealth) {
+            return false;
+        }
+        
+        // Decay health based on time
+        const decay = JET_MECH_CONFIG.healthDecayPerSecond * (deltaMs / 1000);
+        this.stats.mechHealth = Math.max(0, this.stats.mechHealth - decay);
+        
+        // Check if mech died
+        if (this.stats.mechHealth <= 0) {
+            this.deactivateJetMech();
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get current mech health percentage (0-1)
+     */
+    getMechHealthPercent(): number {
+        if (!this.stats.mechMaxHealth || !this.stats.mechHealth) return 0;
+        return this.stats.mechHealth / this.stats.mechMaxHealth;
+    }
+    
+    /**
+     * Get remaining time for ability activation window in seconds
+     */
+    getMechAbilityRemainingSeconds(): number {
+        if (!this.stats.mechAbilityExpiresAt) return 0;
+        const remaining = (this.stats.mechAbilityExpiresAt - Date.now()) / 1000;
+        return Math.max(0, remaining);
     }
     
     /**

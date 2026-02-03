@@ -3,7 +3,7 @@
  * Manages all projectile-related functionality including player and enemy projectiles.
  * Singleton pattern for consistent state management across the game.
  */
-import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG, getOptions } from '../config';
+import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG, JET_MECH_CONFIG, getOptions } from '../config';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import stageStatsTracker from '../systems/StageStatsTracker';
@@ -91,8 +91,15 @@ class ProjectileManager {
         const tankHeight = player.displayHeight;
         const projectileY = player.y - tankHeight / 2 + PHYSICS_CONFIG.projectile.heightRatio * tankHeight;
         
-        // Create projectile (torpedo underwater, beam on land)
-        const projectileTexture = isUnderwater ? 'water/torpedo' : 'land/beam';
+        // Create projectile (jet mech projectile when mech active, torpedo underwater, beam on land)
+        let projectileTexture: string;
+        if (playerStatsSystem.isJetMechActive()) {
+            projectileTexture = JET_MECH_CONFIG.projectileKey;
+        } else if (isUnderwater) {
+            projectileTexture = 'water/torpedo';
+        } else {
+            projectileTexture = 'land/beam';
+        }
         const projectile = scene.add.image(projectileX, projectileY, projectileTexture) as Projectile;
         projectile.setOrigin(0.5, 0.5);
         projectile.setDepth(PHYSICS_CONFIG.projectile.depth);

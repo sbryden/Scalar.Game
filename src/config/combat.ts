@@ -130,3 +130,14 @@ export const COMBAT_CONFIG = {
 export const GOD_MODE_CONFIG = {
     playerSpeedMultiplier: 4.0
 } as const;
+
+// Jet Mech power-up configuration
+export const JET_MECH_CONFIG = {
+    maxHealth: 1000,
+    healthDecayPerSecond: 1000 / 60, // ~16.67 HP/sec, depletes in 60 seconds
+    scale: 0.5, // Boss-sized (larger than normal player)
+    thrustPower: 200, // Vertical thrust power (similar to underwater)
+    projectileKey: 'land/jet_mech_projectile',
+    abilityWindowSeconds: 15, // Time player has to activate ability after level-up
+    activationLevelThreshold: 2 // Mech becomes available after reaching this level
+} as const;

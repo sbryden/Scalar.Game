@@ -8,7 +8,7 @@ import playerStatsSystem from './PlayerStatsSystem';
 import stageProgressionSystem from './StageProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
 import { getCompanionManager } from '../managers/CompanionManager';
-import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG, getDifficultyConfig } from '../config';
+import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG, JET_MECH_CONFIG, getDifficultyConfig } from '../config';
 import type { XPOrb, CompanionKind, Companion } from '../types/game';
 
 /**
@@ -503,10 +503,16 @@ export class SpawnSystem {
     }
     
     /**
-     * Handle player level up - upgrade car only
+     * Handle player level up - upgrade car and make jet mech ability available
      */
     onPlayerLevelUp(level: number): void {
         this.upgradePlayerCar();
+        
+        // Make jet mech ability available after reaching level threshold
+        // (If mech is already active, this will refresh mech health to full)
+        if (level > JET_MECH_CONFIG.activationLevelThreshold) {
+            playerStatsSystem.makeJetMechAvailable();
+        }
     }
 }
 

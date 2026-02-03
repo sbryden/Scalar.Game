@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { STAMINA_UI_CONFIG, FUEL_UI_CONFIG } from '../config';
 import stageProgressionSystem from '../systems/StageProgressionSystem';
+import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getFuelSystem } from '../systems/FuelSystem';
 import type { PlayerStats } from '../types/game';
 
@@ -30,6 +31,14 @@ export class HUD {
     resumeButton: Phaser.GameObjects.Text | null;
     menuButton: Phaser.GameObjects.Text | null;
     isPaused: boolean = false;
+    
+    // Jet Mech HUD elements
+    mechAbilityText1: Phaser.GameObjects.Text | null;
+    mechAbilityText2: Phaser.GameObjects.Text | null;
+    mechHealthBar: Phaser.GameObjects.Rectangle | null;
+    mechHealthBarBackground: Phaser.GameObjects.Rectangle | null;
+    mechHealthLabel: Phaser.GameObjects.Text | null;
+    private mechFlashTimer: Phaser.Time.TimerEvent | null = null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -52,6 +61,13 @@ export class HUD {
         this.pauseOverlay = null;
         this.resumeButton = null;
         this.menuButton = null;
+        
+        // Mech HUD
+        this.mechAbilityText1 = null;
+        this.mechAbilityText2 = null;
+        this.mechHealthBar = null;
+        this.mechHealthBarBackground = null;
+        this.mechHealthLabel = null;
         
         this.create();
     }
@@ -220,6 +236,54 @@ export class HUD {
         
         // Add ESC key for pause
         this.scene.input.keyboard?.on('keydown-ESC', () => this.togglePause());
+        
+        // --- JET MECH HUD ELEMENTS ---
+        
+        // Mech ability available text (flashing green) - positioned below XP bar
+        // Note: slot4X already defined above as XP slot position
+        
+        this.mechAbilityText1 = this.scene.add.text(slot4X, barY + 20, 'Special Ability Available!', {
+            fontSize: '14px',
+            color: '#00FF00',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
+        });
+        this.mechAbilityText1.setOrigin(0.5, 0);
+        this.mechAbilityText1.setDepth(1000);
+        this.mechAbilityText1.setScrollFactor(0);
+        this.mechAbilityText1.setVisible(false);
+        
+        this.mechAbilityText2 = this.scene.add.text(slot4X, barY + 38, 'Press Enter to Activate (15s)', {
+            fontSize: '12px',
+            color: '#00FF00',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
+        });
+        this.mechAbilityText2.setOrigin(0.5, 0);
+        this.mechAbilityText2.setDepth(1000);
+        this.mechAbilityText2.setScrollFactor(0);
+        this.mechAbilityText2.setVisible(false);
+        
+        // Mech health bar (spans full width of all 4 slots when active)
+        const mechBarWidth = totalBarWidth;
+        const mechBarX = cameraWidth / 2;
+        
+        this.mechHealthLabel = this.scene.add.text(mechBarX, labelY, 'MECH', labelStyle);
+        this.mechHealthLabel.setOrigin(0.5, 0);
+        this.mechHealthLabel.setDepth(1000);
+        this.mechHealthLabel.setScrollFactor(0);
+        this.mechHealthLabel.setVisible(false);
+        
+        this.mechHealthBarBackground = this.scene.add.rectangle(mechBarX, barY, mechBarWidth, barHeight, 0x333333);
+        this.mechHealthBar = this.scene.add.rectangle(mechBarX, barY, mechBarWidth, barHeight, 0xFF6600); // Orange for mech
+        this.mechHealthBarBackground.setDepth(1000);
+        this.mechHealthBar.setDepth(1000);
+        this.mechHealthBarBackground.setScrollFactor(0);
+        this.mechHealthBar.setScrollFactor(0);
+        this.mechHealthBarBackground.setVisible(false);
+        this.mechHealthBar.setVisible(false);
     }
     
     /**
@@ -295,6 +359,107 @@ export class HUD {
         // Update stage text
         const currentStage = stageProgressionSystem.getCurrentStage();
         this.stageText?.setText(`STAGE ${currentStage}`);
+        
+        // --- JET MECH HUD UPDATE ---
+        this.updateMechHUD(playerStats, totalBarWidth);
+    }
+    
+    /**
+     * Update jet mech HUD elements
+     */
+    private updateMechHUD(playerStats: PlayerStats, totalBarWidth: number): void {
+        const isMechActive = playerStatsSystem.isJetMechActive();
+        const isMechAvailable = playerStatsSystem.isJetMechAvailable();
+        
+        // Handle mech ability availability text (flashing green)
+        if (isMechAvailable && !isMechActive) {
+            this.mechAbilityText1?.setVisible(true);
+            this.mechAbilityText2?.setVisible(true);
+            
+            // Update countdown timer text
+            const remainingSeconds = Math.ceil(playerStatsSystem.getMechAbilityRemainingSeconds());
+            this.mechAbilityText2?.setText(`Press Enter to Activate (${remainingSeconds}s)`);
+            
+            // Start flashing if not already
+            if (!this.mechFlashTimer) {
+                let visible = true;
+                this.mechFlashTimer = this.scene.time.addEvent({
+                    delay: 300,
+                    callback: () => {
+                        visible = !visible;
+                        this.mechAbilityText1?.setVisible(visible);
+                        this.mechAbilityText2?.setVisible(visible);
+                    },
+                    loop: true
+                });
+            }
+        } else {
+            // Hide ability text
+            this.mechAbilityText1?.setVisible(false);
+            this.mechAbilityText2?.setVisible(false);
+            
+            // Stop flashing timer
+            if (this.mechFlashTimer) {
+                this.mechFlashTimer.destroy();
+                this.mechFlashTimer = null;
+            }
+        }
+        
+        // Handle mech mode HUD (replace standard bars with mech bar)
+        if (isMechActive) {
+            // Hide standard bars
+            this.healthBar?.setVisible(false);
+            this.healthBarBackground?.setVisible(false);
+            this.healthLabel?.setVisible(false);
+            this.staminaBar?.setVisible(false);
+            this.staminaBarBackground?.setVisible(false);
+            this.staminaLabel?.setVisible(false);
+            this.fuelBar?.setVisible(false);
+            this.fuelBarBackground?.setVisible(false);
+            this.fuelLabel?.setVisible(false);
+            this.fuelCooldownText?.setVisible(false);
+            this.xpBar?.setVisible(false);
+            this.xpBarBackground?.setVisible(false);
+            this.xpLabel?.setVisible(false);
+            
+            // Show mech health bar
+            this.mechHealthBar?.setVisible(true);
+            this.mechHealthBarBackground?.setVisible(true);
+            this.mechHealthLabel?.setVisible(true);
+            
+            // Update mech health bar
+            const mechPercent = playerStatsSystem.getMechHealthPercent();
+            this.mechHealthBar?.setDisplayOrigin(totalBarWidth / 2, 5);
+            this.mechHealthBar?.setScale(mechPercent, 1);
+            
+            // Color code mech bar based on health
+            if (mechPercent <= 0.25) {
+                this.mechHealthBar?.setFillStyle(0xFF0000); // Red - critical
+            } else if (mechPercent <= 0.5) {
+                this.mechHealthBar?.setFillStyle(0xFF6600); // Orange - low
+            } else {
+                this.mechHealthBar?.setFillStyle(0x00AAFF); // Blue - good
+            }
+        } else {
+            // Show standard bars
+            this.healthBar?.setVisible(true);
+            this.healthBarBackground?.setVisible(true);
+            this.healthLabel?.setVisible(true);
+            this.staminaBar?.setVisible(true);
+            this.staminaBarBackground?.setVisible(true);
+            this.staminaLabel?.setVisible(true);
+            this.fuelBar?.setVisible(true);
+            this.fuelBarBackground?.setVisible(true);
+            this.fuelLabel?.setVisible(true);
+            this.xpBar?.setVisible(true);
+            this.xpBarBackground?.setVisible(true);
+            this.xpLabel?.setVisible(true);
+            
+            // Hide mech health bar
+            this.mechHealthBar?.setVisible(false);
+            this.mechHealthBarBackground?.setVisible(false);
+            this.mechHealthLabel?.setVisible(false);
+        }
     }
     
     /**
@@ -337,6 +502,14 @@ export class HUD {
         if (this.pauseOverlay) this.pauseOverlay.destroy();
         if (this.resumeButton) this.resumeButton.destroy();
         if (this.menuButton) this.menuButton.destroy();
+        
+        // Mech HUD cleanup
+        if (this.mechAbilityText1) this.mechAbilityText1.destroy();
+        if (this.mechAbilityText2) this.mechAbilityText2.destroy();
+        if (this.mechHealthBar) this.mechHealthBar.destroy();
+        if (this.mechHealthBarBackground) this.mechHealthBarBackground.destroy();
+        if (this.mechHealthLabel) this.mechHealthLabel.destroy();
+        if (this.mechFlashTimer) this.mechFlashTimer.destroy();
     }
     
     /**

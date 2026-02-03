@@ -16,6 +16,7 @@ export interface GameOptions {
     macroLandGravity: number;
     macroWaterGravity: number;
     startingHP: number;
+    level1XP: number; // XP required for level 1 (base for scaling)
 }
 
 // Default values
@@ -30,7 +31,8 @@ const DEFAULT_OPTIONS: GameOptions = {
     microWaterGravity: 50,
     macroLandGravity: 450,
     macroWaterGravity: 80,
-    startingHP: 100
+    startingHP: 100,
+    level1XP: 750 // XP required for level 1
 };
 
 // Current options (loaded from localStorage or defaults)

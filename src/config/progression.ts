@@ -26,9 +26,9 @@ export const XP_CONFIG = {
         startingHealth: 100,
         startingMaxHealth: 100,
         startingXP: 0,
-        startingXPToLevel: 100,
+        startingXPToLevel: 750,
         healthIncreasePerLevel: 20,
-        xpScalingFactor: 1.5
+        xpScalingFactor: 1.25
     },
     vehicleUpgrade: {
         submarineLevel2Threshold: 2,

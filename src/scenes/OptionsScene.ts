@@ -52,7 +52,8 @@ export default class OptionsScene extends Phaser.Scene {
             { key: 'microWaterGravity', label: 'Micro Water Gravity', min: 10, max: 300, step: 5 },
             { key: 'macroLandGravity', label: 'Macro Land Gravity', min: 200, max: 2000, step: 10 },
             { key: 'macroWaterGravity', label: 'Macro Water Gravity', min: 30, max: 400, step: 5 },
-            { key: 'startingHP', label: 'Starting HP', min: 50, max: 1000, step: 10 }
+            { key: 'startingHP', label: 'Starting HP', min: 50, max: 1000, step: 10 },
+            { key: 'level1XP', label: 'Level 1 XP', min: 50, max: 1000, step: 25 }
         ];
         
         // Create sliders for each option

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
 import playerManager from './PlayerManager';
 import projectileManager from './ProjectileManager';
-import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, getOptions } from '../config';
+import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, JET_MECH_CONFIG, getOptions } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import type { WASDKeys } from '../types/game';
@@ -74,6 +74,42 @@ export class InputManager {
         this.scene.input.keyboard?.on('keydown-K', () => {
             projectileManager.fireProjectile(this.scene);
         });
+        
+        // Jet Mech activation - Enter key
+        this.scene.input.keyboard?.on('keydown-ENTER', () => {
+            this.handleJetMechActivation();
+        });
+    }
+    
+    /**
+     * Handle jet mech activation when Enter is pressed
+     */
+    handleJetMechActivation(): void {
+        if (!playerStatsSystem.isJetMechAvailable()) {
+            return;
+        }
+        
+        // Activate the mech
+        playerStatsSystem.activateJetMech();
+        
+        // Transform player visuals
+        const player = gameState.player;
+        if (player) {
+            // Store original texture for restoration later
+            gameState.preMechPlayerTexture = player.texture.key;
+            gameState.preMechPlayerScale = player.scaleX;
+            
+            // Change to jet mech appearance
+            player.setTexture('land/jet_mech');
+            player.setScale(JET_MECH_CONFIG.scale);
+            
+            // Update physics body
+            if (player.body) {
+                player.body.updateFromGameObject();
+            }
+            
+            console.log('Player transformed into Jet Mech!');
+        }
     }
     
     /**
@@ -159,6 +195,12 @@ export class InputManager {
             return;
         }
         
+        // Check if jet mech is active - uses water-style flight on land
+        if (playerStatsSystem.isJetMechActive()) {
+            this.handleJetMechMovement();
+            return;
+        }
+        
         // Check if we're underwater for different movement physics
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
                             gameState.currentSceneKey === 'UnderwaterMicroScene';
@@ -240,6 +282,60 @@ export class InputManager {
             // Thrust downward
             const currentVelY = body.velocity.y;
             body.setVelocityY(Math.min(currentVelY + thrustPower * 0.15, thrustPower));
+        }
+    }
+    
+    /**
+     * Handle jet mech movement - water-style flight on land
+     * No traditional jumping, continuous thrust with W/Space (up) and S (down)
+     */
+    handleJetMechMovement(): void {
+        if (!gameState.player || !gameState.player.body) return;
+        
+        const options = getOptions();
+        const baseSpeed = options.playerSpeed;
+        const thrustPower = JET_MECH_CONFIG.thrustPower;
+        
+        let speedMultiplier = 1.0;
+        
+        // Apply god mode speed multiplier if active
+        if (playerStatsSystem.isGodMode()) {
+            speedMultiplier *= GOD_MODE_CONFIG.playerSpeedMultiplier;
+        }
+        
+        const body = gameState.player.body;
+        
+        // Horizontal movement (A/D or arrows)
+        if (this.wasdKeys.A.isDown || this.cursors.left.isDown) {
+            body.setVelocityX(-baseSpeed * speedMultiplier);
+            gameState.player.setFlipX(true);  // Face left
+        } else if (this.wasdKeys.D.isDown || this.cursors.right.isDown) {
+            body.setVelocityX(baseSpeed * speedMultiplier);
+            gameState.player.setFlipX(false); // Face right
+        } else {
+            body.setVelocityX(0);
+        }
+        
+        // Vertical thrust controls (W/Space for up, S for down)
+        if (this.wasdKeys.W.isDown || this.cursors.up.isDown || this.spaceKey.isDown) {
+            // Thrust upward - limit to near top of screen
+            const currentVelY = body.velocity.y;
+            const minY = 50; // Don't go above this Y coordinate
+            
+            if (gameState.player.y > minY) {
+                body.setVelocityY(Math.max(currentVelY - thrustPower * 0.15, -thrustPower));
+            } else {
+                body.setVelocityY(0);
+            }
+        } else if (this.wasdKeys.S.isDown || this.cursors.down.isDown) {
+            // Thrust downward
+            const currentVelY = body.velocity.y;
+            body.setVelocityY(Math.min(currentVelY + thrustPower * 0.15, thrustPower));
+        } else {
+            // Hover mode - counter gravity with slight upward thrust to maintain altitude
+            const currentVelY = body.velocity.y;
+            // Apply drag to slow vertical movement when idle
+            body.setVelocityY(currentVelY * 0.92);
         }
     }
     

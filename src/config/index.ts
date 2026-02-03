@@ -40,7 +40,8 @@ export {
     PLAYER_COMBAT_CONFIG,
     PROJECTILE_CONFIG,
     COMBAT_CONFIG,
-    GOD_MODE_CONFIG
+    GOD_MODE_CONFIG,
+    JET_MECH_CONFIG
 } from './combat';
 
 // Physics
