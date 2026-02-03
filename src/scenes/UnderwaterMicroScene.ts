@@ -3,7 +3,7 @@
  * Microscopic underwater scene with swimming micro organisms
  */
 import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { generateUnderwaterMicroBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
@@ -34,8 +34,8 @@ export default class UnderwaterMicroScene extends BaseGameScene {
     }
 
     protected createBackground(): void {
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        generateUnderwaterMicroBackground(this, mapLevel);
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        generateUnderwaterMicroBackground(this, currentStage);
     }
 
     protected createGround(): void {

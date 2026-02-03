@@ -3,7 +3,7 @@
  * Cellular-level gameplay scene with bacteria enemies
  */
 import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { generateQuantumBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
@@ -34,8 +34,8 @@ export default class MicroScene extends BaseGameScene {
     }
 
     protected createBackground(): void {
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        generateQuantumBackground(this, mapLevel);
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        generateQuantumBackground(this, currentStage);
     }
 
     protected createGround(): void {

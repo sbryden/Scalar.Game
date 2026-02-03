@@ -3,7 +3,7 @@
  * Submarine gameplay scene with lighter gravity
  */
 import { WORLD_WIDTH, getOptions } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { generateUnderwaterBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
@@ -34,8 +34,8 @@ export default class UnderwaterScene extends BaseGameScene {
     }
 
     protected createBackground(): void {
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        generateUnderwaterBackground(this, mapLevel);
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        generateUnderwaterBackground(this, currentStage);
     }
 
     protected createGround(): void {

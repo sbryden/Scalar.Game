@@ -37,18 +37,19 @@ export const XP_CONFIG = {
     }
 } as const;
 
-// Progressive Level System configuration
-export const LEVEL_SYSTEM_CONFIG = {
-    startingLevel: 1,
+// Progressive Stage System configuration
+// Note: "Stage" refers to game world/scene progression, distinct from player level (XP-based)
+export const STAGE_SYSTEM_CONFIG = {
+    startingStage: 1,
     enemyCountBase: 1.0,
-    enemyCountIncreasePerLevel: 0.1,
+    enemyCountIncreasePerStage: 0.1,
     enemyHealthBase: 1.0,
-    enemyHealthIncreasePerLevel: 0.15,
+    enemyHealthIncreasePerStage: 0.15,
     enemyDamageBase: 1.0,
-    enemyDamageIncreasePerLevel: 0.10,
+    enemyDamageIncreasePerStage: 0.10,
     enemySpeedBase: 1.0,
-    enemySpeedIncreasePerLevel: 0.05,
-    maxLevel: 99
+    enemySpeedIncreasePerStage: 0.05,
+    maxStage: 99
 } as const;
 
 // Boss Mode configuration (not using 'as const' to allow mutable array assignment)

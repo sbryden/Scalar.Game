@@ -3,7 +3,7 @@
  * Deep ocean gameplay scene with massive sea creatures
  */
 import { WORLD_WIDTH, WORLD_HEIGHT, getOptions } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { generateUnderwaterBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
@@ -34,8 +34,8 @@ export default class UnderwaterMacroScene extends BaseGameScene {
     }
 
     protected createBackground(): void {
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        generateUnderwaterBackground(this, mapLevel);
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        generateUnderwaterBackground(this, currentStage);
         
         // Add deeper ocean visual elements for macro scale
         this.createDeepOceanEffects();

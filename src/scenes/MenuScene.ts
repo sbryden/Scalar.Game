@@ -5,8 +5,8 @@
 import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
+import stageStatsTracker from '../systems/StageStatsTracker';
 import { BUILD_NUMBER } from '../buildInfo';
 
 /**
@@ -522,11 +522,11 @@ export default class MenuScene extends Phaser.Scene {
             // Reset player stats system
             playerStatsSystem.reset();
             
-            // Reset to level 1
-            levelProgressionSystem.resetToLevel1();
+            // Reset to stage 1
+            stageProgressionSystem.resetToStage1();
             
-            // Reset level stats tracker
-            levelStatsTracker.reset();
+            // Reset stage stats tracker
+            stageStatsTracker.reset();
             
             // Start the appropriate scene based on environment
             if (this.selectedEnvironment === 'water') {

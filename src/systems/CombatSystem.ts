@@ -4,7 +4,7 @@
  */
 import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG, getDifficultyConfig } from '../config';
 import playerStatsSystem from './PlayerStatsSystem';
-import levelStatsTracker from './LevelStatsTracker';
+import stageStatsTracker from './StageStatsTracker';
 import spawnSystem from './SpawnSystem';
 import gameState from '../utils/GameContext';
 import enemyManager from '../managers/EnemyManager';
@@ -288,7 +288,7 @@ export class CombatSystem {
         enemy.health -= damage;
         
         // Track damage dealt
-        levelStatsTracker.recordDamageDealt(damage);
+        stageStatsTracker.recordDamageDealt(damage);
         
         // Trigger chase when hit by projectile
         if (!enemy.isChasing && gameState.player) {
@@ -466,7 +466,7 @@ export class CombatSystem {
                 enemy.lastPlayerDamageTime = gameTime;
                 
                 // Track damage dealt
-                levelStatsTracker.recordDamageDealt(playerDamage);
+                stageStatsTracker.recordDamageDealt(playerDamage);
                 
                 // Visual feedback: flash enemy white (different from projectile red)
                 enemy.setTint(0xffffff);
@@ -742,7 +742,7 @@ export class CombatSystem {
         const isMinion = !!enemy.parentSpawnerBossId;
         
         // Track enemy destruction with enemy type for scoring
-        levelStatsTracker.recordEnemyDestroyed(enemy.enemyType, isBoss);
+        stageStatsTracker.recordEnemyDestroyed(enemy.enemyType, isBoss);
         
         // Mark enemy as dead to prevent further AI/damage processing
         enemy.health = 0;
@@ -922,7 +922,7 @@ export class CombatSystem {
      */
     damagePlayer(damage: number): void {
         // Track damage taken
-        levelStatsTracker.recordDamageTaken(damage);
+        stageStatsTracker.recordDamageTaken(damage);
         
         playerStatsSystem.takeDamage(damage);
     }
@@ -962,7 +962,7 @@ export class CombatSystem {
         });
         
         // Track damage dealt
-        levelStatsTracker.recordDamageDealt(damage);
+        stageStatsTracker.recordDamageDealt(damage);
         
         // Check if enemy died
         if (enemy.health <= 0 && !enemy.isDead) {

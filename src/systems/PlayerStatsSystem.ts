@@ -7,7 +7,7 @@ import gameState from '../utils/GameContext';
 import { COMBAT_CONFIG, XP_CONFIG, STAMINA_CONFIG, FUEL_CONFIG, COMPANION_CONFIG, getOptions, getDifficultyConfig } from '../config';
 import { initializeStaminaSystem, getStaminaSystem } from './StaminaSystem';
 import { initializeFuelSystem, getFuelSystem } from './FuelSystem';
-import levelStatsTracker from './LevelStatsTracker';
+import stageStatsTracker from './StageStatsTracker';
 import type { PlayerStats, Difficulty, CompanionKind, CompanionState } from '../types/game';
 
 type LevelUpCallback = (level: number) => void;
@@ -175,7 +175,7 @@ export class PlayerStatsSystem {
             console.log('Player defeated! Game Over.');
             
             // Track player death
-            levelStatsTracker.recordDeath();
+            stageStatsTracker.recordDeath();
             
             // Trigger game over callback if set
             if (this.onGameOver) {

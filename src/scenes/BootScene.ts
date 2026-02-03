@@ -14,8 +14,8 @@ import enemyManager from '../managers/EnemyManager';
 import combatSystem from '../systems/CombatSystem';
 import spawnSystem from '../systems/SpawnSystem';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
+import stageStatsTracker from '../systems/StageStatsTracker';
 import magnetismSystem from '../systems/MagnetismSystem';
 
 export default class BootScene extends Phaser.Scene {
@@ -104,8 +104,8 @@ export default class BootScene extends Phaser.Scene {
         Services.register('combatSystem', combatSystem);
         Services.register('spawnSystem', spawnSystem);
         Services.register('playerStatsSystem', playerStatsSystem);
-        Services.register('levelProgressionSystem', levelProgressionSystem);
-        Services.register('levelStatsTracker', levelStatsTracker);
+        Services.register('stageProgressionSystem', stageProgressionSystem);
+        Services.register('stageStatsTracker', stageStatsTracker);
         Services.register('magnetismSystem', magnetismSystem);
 
         // Mark services as initialized

@@ -3,7 +3,7 @@
  * Giant-scale gameplay scene for land environment with massive enemies
  */
 import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { generateSkyBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
@@ -34,8 +34,8 @@ export default class MainGameMacroScene extends BaseGameScene {
     }
 
     protected createBackground(): void {
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        generateSkyBackground(this, mapLevel);
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        generateSkyBackground(this, currentStage);
         
         // Add distant mountain silhouettes for macro scale feeling
         this.createMountainSilhouettes();

@@ -1,12 +1,13 @@
 /**
- * Level Complete Screen
- * Displays when player defeats the boss with next-level or exit options
+ * Stage Complete Screen
+ * Displays when player defeats the boss with next-stage or exit options.
+ * Note: "Stage" refers to game world/scene progression, distinct from player level (XP-based).
  */
 import Phaser from 'phaser';
-import levelStatsTracker from '../systems/LevelStatsTracker';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageStatsTracker from '../systems/StageStatsTracker';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 
-export class LevelCompleteScreen {
+export class StageCompleteScreen {
     scene: Phaser.Scene;
     container: Phaser.GameObjects.Container | null;
     overlay: Phaser.GameObjects.Rectangle | null;
@@ -16,7 +17,7 @@ export class LevelCompleteScreen {
     nKey: Phaser.Input.Keyboard.Key | null;
     mKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
-    onNextLevel: (() => void) | null;
+    onNextStage: (() => void) | null;
     onExit: (() => void) | null;
 
     constructor(scene: Phaser.Scene) {
@@ -29,12 +30,12 @@ export class LevelCompleteScreen {
         this.nKey = null;
         this.mKey = null;
         this.isVisible = false;
-        this.onNextLevel = null;
+        this.onNextStage = null;
         this.onExit = null;
     }
 
     /**
-     * Create the level complete screen (initially hidden)
+     * Create the stage complete screen (initially hidden)
      */
     create(): void {
         // Create semi-transparent overlay
@@ -51,11 +52,11 @@ export class LevelCompleteScreen {
         this.overlay.setVisible(false);
 
         // Create title text
-        const currentLevel = levelProgressionSystem.getCurrentLevel();
+        const currentStage = stageProgressionSystem.getCurrentStage();
         this.titleText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             80,
-            `MAP ${currentLevel} COMPLETE!`,
+            `STAGE ${currentStage} COMPLETE!`,
             {
                 fontSize: '64px',
                 color: '#FFD700',
@@ -94,7 +95,7 @@ export class LevelCompleteScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 100,
-            'Press N for Next Level\nPress M to Exit to Main Menu',
+            'Press N for Next Stage\nPress M to Exit to Main Menu',
             {
                 fontSize: '24px',
                 color: '#FFFFFF',
@@ -116,7 +117,7 @@ export class LevelCompleteScreen {
         // Add listeners for N and M keys
         this.nKey.on('down', () => {
             if (this.isVisible) {
-                this.handleNextLevel();
+                this.handleNextStage();
             }
         });
 
@@ -128,25 +129,25 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Show the level complete screen
+     * Show the stage complete screen
      */
     show(): void {
         if (this.overlay && this.titleText && this.statsText && this.messageText) {
-            // Update title with current level
-            const currentLevel = levelProgressionSystem.getCurrentLevel();
-            this.titleText.setText(`MAP ${currentLevel} COMPLETE!`);
+            // Update title with current stage
+            const currentStage = stageProgressionSystem.getCurrentStage();
+            this.titleText.setText(`STAGE ${currentStage} COMPLETE!`);
             
             // Get stats from tracker
-            const stats = levelStatsTracker.getStats();
-            const completionTime = levelStatsTracker.getFormattedCompletionTime();
+            const stats = stageStatsTracker.getStats();
+            const completionTime = stageStatsTracker.getFormattedCompletionTime();
             
             // Calculate score
-            const score = levelStatsTracker.calculateScore(currentLevel);
-            const runTotalScore = Math.round(levelStatsTracker.getCumulativeScore(currentLevel));
+            const score = stageStatsTracker.calculateScore(currentStage);
+            const runTotalScore = Math.round(stageStatsTracker.getCumulativeScore(currentStage));
             
             // Build stats display text with score breakdown
             const statsDisplay = [
-                'Level Statistics',
+                'Stage Statistics',
                 '',
                 `Time to Completion: ${completionTime}`,
                 '',
@@ -169,7 +170,7 @@ export class LevelCompleteScreen {
             }
             
             statsDisplay.push('');
-            statsDisplay.push(`LEVEL SCORE: ${Math.round(score.totalScore)} pts`);
+            statsDisplay.push(`STAGE SCORE: ${Math.round(score.totalScore)} pts`);
             statsDisplay.push(`RUN TOTAL: ${runTotalScore} pts`);
             statsDisplay.push('');
             statsDisplay.push(`Projectiles Fired: ${stats.projectilesFired}`);
@@ -190,7 +191,7 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Hide the level complete screen
+     * Hide the stage complete screen
      */
     hide(): void {
         if (this.overlay && this.titleText && this.statsText && this.messageText) {
@@ -203,17 +204,17 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Handle next level (N key)
+     * Handle next stage (N key)
      */
-    handleNextLevel(): void {
+    handleNextStage(): void {
         this.hide();
         
         // Resume physics
         this.scene.physics.resume();
 
-        // Call next level callback if set
-        if (this.onNextLevel) {
-            this.onNextLevel();
+        // Call next stage callback if set
+        if (this.onNextStage) {
+            this.onNextStage();
         }
     }
 
@@ -230,10 +231,10 @@ export class LevelCompleteScreen {
     }
 
     /**
-     * Set the next level callback
+     * Set the next stage callback
      */
-    setNextLevelCallback(callback: () => void): void {
-        this.onNextLevel = callback;
+    setNextStageCallback(callback: () => void): void {
+        this.onNextStage = callback;
     }
 
     /**

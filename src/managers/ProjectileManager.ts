@@ -6,7 +6,7 @@
 import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_CONFIG, getOptions } from '../config';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
+import stageStatsTracker from '../systems/StageStatsTracker';
 import type { WASDKeys, Projectile, Enemy } from '../types/game';
 import type { TextureVariant } from '../config/enemies';
 
@@ -124,7 +124,7 @@ class ProjectileManager {
         projectile.maxRange = VISUAL_CONFIG.viewportWidth * PHYSICS_CONFIG.projectile.maxRangeMultiplier;
         
         // Track projectile fired for stats
-        levelStatsTracker.recordProjectileFired();
+        stageStatsTracker.recordProjectileFired();
     }
 
     /**

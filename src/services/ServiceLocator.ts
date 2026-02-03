@@ -45,8 +45,8 @@ type ServiceKey =
     | 'playerStatsSystem'
     | 'staminaSystem'
     | 'fuelSystem'
-    | 'levelProgressionSystem'
-    | 'levelStatsTracker'
+    | 'stageProgressionSystem'
+    | 'stageStatsTracker'
     | 'magnetismSystem';
 
 class ServiceLocator {

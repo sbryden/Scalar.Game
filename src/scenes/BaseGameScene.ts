@@ -13,8 +13,8 @@ import playerManager from '../managers/PlayerManager';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
-import levelStatsTracker from '../systems/LevelStatsTracker';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageStatsTracker from '../systems/StageStatsTracker';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import { getFuelSystem } from '../systems/FuelSystem';
 import { InputManager } from '../managers/InputManager';
@@ -25,7 +25,7 @@ import { Services } from '../services';
 import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
-import { LevelCompleteScreen } from '../ui/LevelCompleteScreen';
+import { StageCompleteScreen } from '../ui/StageCompleteScreen';
 import type { Enemy, Player, SceneKey } from '../types/game';
 
 /**
@@ -69,15 +69,15 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     hud!: HUD;
     debugDisplay!: DebugDisplay;
     gameOverScreen!: GameOverScreen;
-    levelCompleteScreen!: LevelCompleteScreen;
+    stageCompleteScreen!: StageCompleteScreen;
     
     // Managers
     inputManager!: InputManager;
     collisionManager!: CollisionManager;
     cameraManager!: CameraManager;
     
-    // Level completion state
-    private isLevelCompleting: boolean = false;
+    // Stage completion state
+    private isStageCompleting: boolean = false;
 
     constructor(sceneKey: SceneKey) {
         super({ key: sceneKey });
@@ -109,8 +109,8 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     create(): void {
         const config = this.getSceneConfig();
 
-        // Reset level completion state (important for scene.restart() which reuses the same instance)
-        this.isLevelCompleting = false;
+        // Reset stage completion state (important for scene.restart() which reuses the same instance)
+        this.isStageCompleting = false;
 
         // Initialize difficulty if this is first time entering game
         const difficulty = this.registry.get('difficulty') || 'normal';
@@ -122,8 +122,8 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Reset spawner boss tracking
         combatSystem.resetSpawnerTracking();
 
-        // Start tracking level stats (keep run totals across scene swaps)
-        levelStatsTracker.startLevel(this.time.now, levelProgressionSystem.getCurrentLevel());
+        // Start tracking stage stats (keep run totals across scene swaps)
+        stageStatsTracker.startStage(this.time.now, stageProgressionSystem.getCurrentStage());
 
         // Set scene-specific gravity
         this.physics.world.gravity.y = config.gravity;
@@ -214,14 +214,14 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         this.cameraManager.update();
         
         // Check for player-flag collision
-        if (gameState.levelCompleteFlag && this.player && !this.isLevelCompleting) {
+        if (gameState.stageCompleteFlag && this.player && !this.isStageCompleting) {
             const distance = Phaser.Math.Distance.Between(
                 this.player.x, this.player.y,
-                gameState.levelCompleteFlag.x, gameState.levelCompleteFlag.y
+                gameState.stageCompleteFlag.x, gameState.stageCompleteFlag.y
             );
             
             if (distance < 100) { // Collision threshold (increased for easier collection)
-                this.isLevelCompleting = true;
+                this.isStageCompleting = true;
                 this.handleFlagReached();
             }
         }
@@ -325,21 +325,21 @@ export default abstract class BaseGameScene extends Phaser.Scene {
             this.handleQuit();
         });
 
-        // Create Level Complete Screen
-        this.levelCompleteScreen = new LevelCompleteScreen(this);
-        this.levelCompleteScreen.create();
+        // Create Stage Complete Screen
+        this.stageCompleteScreen = new StageCompleteScreen(this);
+        this.stageCompleteScreen.create();
 
         // Set up boss defeat callback
         combatSystem.setBossDefeatCallback(() => {
-            this.handleLevelComplete();
+            this.handleStageComplete();
         });
 
-        // Set up next level and exit callbacks
-        this.levelCompleteScreen.setNextLevelCallback(() => {
-            this.handleNextLevel();
+        // Set up next stage and exit callbacks
+        this.stageCompleteScreen.setNextStageCallback(() => {
+            this.handleNextStage();
         });
 
-        this.levelCompleteScreen.setExitCallback(() => {
+        this.stageCompleteScreen.setExitCallback(() => {
             this.handleExitToMenu();
         });
     }
@@ -418,12 +418,12 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         const config = this.getSceneConfig();
         console.log('Player chose to continue');
 
-        // Reset level completing flag so player can collect the flag again
-        this.isLevelCompleting = false;
+        // Reset stage completing flag so player can collect the flag again
+        this.isStageCompleting = false;
 
         // Game over resets the run score
-        levelStatsTracker.resetRun();
-        levelStatsTracker.startLevel(this.time.now, levelProgressionSystem.getCurrentLevel());
+        stageStatsTracker.resetRun();
+        stageStatsTracker.startStage(this.time.now, stageProgressionSystem.getCurrentStage());
 
         // Reset player stats
         playerStatsSystem.reset();
@@ -483,7 +483,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleQuit(): void {
         console.log('Player chose to quit');
         playerStatsSystem.reset();
-        levelStatsTracker.resetRun();
+        stageStatsTracker.resetRun();
         
         // Full reset of companions for new run
         playerStatsSystem.resetCompanions();
@@ -491,20 +491,20 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         this.scene.start('MenuScene');
     }
 
-    protected handleLevelComplete(): void {
-        console.log('Level Complete - All Bosses Defeated! Spawning flag...');
-        this.spawnLevelCompleteFlag();
+    protected handleStageComplete(): void {
+        console.log('Stage Complete - All Bosses Defeated! Spawning flag...');
+        this.spawnStageCompleteFlag();
     }
     
     /**
-     * Spawn the level complete flag near the end of the map
+     * Spawn the stage complete flag near the end of the stage
      */
-    protected spawnLevelCompleteFlag(): void {
-        // Flag spawns at a fixed distance from the end of the map
+    protected spawnStageCompleteFlag(): void {
+        // Flag spawns at a fixed distance from the end of the stage
         const flagX = WORLD_WIDTH - 300; // 300 pixels from the end
         const flagY = 650; // Near the ground
         
-        const flagTextureKey = 'level_complete_flag';
+        const flagTextureKey = 'stage_complete_flag';
         
         // Generate the flag texture once per scene, if it does not already exist
         if (!this.textures.exists(flagTextureKey)) {
@@ -531,7 +531,7 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         flagSprite.body.setOffset(-20, -25);
         
         // Store flag reference in gameState
-        gameState.levelCompleteFlag = flagSprite;
+        gameState.stageCompleteFlag = flagSprite;
         
         // Add a bounce animation to make it noticeable
         this.tweens.add({
@@ -547,23 +547,23 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     }
     
     /**
-     * Handle player reaching the level complete flag
+     * Handle player reaching the stage complete flag
      */
     protected handleFlagReached(): void {
-        if (!gameState.levelCompleteFlag) return;
+        if (!gameState.stageCompleteFlag) return;
         
         console.log('Player reached the flag!');
         
         // Destroy the flag
-        gameState.levelCompleteFlag.destroy();
-        gameState.levelCompleteFlag = null;
+        gameState.stageCompleteFlag.destroy();
+        gameState.stageCompleteFlag = null;
         
-        // End level timer
-        levelStatsTracker.endLevel(this.time.now);
+        // End stage timer
+        stageStatsTracker.endStage(this.time.now);
         
-        // Play firework animation, then show level complete screen
+        // Play firework animation, then show stage complete screen
         this.createFireworkAnimation(() => {
-            this.levelCompleteScreen.show();
+            this.stageCompleteScreen.show();
         });
     }
     
@@ -638,22 +638,22 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         });
     }
 
-    protected handleNextLevel(): void {
+    protected handleNextStage(): void {
         const config = this.getSceneConfig();
-        console.log('Advancing to next level');
+        console.log('Advancing to next stage');
 
-        levelProgressionSystem.advanceToNextLevel();
+        stageProgressionSystem.advanceToNextStage();
 
         // Reset player position to start
         gameState.savedPositions[config.sceneKey] = { x: 100, y: 650 };
 
-        // Clear saved enemies to spawn fresh enemies for new level
+        // Clear saved enemies to spawn fresh enemies for new stage
         gameState.savedEnemies[config.sceneKey] = [];
         
         // Clear flag if it exists
-        if (gameState.levelCompleteFlag) {
-            gameState.levelCompleteFlag.destroy();
-            gameState.levelCompleteFlag = null;
+        if (gameState.stageCompleteFlag) {
+            gameState.stageCompleteFlag.destroy();
+            gameState.stageCompleteFlag = null;
         }
 
         this.scene.restart();
@@ -662,8 +662,8 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     protected handleExitToMenu(): void {
         console.log('Exiting to main menu');
 
-        levelStatsTracker.reset();
-        levelProgressionSystem.resetToLevel1();
+        stageStatsTracker.reset();
+        stageProgressionSystem.resetToStage1();
         
         // Full reset of companions for new run
         playerStatsSystem.resetCompanions();

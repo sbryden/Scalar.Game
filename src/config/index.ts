@@ -61,7 +61,7 @@ export {
 // Progression
 export {
     XP_CONFIG,
-    LEVEL_SYSTEM_CONFIG,
+    STAGE_SYSTEM_CONFIG,
     BOSS_MODE_CONFIG
 } from './progression';
 

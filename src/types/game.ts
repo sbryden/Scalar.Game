@@ -209,8 +209,8 @@ export type PlayerSize = 'small' | 'normal' | 'large';
 export type SceneKey = 'BootScene' | 'MenuScene' | 'MainGameScene' | 'MicroScene' | 'MainGameMacroScene' | 'UnderwaterScene' | 'UnderwaterMicroScene' | 'UnderwaterMacroScene';
 
 /**
- * Level complete flag sprite with custom properties
+ * Stage complete flag sprite with custom properties
  */
-export interface LevelCompleteFlag extends Phaser.GameObjects.Sprite {
+export interface StageCompleteFlag extends Phaser.GameObjects.Sprite {
     body: Phaser.Physics.Arcade.Body;
 }

@@ -4,7 +4,7 @@
  */
 import Phaser from 'phaser';
 import { STAMINA_UI_CONFIG, FUEL_UI_CONFIG } from '../config';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { getFuelSystem } from '../systems/FuelSystem';
 import type { PlayerStats } from '../types/game';
 
@@ -23,7 +23,7 @@ export class HUD {
     fuelBarBackground: Phaser.GameObjects.Rectangle | null;
     fuelLabel: Phaser.GameObjects.Text | null;
     fuelCooldownText: Phaser.GameObjects.Text | null;
-    mapLevelText: Phaser.GameObjects.Text | null;
+    stageText: Phaser.GameObjects.Text | null;
     bossCountText: Phaser.GameObjects.Text | null;
     pauseButton: Phaser.GameObjects.Text | null;
     pauseOverlay: Phaser.GameObjects.Rectangle | null;
@@ -46,7 +46,7 @@ export class HUD {
         this.fuelBarBackground = null;
         this.fuelLabel = null;
         this.fuelCooldownText = null;
-        this.mapLevelText = null;
+        this.stageText = null;
         this.bossCountText = null;
         this.pauseButton = null;
         this.pauseOverlay = null;
@@ -151,18 +151,18 @@ export class HUD {
         
         // --- AUXILIARY HUD ELEMENTS ---
         
-        // Map level text - positioned at bottom right
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        this.mapLevelText = this.scene.add.text(cameraWidth - 15, cameraHeight - 15, `MAP ${mapLevel}`, {
+        // Stage text - positioned at bottom right
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        this.stageText = this.scene.add.text(cameraWidth - 15, cameraHeight - 15, `STAGE ${currentStage}`, {
             fontSize: '16px',
             color: '#FFD700',
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 2
         });
-        this.mapLevelText.setOrigin(1, 1); // Anchor to bottom right
-        this.mapLevelText.setDepth(1000);
-        this.mapLevelText.setScrollFactor(0);
+        this.stageText.setOrigin(1, 1); // Anchor to bottom right
+        this.stageText.setDepth(1000);
+        this.stageText.setScrollFactor(0);
         
         // Boss count text (only visible in boss mode) - positioned on the left side
         this.bossCountText = this.scene.add.text(15, 50, '', {
@@ -292,9 +292,9 @@ export class HUD {
         // Update XP label to show current player level
         this.xpLabel?.setText(`LEVEL: ${playerStats.level}`);
         
-        // Update map level text
-        const mapLevel = levelProgressionSystem.getCurrentLevel();
-        this.mapLevelText?.setText(`MAP ${mapLevel}`);
+        // Update stage text
+        const currentStage = stageProgressionSystem.getCurrentStage();
+        this.stageText?.setText(`STAGE ${currentStage}`);
     }
     
     /**
@@ -331,7 +331,7 @@ export class HUD {
         if (this.fuelBarBackground) this.fuelBarBackground.destroy();
         if (this.fuelLabel) this.fuelLabel.destroy();
         if (this.fuelCooldownText) this.fuelCooldownText.destroy();
-        if (this.mapLevelText) this.mapLevelText.destroy();
+        if (this.stageText) this.stageText.destroy();
         if (this.bossCountText) this.bossCountText.destroy();
         if (this.pauseButton) this.pauseButton.destroy();
         if (this.pauseOverlay) this.pauseOverlay.destroy();

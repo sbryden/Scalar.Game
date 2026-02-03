@@ -6,7 +6,7 @@ A 2D side-scrolling action game built with **Phaser 3** and **TypeScript**. Mast
 
 ## Overview
 
-Scalar is a physics-based side-scroller where you control a vehicle with the unique ability to shrink and grow. Navigate through two distinct biomes (Land and Underwater), each with normal and micro scale variants. Face off against intelligent enemies that patrol, chase, and attack using line-of-sight detection. Progress through map levels, defeat bosses, collect XP orbs, and level up your character in this evolving adventure!
+Scalar is a physics-based side-scroller where you control a vehicle with the unique ability to shrink and grow. Navigate through two distinct biomes (Land and Underwater), each with normal and micro scale variants. Face off against intelligent enemies that patrol, chase, and attack using line-of-sight detection. Progress through stages, defeat bosses, collect XP orbs, and level up your character in this evolving adventure!
 
 ## ✨ Key Features
 
@@ -36,7 +36,7 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 
 ### 📊 **Progression Systems**
 - **Player Leveling**: Collect XP orbs dropped by enemies to level up
-- **Map Levels**: Progressive difficulty scaling across multiple map levels
+- **Stages**: Progressive difficulty scaling across multiple stages
 - **Difficulty Modes**: Easy (0.7x health, 0.8x speed, 0.6x spawns), Normal, and Hard (1.5x multipliers)
 - **God Mode**: Separate toggle for invincibility (optional)
 - **Boss Mode**: Toggle for boss-heavy gameplay
@@ -45,7 +45,7 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
   - A golden flag spawns near the map's end
   - Reach the flag to trigger a firework celebration
   - Stats screen displays after the celebration
-- **Stats Tracking**: Detailed end-of-level statistics and score calculation
+- **Stats Tracking**: Detailed end-of-stage statistics and score calculation
 
 ### 💪 **Combat & Feedback**
 - **Stamina System**: Manage stamina for melee attacks (recharges over time)
@@ -69,8 +69,8 @@ Scalar is a physics-based side-scroller where you control a vehicle with the uni
 - **Multi-Companion Support**: Multiple different companions can be active simultaneously
 - **Size Persistence**: Companions stay with you when scaling micro/normal/macro within same biome
 
-- **Dynamic HUD**: Improved horizontal top bar with labeled stat indicators (HP, STA, FUEL, XP) using pixel-friendly styling, real-time player level, and map level display
-- **Dynamic Backgrounds**: Procedurally generated backgrounds with 5 seeded variations per map level, featuring mountains, clouds, fish schools, coral, bioluminescent plankton, and more
+- **Dynamic HUD**: Improved horizontal top bar with labeled stat indicators (HP, STA, FUEL, XP) using pixel-friendly styling, real-time player level, and stage display
+- **Dynamic Backgrounds**: Procedurally generated backgrounds with 5 seeded variations per stage, featuring mountains, clouds, fish schools, coral, bioluminescent plankton, and more
 
 ## Quick Start
 
@@ -93,7 +93,7 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 2. **Choose Difficulty**: Easy, Normal, or Hard
 3. **Toggle God Mode**: Enable invincibility (optional)
 4. **Toggle Boss Mode**: Enable for boss-heavy gameplay (optional)
-5. **Start Playing**: Battle enemies, collect XP, and progress through map levels!
+5. **Start Playing**: Battle enemies, collect XP, and progress through stages!
 
 ### Controls
 
@@ -121,7 +121,7 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - **3-Tier System**: Micro (small) → Normal → Macro (large)
 
 **UI Controls:**
-- **M** - Exit level complete screen (return to menu)
+- **M** - Exit stage complete screen (return to menu)
 
 ### Gameplay Tips
 - 💡 Collect glowing XP orbs to level up your character
@@ -135,13 +135,13 @@ Open your browser to the URL shown in your terminal (typically `http://localhost
 - 💡 Defeat all minions to get XP from spawner enemies
 - 💡 Defeat all bosses to clear remaining enemies and spawn the completion flag
 - 💡 Look for the golden flag near the map's end after defeating all bosses
-- 💡 Reach the flag to trigger a celebratory firework display and complete the level
+- 💡 Reach the flag to trigger a celebratory firework display and complete the stage
 - 💡 Underwater physics differ - lighter gravity and slower projectiles
 - 💡 Each scale has different enemies - micro bacteria, normal threats, macro giants
 - 💡 Boss enemies have enhanced detection range and special abilities
-- 💡 Backgrounds change with each map level - enjoy 5 unique variations per scene type!
+- 💡 Backgrounds change with each stage - enjoy 5 unique variations per scene type!
 - 💡 Try Easy mode if the game feels too challenging - reduced enemy health and spawn rates
-- 💡 Check your stats at level complete screen to track progress
+- 💡 Check your stats at stage complete screen to track progress
 
 ## ⚙️ Technical Stack
 

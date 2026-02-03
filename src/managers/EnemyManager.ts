@@ -8,7 +8,7 @@ import gameState from "../utils/GameContext";
 import combatSystem from "../systems/CombatSystem";
 import type { Enemy, Projectile } from '../types/game';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
-import levelProgressionSystem from '../systems/LevelProgressionSystem';
+import stageProgressionSystem from '../systems/StageProgressionSystem';
 import projectileManager from './ProjectileManager';
 
 class EnemyManager {
@@ -64,15 +64,15 @@ class EnemyManager {
         const difficultyDamageMultiplier = difficultyConfig.enemyDamageMultiplier;
         const lineOfSightMultiplier = difficultyConfig.enemyLineOfSightMultiplier;
         
-        // Apply level-based multipliers (these stack with difficulty multipliers)
-        const levelHealthMultiplier = levelProgressionSystem.getEnemyHealthMultiplier();
-        const levelDamageMultiplier = levelProgressionSystem.getEnemyDamageMultiplier();
-        const levelSpeedMultiplier = levelProgressionSystem.getEnemySpeedMultiplier();
+        // Apply stage-based multipliers (these stack with difficulty multipliers)
+        const stageHealthMultiplier = stageProgressionSystem.getEnemyHealthMultiplier();
+        const stageDamageMultiplier = stageProgressionSystem.getEnemyDamageMultiplier();
+        const stageSpeedMultiplier = stageProgressionSystem.getEnemySpeedMultiplier();
         
-        // Combine all multipliers (damage now includes both difficulty and level)
-        const finalHealthMultiplier = difficultyHealthMultiplier * levelHealthMultiplier;
-        const finalSpeedMultiplier = difficultySpeedMultiplier * levelSpeedMultiplier;
-        const finalDamageMultiplier = difficultyDamageMultiplier * levelDamageMultiplier;
+        // Combine all multipliers (damage now includes both difficulty and stage)
+        const finalHealthMultiplier = difficultyHealthMultiplier * stageHealthMultiplier;
+        const finalSpeedMultiplier = difficultySpeedMultiplier * stageSpeedMultiplier;
+        const finalDamageMultiplier = difficultyDamageMultiplier * stageDamageMultiplier;
         
         // Select texture - handle both single textures and weighted variants
         const texture = this.selectEnemyTexture(config.texture);

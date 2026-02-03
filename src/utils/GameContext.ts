@@ -54,8 +54,8 @@ class GameContext {
     private _savedPositions: Record<SceneKey, SavedPosition>;
     private _savedEnemies: Record<SceneKey, SavedEnemy[]>;
     private _difficultyInitialized: boolean = false;
-    private _currentMapLevel: number = 1;
-    private _levelCompleteFlag: Phaser.GameObjects.Sprite | null = null;
+    private _currentStage: number = 1;
+    private _stageCompleteFlag: Phaser.GameObjects.Sprite | null = null;
 
     constructor() {
         // Initialize saved positions for all scenes
@@ -86,8 +86,8 @@ class GameContext {
     get playerSize(): PlayerSize { return this._playerSize; }
     get currentSceneKey(): SceneKey { return this._currentSceneKey; }
     get difficultyInitialized(): boolean { return this._difficultyInitialized; }
-    get currentMapLevel(): number { return this._currentMapLevel; }
-    get levelCompleteFlag(): Phaser.GameObjects.Sprite | null { return this._levelCompleteFlag; }
+    get currentStage(): number { return this._currentStage; }
+    get stageCompleteFlag(): Phaser.GameObjects.Sprite | null { return this._stageCompleteFlag; }
 
     // Read-only access to saved state maps
     // Note: The Record itself is mutable to allow gameState.savedPositions[key] = value patterns
@@ -114,8 +114,8 @@ class GameContext {
     set playerSize(value: PlayerSize) { this._playerSize = value; }
     set currentSceneKey(value: SceneKey) { this._currentSceneKey = value; }
     set difficultyInitialized(value: boolean) { this._difficultyInitialized = value; }
-    set currentMapLevel(value: number) { this._currentMapLevel = Math.max(1, value); }
-    set levelCompleteFlag(value: Phaser.GameObjects.Sprite | null) { this._levelCompleteFlag = value; }
+    set currentStage(value: number) { this._currentStage = Math.max(1, value); }
+    set stageCompleteFlag(value: Phaser.GameObjects.Sprite | null) { this._stageCompleteFlag = value; }
 
     // ============================================
     // SCENE STATE METHODS
@@ -191,7 +191,7 @@ class GameContext {
         this._sizeChangeTimer = 0;
         this._playerSize = 'normal';
         this._difficultyInitialized = false;
-        this._currentMapLevel = 1;
+        this._currentStage = 1;
         
         // Reset all saved positions and enemies
         for (const key of ALL_SCENE_KEYS) {

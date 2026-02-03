@@ -1,7 +1,7 @@
 /**
  * Background Generator Utility
  * Generates dynamic, randomized backgrounds for different scene types
- * Uses seeded RNG for deterministic variation per map level
+ * Uses seeded RNG for deterministic variation per stage
  */
 
 import Phaser from 'phaser';
@@ -226,13 +226,13 @@ const UNDERWATER_MICRO_PALETTES = [
 /**
  * Generates a sky background for regular/land scenes
  * @param scene - The Phaser scene to generate the background for
- * @param seed - Map level seed for deterministic variation (1-5 variations)
+ * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
 export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 12345); // Different multiplier per scene type for variation
     
-    // Select palette based on map level
+    // Select palette based on stage
     const basePalette = SKY_PALETTES[effectiveSeed % SKY_PALETTES.length];
     if (!basePalette) return;
     
@@ -308,13 +308,13 @@ export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void 
 /**
  * Generates a quantum realm background for micro scenes
  * @param scene - The Phaser scene to generate the background for
- * @param seed - Map level seed for deterministic variation (1-5 variations)
+ * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
 export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 23456); // Different multiplier per scene type for variation
     
-    // Select palette based on map level
+    // Select palette based on stage
     const basePalette = QUANTUM_PALETTES[effectiveSeed % QUANTUM_PALETTES.length];
     if (!basePalette) return;
     
@@ -415,13 +415,13 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): v
 /**
  * Generates an underwater background
  * @param scene - The Phaser scene to generate the background for
- * @param seed - Map level seed for deterministic variation (1-5 variations)
+ * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
 export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 34567); // Different multiplier per scene type for variation
     
-    // Select palette based on map level
+    // Select palette based on stage
     const basePalette = UNDERWATER_PALETTES[effectiveSeed % UNDERWATER_PALETTES.length];
     if (!basePalette) return;
     
@@ -510,13 +510,13 @@ export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number)
 /**
  * Generates an underwater micro background
  * @param scene - The Phaser scene to generate the background for
- * @param seed - Map level seed for deterministic variation (1-5 variations)
+ * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
 export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: number): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 45678); // Different multiplier per scene type for variation
     
-    // Select palette based on map level
+    // Select palette based on stage
     const basePalette = UNDERWATER_MICRO_PALETTES[effectiveSeed % UNDERWATER_MICRO_PALETTES.length];
     if (!basePalette) return;
     

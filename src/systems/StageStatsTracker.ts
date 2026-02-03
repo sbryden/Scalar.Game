@@ -1,6 +1,7 @@
 /**
- * Level Stats Tracker System
- * Tracks player performance statistics throughout a level
+ * Stage Stats Tracker System
+ * Tracks player performance statistics throughout a stage (game world/scene level).
+ * Note: "Stage" refers to game world/scene progression, distinct from player level (XP-based).
  */
 
 // Base point values for scoring
@@ -11,9 +12,9 @@ export const SCORING_CONFIG = {
     microEnemyPoints: 2.5
 } as const;
 
-export interface LevelStats {
-    levelStartTime: number;
-    levelEndTime: number | null;
+export interface StageStats {
+    stageStartTime: number;
+    stageEndTime: number | null;
     projectilesFired: number;
     deaths: number;
     enemiesDestroyed: number;
@@ -27,28 +28,28 @@ export interface LevelStats {
     microBossesDestroyed: number;
 }
 
-export class LevelStatsTracker {
-    private stats: LevelStats;
-    private isLevelActive: boolean;
+export class StageStatsTracker {
+    private stats: StageStats;
+    private isStageActive: boolean;
     private cumulativeScore: number;
-    private currentLevel: number | null;
-    private hasCommittedCurrentLevel: boolean;
+    private currentStage: number | null;
+    private hasCommittedCurrentStage: boolean;
 
     constructor() {
         this.stats = this.createEmptyStats();
-        this.isLevelActive = false;
+        this.isStageActive = false;
         this.cumulativeScore = 0;
-        this.currentLevel = null;
-        this.hasCommittedCurrentLevel = false;
+        this.currentStage = null;
+        this.hasCommittedCurrentStage = false;
     }
 
     /**
      * Create a fresh stats object
      */
-    private createEmptyStats(): LevelStats {
+    private createEmptyStats(): StageStats {
         return {
-            levelStartTime: 0,
-            levelEndTime: null,
+            stageStartTime: 0,
+            stageEndTime: null,
             projectilesFired: 0,
             deaths: 0,
             enemiesDestroyed: 0,
@@ -63,35 +64,35 @@ export class LevelStatsTracker {
     }
 
     /**
-     * Start tracking a new level
+     * Start tracking a new stage
      */
-    startLevel(startTime: number, level: number): void {
-        const isNewLevel = this.currentLevel !== level;
-        const shouldResetStats = isNewLevel || !this.isLevelActive || this.stats.levelStartTime === 0;
+    startStage(startTime: number, stage: number): void {
+        const isNewStage = this.currentStage !== stage;
+        const shouldResetStats = isNewStage || !this.isStageActive || this.stats.stageStartTime === 0;
 
         if (shouldResetStats) {
             this.stats = this.createEmptyStats();
-            this.stats.levelStartTime = startTime;
-            this.currentLevel = level;
-            this.hasCommittedCurrentLevel = false;
+            this.stats.stageStartTime = startTime;
+            this.currentStage = stage;
+            this.hasCommittedCurrentStage = false;
         }
 
-        this.isLevelActive = true;
+        this.isStageActive = true;
     }
 
     /**
-     * End the current level
+     * End the current stage
      */
-    endLevel(endTime: number): void {
-        this.stats.levelEndTime = endTime;
-        this.isLevelActive = false;
+    endStage(endTime: number): void {
+        this.stats.stageEndTime = endTime;
+        this.isStageActive = false;
 
-        // Commit this level's score to the run total exactly once
-        const levelForScore = this.currentLevel ?? 1;
-        if (!this.hasCommittedCurrentLevel) {
-            const levelScore = this.calculateScore(levelForScore);
-            this.cumulativeScore += levelScore.totalScore;
-            this.hasCommittedCurrentLevel = true;
+        // Commit this stage's score to the run total exactly once
+        const stageForScore = this.currentStage ?? 1;
+        if (!this.hasCommittedCurrentStage) {
+            const stageScore = this.calculateScore(stageForScore);
+            this.cumulativeScore += stageScore.totalScore;
+            this.hasCommittedCurrentStage = true;
         }
     }
 
@@ -99,7 +100,7 @@ export class LevelStatsTracker {
      * Track a projectile being fired
      */
     recordProjectileFired(): void {
-        if (this.isLevelActive) {
+        if (this.isStageActive) {
             this.stats.projectilesFired++;
         }
     }
@@ -108,7 +109,7 @@ export class LevelStatsTracker {
      * Track a player death
      */
     recordDeath(): void {
-        if (this.isLevelActive) {
+        if (this.isStageActive) {
             this.stats.deaths++;
         }
     }
@@ -130,7 +131,7 @@ export class LevelStatsTracker {
      * @param isBoss - Whether this enemy is a boss
      */
     recordEnemyDestroyed(enemyType: string, isBoss: boolean = false): void {
-        if (this.isLevelActive) {
+        if (this.isStageActive) {
             this.stats.enemiesDestroyed++;
             if (isBoss) {
                 this.stats.bossesDestroyed++;
@@ -159,7 +160,7 @@ export class LevelStatsTracker {
      * Track damage dealt to enemies
      */
     recordDamageDealt(damage: number): void {
-        if (this.isLevelActive) {
+        if (this.isStageActive) {
             this.stats.damageDealt += damage;
         }
     }
@@ -168,7 +169,7 @@ export class LevelStatsTracker {
      * Track damage taken by player
      */
     recordDamageTaken(damage: number): void {
-        if (this.isLevelActive) {
+        if (this.isStageActive) {
             this.stats.damageTaken += damage;
         }
     }
@@ -176,18 +177,18 @@ export class LevelStatsTracker {
     /**
      * Get current stats
      */
-    getStats(): LevelStats {
+    getStats(): StageStats {
         return { ...this.stats };
     }
 
     /**
-     * Get total run score (committed levels plus in-progress level)
+     * Get total run score (committed stages plus in-progress stage)
      */
-    getCumulativeScore(currentLevel: number): number {
-        // If we are actively tracking the same level, include the live score
-        const isActiveSameLevel = this.isLevelActive && this.currentLevel === currentLevel && !this.hasCommittedCurrentLevel;
-        if (isActiveSameLevel) {
-            const liveScore = this.calculateScore(currentLevel).totalScore;
+    getCumulativeScore(currentStage: number): number {
+        // If we are actively tracking the same stage, include the live score
+        const isActiveSameStage = this.isStageActive && this.currentStage === currentStage && !this.hasCommittedCurrentStage;
+        if (isActiveSameStage) {
+            const liveScore = this.calculateScore(currentStage).totalScore;
             return this.cumulativeScore + liveScore;
         }
         return this.cumulativeScore;
@@ -197,10 +198,10 @@ export class LevelStatsTracker {
      * Get completion time in seconds
      */
     getCompletionTime(): number {
-        if (this.stats.levelEndTime === null) {
+        if (this.stats.stageEndTime === null) {
             return 0;
         }
-        return (this.stats.levelEndTime - this.stats.levelStartTime) / 1000;
+        return (this.stats.stageEndTime - this.stats.stageStartTime) / 1000;
     }
 
     /**
@@ -214,10 +215,10 @@ export class LevelStatsTracker {
     }
 
     /**
-     * Check if level is currently being tracked
+     * Check if stage is currently being tracked
      */
     isTracking(): boolean {
-        return this.isLevelActive;
+        return this.isStageActive;
     }
 
     /**
@@ -228,13 +229,13 @@ export class LevelStatsTracker {
     }
 
     /**
-     * Reset only the current level's stats while keeping the run total
+     * Reset only the current stage's stats while keeping the run total
      */
-    resetLevelStats(): void {
+    resetStageStats(): void {
         this.stats = this.createEmptyStats();
-        this.isLevelActive = false;
-        this.hasCommittedCurrentLevel = false;
-        this.currentLevel = null;
+        this.isStageActive = false;
+        this.hasCommittedCurrentStage = false;
+        this.currentStage = null;
     }
 
     /**
@@ -242,18 +243,18 @@ export class LevelStatsTracker {
      */
     resetRun(): void {
         this.stats = this.createEmptyStats();
-        this.isLevelActive = false;
+        this.isStageActive = false;
         this.cumulativeScore = 0;
-        this.currentLevel = null;
-        this.hasCommittedCurrentLevel = false;
+        this.currentStage = null;
+        this.hasCommittedCurrentStage = false;
     }
 
     /**
-     * Calculate score based on enemy kills with level-based scaling
+     * Calculate score based on enemy kills with stage-based scaling
      * Base point values are defined in SCORING_CONFIG constant
-     * Points scale linearly with map level
+     * Points scale linearly with stage number
      */
-    calculateScore(currentLevel: number): {
+    calculateScore(currentStage: number): {
         regularBossPoints: number;
         regularEnemyPoints: number;
         microBossPoints: number;
@@ -267,14 +268,14 @@ export class LevelStatsTracker {
             microEnemy: number;
         };
     } {
-        // Level scaling multiplier (increases linearly with level)
-        const levelMultiplier = currentLevel;
+        // Stage scaling multiplier (increases linearly with stage)
+        const stageMultiplier = currentStage;
         
         // Calculate scaled point values per enemy
-        const scaledRegularBoss = SCORING_CONFIG.regularBossPoints * levelMultiplier;
-        const scaledRegularEnemy = SCORING_CONFIG.regularEnemyPoints * levelMultiplier;
-        const scaledMicroBoss = SCORING_CONFIG.microBossPoints * levelMultiplier;
-        const scaledMicroEnemy = SCORING_CONFIG.microEnemyPoints * levelMultiplier;
+        const scaledRegularBoss = SCORING_CONFIG.regularBossPoints * stageMultiplier;
+        const scaledRegularEnemy = SCORING_CONFIG.regularEnemyPoints * stageMultiplier;
+        const scaledMicroBoss = SCORING_CONFIG.microBossPoints * stageMultiplier;
+        const scaledMicroEnemy = SCORING_CONFIG.microEnemyPoints * stageMultiplier;
         
         // Calculate points for each category
         const regularBossPoints = this.stats.regularBossesDestroyed * scaledRegularBoss;
@@ -300,24 +301,24 @@ export class LevelStatsTracker {
 }
 
 // Singleton instance management
-let levelStatsTrackerInstance: LevelStatsTracker | null = null;
+let stageStatsTrackerInstance: StageStatsTracker | null = null;
 
 /**
- * Get the LevelStatsTracker instance, creating it if necessary
+ * Get the StageStatsTracker instance, creating it if necessary
  */
-export function getLevelStatsTracker(): LevelStatsTracker {
-    if (!levelStatsTrackerInstance) {
-        levelStatsTrackerInstance = new LevelStatsTracker();
+export function getStageStatsTracker(): StageStatsTracker {
+    if (!stageStatsTrackerInstance) {
+        stageStatsTrackerInstance = new StageStatsTracker();
     }
-    return levelStatsTrackerInstance;
+    return stageStatsTrackerInstance;
 }
 
 /**
- * Reset the LevelStatsTracker instance (useful for testing)
+ * Reset the StageStatsTracker instance (useful for testing)
  */
-export function resetLevelStatsTracker(): void {
-    levelStatsTrackerInstance = null;
+export function resetStageStatsTracker(): void {
+    stageStatsTrackerInstance = null;
 }
 
 // Default export for backward compatibility
-export default getLevelStatsTracker();
+export default getStageStatsTracker();

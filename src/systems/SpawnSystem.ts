@@ -5,7 +5,7 @@
 import Phaser from 'phaser';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from './PlayerStatsSystem';
-import levelProgressionSystem from './LevelProgressionSystem';
+import stageProgressionSystem from './StageProgressionSystem';
 import { getStaminaSystem } from './StaminaSystem';
 import { getCompanionManager } from '../managers/CompanionManager';
 import { XP_CONFIG, WORLD_WIDTH, SPAWN_CONFIG, STAMINA_CONFIG, BOSS_MODE_CONFIG, getDifficultyConfig } from '../config';
@@ -301,11 +301,11 @@ export class SpawnSystem {
         const difficultyConfig = getDifficultyConfig(difficulty);
         const difficultyMultiplier = difficultyConfig.enemySpawnMultiplier;
         
-        // Apply level-based multiplier (stacks with difficulty)
-        const levelMultiplier = levelProgressionSystem.getEnemyCountMultiplier();
+        // Apply stage-based multiplier (stacks with difficulty)
+        const stageMultiplier = stageProgressionSystem.getEnemyCountMultiplier();
         
         // Combine multipliers
-        const finalSpawnMultiplier = difficultyMultiplier * levelMultiplier;
+        const finalSpawnMultiplier = difficultyMultiplier * stageMultiplier;
         
         // Calculate segment width
         const segmentWidth = WORLD_WIDTH / SPAWN_CONFIG.segmentCount;
