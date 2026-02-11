@@ -6,6 +6,7 @@
 import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, PHYSICS_CONFIG } from '../config';
 import gameState from '../utils/GameContext';
 import { getFuelSystem } from '../systems/FuelSystem';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 import type { PlayerSize } from '../types/game';
 
 class PlayerManager {
@@ -48,6 +49,9 @@ class PlayerManager {
      * @param direction - The direction to change size ('smaller', 'larger', or a specific PlayerSize)
      */
     changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
+        // Block during active transition
+        if (sizeTransitionSystem.isTransitioning) return;
+
         // Check cooldown
         if (gameState.sizeChangeTimer > 0) {
             return; // Can't change size yet
@@ -99,7 +103,7 @@ class PlayerManager {
         if (newSize === 'small' && currentScene === 'MainGameScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('MicroScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'shrink', 'MicroScene');
             return;
         }
         
@@ -107,7 +111,7 @@ class PlayerManager {
         if (newSize === 'normal' && currentScene === 'MicroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('MainGameScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'grow', 'MainGameScene');
             return;
         }
         
@@ -115,7 +119,7 @@ class PlayerManager {
         if (newSize === 'large' && currentScene === 'MainGameScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('MainGameMacroScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'grow', 'MainGameMacroScene');
             return;
         }
         
@@ -123,7 +127,7 @@ class PlayerManager {
         if (newSize === 'normal' && currentScene === 'MainGameMacroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('MainGameScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'shrink', 'MainGameScene');
             return;
         }
         
@@ -133,7 +137,7 @@ class PlayerManager {
         if (newSize === 'small' && currentScene === 'UnderwaterScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('UnderwaterMicroScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'shrink', 'UnderwaterMicroScene');
             return;
         }
         
@@ -141,7 +145,7 @@ class PlayerManager {
         if (newSize === 'normal' && currentScene === 'UnderwaterMicroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('UnderwaterScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'grow', 'UnderwaterScene');
             return;
         }
         
@@ -149,7 +153,7 @@ class PlayerManager {
         if (newSize === 'large' && currentScene === 'UnderwaterScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('UnderwaterMacroScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'grow', 'UnderwaterMacroScene');
             return;
         }
         
@@ -157,7 +161,7 @@ class PlayerManager {
         if (newSize === 'normal' && currentScene === 'UnderwaterMacroScene') {
             gameState.playerSize = newSize;
             gameState.sizeChangeTimer = SIZE_CHANGE_COOLDOWN;
-            gameState.scene?.scene.start('UnderwaterScene');
+            sizeTransitionSystem.startTransition(gameState.scene!, 'shrink', 'UnderwaterScene');
             return;
         }
         

@@ -6,6 +6,7 @@ import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, JET_MEC
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import targetingSystem from '../systems/TargetingSystem';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -52,17 +53,20 @@ export class InputManager {
         if (!isUnderwater) {
             // Jump (only for land environments)
             this.scene.input.keyboard?.on('keydown-SPACE', () => {
+                if (sizeTransitionSystem.isTransitioning) return;
                 this.handleJump();
             });
         }
         
         // Size changes - Q for smaller, E for larger (one step at a time)
         this.scene.input.keyboard?.on('keydown-Q', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             const currentSize = playerManager.getPlayerSize();
             const newSize = currentSize === 'large' ? 'normal' : 'small';
             playerManager.changeSize(newSize);
         });
         this.scene.input.keyboard?.on('keydown-E', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             const currentSize = playerManager.getPlayerSize();
             const newSize = currentSize === 'small' ? 'normal' : 'large';
             playerManager.changeSize(newSize);
@@ -70,20 +74,24 @@ export class InputManager {
         
         // Attack - F or K
         this.scene.input.keyboard?.on('keydown-F', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             projectileManager.fireProjectile(this.scene);
         });
         this.scene.input.keyboard?.on('keydown-K', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             projectileManager.fireProjectile(this.scene);
         });
         
         // Tab targeting - cycle through visible enemies
         this.scene.input.keyboard?.on('keydown-TAB', (event: KeyboardEvent) => {
+            if (sizeTransitionSystem.isTransitioning) return;
             event.preventDefault();
             targetingSystem.cycleTarget(this.scene);
         });
 
         // Jet Mech activation - Enter key
         this.scene.input.keyboard?.on('keydown-ENTER', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             this.handleJetMechActivation();
         });
     }
@@ -148,6 +156,15 @@ export class InputManager {
      */
     handleMovement(): void {
         if (!gameState.player) return;
+        if (sizeTransitionSystem.isTransitioning) {
+            // Zero velocity so the player doesn't drift during the transition
+            const body = gameState.player.body as Phaser.Physics.Arcade.Body | undefined;
+            if (body) {
+                body.setVelocity(0, 0);
+                body.setAngularVelocity(0);
+            }
+            return;
+        }
         
         const staminaSystem = getStaminaSystem();
         const wasMeleeMode = gameState.player.isMeleeMode || false;

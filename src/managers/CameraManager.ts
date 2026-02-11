@@ -4,6 +4,7 @@
  */
 import gameState from '../utils/GameContext';
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 
 export class CameraManager {
     scene: Phaser.Scene;
@@ -27,12 +28,13 @@ export class CameraManager {
         this.camera.startFollow(gameState.player);
         this.camera.setLerp(0.1, 0);
     }
-    
+
     /**
      * Update camera position (called from game loop)
      */
     update(): void {
         if (!gameState.player) return;
+        if (sizeTransitionSystem.isTransitioning) return;
         
         const targetPlayerScreenX = CAMERA_PADDING;
         let targetCameraX = gameState.player.x - targetPlayerScreenX;
