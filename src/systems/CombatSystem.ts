@@ -29,6 +29,7 @@ interface SpawnerBossGroup {
     bossY: number;  // Position where XP orb should spawn
     bossScene: Phaser.Scene; // Scene reference for spawning XP orb
     bossKilled: boolean;
+    isBoss: boolean; // Whether the spawner was an actual boss (not a regular spawner enemy)
     totalMinions: number;
     deadMinions: number;
     xpReward: number; // Total XP to be awarded when fully defeated
@@ -773,6 +774,7 @@ export class CombatSystem {
                 bossY: enemy.y,
                 bossScene: enemy.scene,
                 bossKilled: true,
+                isBoss: isBoss || enemy.enemyType?.includes('boss') || false,
                 totalMinions: enemy.minionCount,
                 deadMinions: 0,
                 xpReward: enemy.xpReward || 0
@@ -813,8 +815,8 @@ export class CombatSystem {
                     // Clean up group tracking
                     this.spawnerBossGroups.delete(group.bossId);
                     
-                    // Count this spawner boss (with all minions) as defeated
-                    if (this.onBossDefeat) {
+                    // Only count toward boss defeats if the spawner was actually a boss
+                    if (group.isBoss && this.onBossDefeat) {
                         this.bossesDefeated++;
                         console.log(`Spawner boss fully defeated (${this.bossesDefeated}/${this.totalBosses})`);
                         
