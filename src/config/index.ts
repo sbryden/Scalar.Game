@@ -19,7 +19,11 @@ export {
     WORLD_HEIGHT,
     CAMERA_PADDING,
     SIZE_CONFIG,
-    SIZE_CHANGE_COOLDOWN
+    SIZE_CHANGE_COOLDOWN,
+    SIZE_TRANSITION_DURATION,
+    GROW_ZOOM_TARGET,
+    SHRINK_ZOOM_TARGET,
+    TRANSITION_EASE
 } from './world';
 export type { SizeKey } from './world';
 

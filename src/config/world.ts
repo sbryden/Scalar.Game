@@ -32,4 +32,10 @@ export const SIZE_CONFIG = {
 
 export const SIZE_CHANGE_COOLDOWN = 500;
 
+// Size transition animation configuration
+export const SIZE_TRANSITION_DURATION = 750; // ms per phase (departure + arrival = ~1.5s total)
+export const GROW_ZOOM_TARGET = 2.5; // Camera zooms in when growing (world appears to expand)
+export const SHRINK_ZOOM_TARGET = 0.5; // Camera zooms out when shrinking (world appears to contract)
+export const TRANSITION_EASE = 'Sine.InOut';
+
 export type SizeKey = keyof typeof SIZE_CONFIG;

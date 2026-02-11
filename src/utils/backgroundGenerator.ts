@@ -228,9 +228,10 @@ const UNDERWATER_MICRO_PALETTES = [
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
-export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void {
+export function generateSkyBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 12345); // Different multiplier per scene type for variation
+    const key = textureKey ?? 'background';
     
     // Select palette based on stage
     const basePalette = SKY_PALETTES[effectiveSeed % SKY_PALETTES.length];
@@ -297,12 +298,14 @@ export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void 
         bgGraphics.lineBetween(0, i, WORLD_WIDTH, i);
     }
     
-    bgGraphics.generateTexture('background', WORLD_WIDTH, WORLD_HEIGHT);
+    bgGraphics.generateTexture(key, WORLD_WIDTH, WORLD_HEIGHT);
     bgGraphics.destroy();
     
-    scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'background')
-        .setOrigin(0.5, 0.5)
-        .setScrollFactor(0);
+    if (!textureOnly) {
+        scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, key)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
 }
 
 /**
@@ -310,9 +313,10 @@ export function generateSkyBackground(scene: Phaser.Scene, seed?: number): void 
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
-export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): void {
+export function generateQuantumBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 23456); // Different multiplier per scene type for variation
+    const key = textureKey ?? 'microBackground';
     
     // Select palette based on stage
     const basePalette = QUANTUM_PALETTES[effectiveSeed % QUANTUM_PALETTES.length];
@@ -404,12 +408,14 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): v
         bgGraphics.fillCircle(x, y, radius);
     }
     
-    bgGraphics.generateTexture('microBackground', WORLD_WIDTH, WORLD_HEIGHT);
+    bgGraphics.generateTexture(key, WORLD_WIDTH, WORLD_HEIGHT);
     bgGraphics.destroy();
     
-    scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'microBackground')
-        .setOrigin(0.5, 0.5)
-        .setScrollFactor(0);
+    if (!textureOnly) {
+        scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, key)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
 }
 
 /**
@@ -417,9 +423,10 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number): v
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
-export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number): void {
+export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 34567); // Different multiplier per scene type for variation
+    const key = textureKey ?? 'underwaterBackground';
     
     // Select palette based on stage
     const basePalette = UNDERWATER_PALETTES[effectiveSeed % UNDERWATER_PALETTES.length];
@@ -499,12 +506,14 @@ export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number)
         bgGraphics.strokePath();
     }
     
-    bgGraphics.generateTexture('underwaterBackground', WORLD_WIDTH, WORLD_HEIGHT);
+    bgGraphics.generateTexture(key, WORLD_WIDTH, WORLD_HEIGHT);
     bgGraphics.destroy();
     
-    scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'underwaterBackground')
-        .setOrigin(0.5, 0.5)
-        .setScrollFactor(0);
+    if (!textureOnly) {
+        scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, key)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
 }
 
 /**
@@ -512,9 +521,10 @@ export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number)
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
  */
-export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: number): void {
+export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
     const rng = new SeededRandom(effectiveSeed * 45678); // Different multiplier per scene type for variation
+    const key = textureKey ?? 'underwaterMicroBackground';
     
     // Select palette based on stage
     const basePalette = UNDERWATER_MICRO_PALETTES[effectiveSeed % UNDERWATER_MICRO_PALETTES.length];
@@ -620,10 +630,12 @@ export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: nu
         }
     }
     
-    bgGraphics.generateTexture('underwaterMicroBackground', WORLD_WIDTH, WORLD_HEIGHT);
+    bgGraphics.generateTexture(key, WORLD_WIDTH, WORLD_HEIGHT);
     bgGraphics.destroy();
     
-    scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 'underwaterMicroBackground')
-        .setOrigin(0.5, 0.5)
-        .setScrollFactor(0);
+    if (!textureOnly) {
+        scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, key)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
 }

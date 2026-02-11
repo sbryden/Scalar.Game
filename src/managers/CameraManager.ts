@@ -4,10 +4,12 @@
  */
 import gameState from '../utils/GameContext';
 import { WORLD_WIDTH, WORLD_HEIGHT, CAMERA_PADDING } from '../config';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 
 export class CameraManager {
     scene: Phaser.Scene;
     camera: Phaser.Cameras.Scene2D.Camera;
+    private paused: boolean = false;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -29,10 +31,25 @@ export class CameraManager {
     }
     
     /**
+     * Pause camera updates (used during size transition animations)
+     */
+    pause(): void {
+        this.paused = true;
+    }
+
+    /**
+     * Resume camera updates after transition completes
+     */
+    resume(): void {
+        this.paused = false;
+    }
+
+    /**
      * Update camera position (called from game loop)
      */
     update(): void {
         if (!gameState.player) return;
+        if (this.paused || sizeTransitionSystem.isTransitioning) return;
         
         const targetPlayerScreenX = CAMERA_PADDING;
         let targetCameraX = gameState.player.x - targetPlayerScreenX;

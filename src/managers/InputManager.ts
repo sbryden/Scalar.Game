@@ -6,6 +6,7 @@ import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, JET_MEC
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
 import targetingSystem from '../systems/TargetingSystem';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -58,11 +59,13 @@ export class InputManager {
         
         // Size changes - Q for smaller, E for larger (one step at a time)
         this.scene.input.keyboard?.on('keydown-Q', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             const currentSize = playerManager.getPlayerSize();
             const newSize = currentSize === 'large' ? 'normal' : 'small';
             playerManager.changeSize(newSize);
         });
         this.scene.input.keyboard?.on('keydown-E', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             const currentSize = playerManager.getPlayerSize();
             const newSize = currentSize === 'small' ? 'normal' : 'large';
             playerManager.changeSize(newSize);
@@ -148,6 +151,7 @@ export class InputManager {
      */
     handleMovement(): void {
         if (!gameState.player) return;
+        if (sizeTransitionSystem.isTransitioning) return;
         
         const staminaSystem = getStaminaSystem();
         const wasMeleeMode = gameState.player.isMeleeMode || false;

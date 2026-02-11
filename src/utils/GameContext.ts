@@ -61,6 +61,11 @@ class GameContext {
     private _preMechPlayerTexture: string | null = null;
     private _preMechPlayerScale: number = 0.25;
 
+    // Size transition state
+    private _transitionZoom: number | null = null;
+    private _transitionDirection: 'grow' | 'shrink' | null = null;
+    private _isInSizeTransition: boolean = false;
+
     constructor() {
         // Initialize saved positions for all scenes
         this._savedPositions = {} as Record<SceneKey, SavedPosition>;
@@ -94,6 +99,9 @@ class GameContext {
     get stageCompleteFlag(): Phaser.GameObjects.Sprite | null { return this._stageCompleteFlag; }
     get preMechPlayerTexture(): string | null { return this._preMechPlayerTexture; }
     get preMechPlayerScale(): number { return this._preMechPlayerScale; }
+    get transitionZoom(): number | null { return this._transitionZoom; }
+    get transitionDirection(): 'grow' | 'shrink' | null { return this._transitionDirection; }
+    get isInSizeTransition(): boolean { return this._isInSizeTransition; }
 
     // Read-only access to saved state maps
     // Note: The Record itself is mutable to allow gameState.savedPositions[key] = value patterns
@@ -124,6 +132,9 @@ class GameContext {
     set stageCompleteFlag(value: Phaser.GameObjects.Sprite | null) { this._stageCompleteFlag = value; }
     set preMechPlayerTexture(value: string | null) { this._preMechPlayerTexture = value; }
     set preMechPlayerScale(value: number) { this._preMechPlayerScale = value; }
+    set transitionZoom(value: number | null) { this._transitionZoom = value; }
+    set transitionDirection(value: 'grow' | 'shrink' | null) { this._transitionDirection = value; }
+    set isInSizeTransition(value: boolean) { this._isInSizeTransition = value; }
 
     // ============================================
     // SCENE STATE METHODS
@@ -200,6 +211,9 @@ class GameContext {
         this._playerSize = 'normal';
         this._difficultyInitialized = false;
         this._currentStage = 1;
+        this._transitionZoom = null;
+        this._transitionDirection = null;
+        this._isInSizeTransition = false;
         
         // Reset all saved positions and enemies
         for (const key of ALL_SCENE_KEYS) {

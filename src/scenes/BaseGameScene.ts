@@ -27,6 +27,7 @@ import { HUD } from '../ui/HUD';
 import { DebugDisplay } from '../ui/DebugDisplay';
 import { GameOverScreen } from '../ui/GameOverScreen';
 import { StageCompleteScreen } from '../ui/StageCompleteScreen';
+import sizeTransitionSystem from '../systems/SizeTransitionSystem';
 import type { Enemy, Player, SceneKey } from '../types/game';
 
 /**
@@ -151,6 +152,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Setup managers (includes collision setup, now aware of companions)
         this.setupManagers();
         this.createDebugText();
+
+        // If arriving from a size transition, run the arrival zoom animation
+        sizeTransitionSystem.finishTransition(this);
     }
 
     update(): void {
@@ -245,6 +249,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
     shutdown(): void {
         const config = this.getSceneConfig();
+
+        // Clean up any active size transition overlay
+        sizeTransitionSystem.cleanup();
 
         // Save enemy states before leaving scene
         gameState.savedEnemies[config.sceneKey] = this.enemies.children.entries
