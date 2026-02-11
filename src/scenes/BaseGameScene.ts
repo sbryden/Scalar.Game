@@ -13,6 +13,7 @@ import playerManager from '../managers/PlayerManager';
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import combatSystem from '../systems/CombatSystem';
+import targetingSystem from '../systems/TargetingSystem';
 import stageStatsTracker from '../systems/StageStatsTracker';
 import stageProgressionSystem from '../systems/StageProgressionSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
@@ -201,6 +202,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Update combat stun effects
         combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
 
+        // Update targeting system (validate target, update reticle)
+        targetingSystem.update(this);
+
         // Update projectiles
         projectileManager.updateProjectiles();
 
@@ -267,6 +271,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
             };
         }
         
+        // Clear targeting state and reticle on scene shutdown
+        targetingSystem.destroyReticle();
+
         // Despawn companions on scene shutdown (they'll respawn in next scene if appropriate)
         const companionManager = getCompanionManager();
         if (companionManager) {
@@ -393,6 +400,9 @@ export default abstract class BaseGameScene extends Phaser.Scene {
 
         this.cameraManager = new CameraManager(this);
         this.cameraManager.setupCamera();
+
+        // Initialize targeting system reticle for this scene
+        targetingSystem.initReticle(this);
     }
 
     protected createDebugText(): void {
