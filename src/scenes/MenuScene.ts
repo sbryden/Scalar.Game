@@ -9,13 +9,6 @@ import stageProgressionSystem from '../systems/StageProgressionSystem';
 import stageStatsTracker from '../systems/StageStatsTracker';
 import { BUILD_NUMBER } from '../buildInfo';
 
-/**
- * Check if running in production mode (hides debug features like God Mode)
- */
-function isProductionMode(): boolean {
-    return BUILD_NUMBER !== 'dev';
-}
-
 export default class MenuScene extends Phaser.Scene {
     selectedDifficulty!: string;
     selectedEnvironment!: string;
@@ -115,10 +108,8 @@ export default class MenuScene extends Phaser.Scene {
         // Boss Mode checkbox
         this.createBossModeCheckbox(width / 2, 600);
         
-        // God Mode checkbox - only show in development mode
-        if (!isProductionMode()) {
-            this.createGodModeCheckbox(width / 2, 630);
-        }
+        // God Mode checkbox
+        this.createGodModeCheckbox(width / 2, 630);
         
         // Hacks button (bottom right, below robot image)
         this.createOptionsButton(width * 0.8, height - 60);
@@ -629,11 +620,6 @@ export default class MenuScene extends Phaser.Scene {
             }
         } catch {
             // Ignore malformed storage and keep defaults
-        }
-
-        // Respect production-mode restriction for God Mode.
-        if (isProductionMode()) {
-            this.godMode = false;
         }
     }
 
