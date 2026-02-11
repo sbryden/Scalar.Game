@@ -7,6 +7,7 @@ import { SIZE_CONFIG, SIZE_CHANGE_COOLDOWN, PHYSICS_CONFIG } from '../config';
 import gameState from '../utils/GameContext';
 import { getFuelSystem } from '../systems/FuelSystem';
 import sizeTransitionSystem from '../systems/SizeTransitionSystem';
+import combatSystem from '../systems/CombatSystem';
 import type { PlayerSize } from '../types/game';
 
 class PlayerManager {
@@ -51,6 +52,9 @@ class PlayerManager {
     changeSize(direction: 'smaller' | 'larger' | PlayerSize): void {
         // Block during active transition
         if (sizeTransitionSystem.isTransitioning) return;
+
+        // Block size changes after boss is defeated (until next stage)
+        if (combatSystem.areAllBossesDefeated) return;
 
         // Check cooldown
         if (gameState.sizeChangeTimer > 0) {

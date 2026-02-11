@@ -69,6 +69,14 @@ export class CombatSystem {
     }
 
     /**
+     * Whether all bosses in the current stage have been defeated.
+     * Used by PlayerManager to block size transitions until the next stage.
+     */
+    get areAllBossesDefeated(): boolean {
+        return this.allBossesDefeated;
+    }
+
+    /**
      * Reset spawner boss tracking (call when starting a new level)
      */
     resetSpawnerTracking(): void {

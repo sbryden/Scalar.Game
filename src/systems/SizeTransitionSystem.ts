@@ -122,6 +122,11 @@ class SizeTransitionSystem {
             this.transitionOverlay.setAlpha(0);
         }
 
+        // --- Hide ground platforms during the transition ---
+        if (gameState.platforms) {
+            gameState.platforms.setVisible(false);
+        }
+
         // --- Freeze all physics bodies (enemies, projectiles, and player) ---
         if (gameState.enemies) {
             gameState.enemies.children.entries.forEach(obj => {
@@ -259,6 +264,11 @@ class SizeTransitionSystem {
         const camera = scene.cameras.main;
         camera.setZoom(startZoom);
 
+        // Hide ground platforms during the arrival animation
+        if (gameState.platforms) {
+            gameState.platforms.setVisible(false);
+        }
+
         // Capture player's screen position at current zoom so we can pin it during the tween
         const player = gameState.player;
         const playerX = player ? player.x : camera.scrollX + camera.width / 2;
@@ -281,6 +291,11 @@ class SizeTransitionSystem {
                 );
             },
             onComplete: () => {
+                // Restore ground platform visibility
+                if (gameState.platforms) {
+                    gameState.platforms.setVisible(true);
+                }
+
                 // Clear transition state
                 gameState.transitionZoom = null;
                 gameState.transitionDirection = null;

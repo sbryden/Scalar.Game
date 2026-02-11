@@ -13,7 +13,7 @@ export class StageCompleteScreen {
     overlay: Phaser.GameObjects.Rectangle | null;
     titleText: Phaser.GameObjects.Text | null;
     statsText: Phaser.GameObjects.Text | null;
-    messageText: Phaser.GameObjects.Text | null;
+    buttons: { bg: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }[];
     nKey: Phaser.Input.Keyboard.Key | null;
     mKey: Phaser.Input.Keyboard.Key | null;
     cKey: Phaser.Input.Keyboard.Key | null;
@@ -27,7 +27,7 @@ export class StageCompleteScreen {
         this.overlay = null;
         this.titleText = null;
         this.statsText = null;
-        this.messageText = null;
+        this.buttons = [];
         this.nKey = null;
         this.mKey = null;
         this.cKey = null;
@@ -93,24 +93,45 @@ export class StageCompleteScreen {
         this.statsText.setScrollFactor(0);
         this.statsText.setVisible(false);
 
-        // Create message text
-        this.messageText = this.scene.add.text(
-            this.scene.cameras.main.width / 2,
-            this.scene.cameras.main.height - 100,
-            'Press N for Next Stage\nPress M to Exit to Main Menu\nPress C for Credits',
-            {
-                fontSize: '24px',
+        // Create action buttons
+        const buttonConfigs = [
+            { label: 'Next Stage', action: () => this.handleNextStage() },
+            { label: 'Main Menu', action: () => this.handleExit() },
+            { label: 'Credits', action: () => this.handleCredits() },
+        ];
+        const buttonY = this.scene.cameras.main.height - 80;
+        const buttonWidth = 200;
+        const buttonHeight = 50;
+        const buttonSpacing = 30;
+        const totalWidth = buttonConfigs.length * buttonWidth + (buttonConfigs.length - 1) * buttonSpacing;
+        const startX = (this.scene.cameras.main.width - totalWidth) / 2 + buttonWidth / 2;
+
+        buttonConfigs.forEach((cfg, i) => {
+            const x = startX + i * (buttonWidth + buttonSpacing);
+            const bg = this.scene.add.rectangle(x, buttonY, buttonWidth, buttonHeight, 0x444444, 0.9)
+                .setStrokeStyle(2, 0xFFD700)
+                .setDepth(2002)
+                .setScrollFactor(0)
+                .setVisible(false)
+                .setInteractive({ useHandCursor: true })
+                .on('pointerover', () => { bg.setFillStyle(0x666666, 1); })
+                .on('pointerout', () => { bg.setFillStyle(0x444444, 0.9); })
+                .on('pointerdown', () => { if (this.isVisible) cfg.action(); });
+
+            const text = this.scene.add.text(x, buttonY, cfg.label, {
+                fontSize: '22px',
                 color: '#FFFFFF',
                 fontStyle: 'bold',
-                align: 'center',
                 stroke: '#000000',
-                strokeThickness: 4
-            }
-        );
-        this.messageText.setOrigin(0.5);
-        this.messageText.setDepth(2001);
-        this.messageText.setScrollFactor(0);
-        this.messageText.setVisible(false);
+                strokeThickness: 3
+            })
+                .setOrigin(0.5)
+                .setDepth(2003)
+                .setScrollFactor(0)
+                .setVisible(false);
+
+            this.buttons.push({ bg, text });
+        });
 
         // Setup keyboard input for N, M, and C
         this.nKey = this.scene.input.keyboard!.addKey('N');
@@ -141,7 +162,7 @@ export class StageCompleteScreen {
      * Show the stage complete screen
      */
     show(): void {
-        if (this.overlay && this.titleText && this.statsText && this.messageText) {
+        if (this.overlay && this.titleText && this.statsText) {
             // Update title with current stage
             const currentStage = stageProgressionSystem.getCurrentStage();
             this.titleText.setText(`STAGE ${currentStage} COMPLETE!`);
@@ -191,7 +212,10 @@ export class StageCompleteScreen {
             this.overlay.setVisible(true);
             this.titleText.setVisible(true);
             this.statsText.setVisible(true);
-            this.messageText.setVisible(true);
+            this.buttons.forEach(btn => {
+                btn.bg.setVisible(true);
+                btn.text.setVisible(true);
+            });
             this.isVisible = true;
 
             // Pause the game physics
@@ -203,11 +227,14 @@ export class StageCompleteScreen {
      * Hide the stage complete screen
      */
     hide(): void {
-        if (this.overlay && this.titleText && this.statsText && this.messageText) {
+        if (this.overlay && this.titleText && this.statsText) {
             this.overlay.setVisible(false);
             this.titleText.setVisible(false);
             this.statsText.setVisible(false);
-            this.messageText.setVisible(false);
+            this.buttons.forEach(btn => {
+                btn.bg.setVisible(false);
+                btn.text.setVisible(false);
+            });
             this.isVisible = false;
         }
     }
@@ -284,8 +311,10 @@ export class StageCompleteScreen {
         if (this.statsText) {
             this.statsText.destroy();
         }
-        if (this.messageText) {
-            this.messageText.destroy();
-        }
+        this.buttons.forEach(btn => {
+            btn.bg.destroy();
+            btn.text.destroy();
+        });
+        this.buttons = [];
     }
 }
