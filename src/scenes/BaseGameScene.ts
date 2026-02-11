@@ -195,30 +195,33 @@ export default abstract class BaseGameScene extends Phaser.Scene {
         // Handle player movement
         this.inputManager.handleMovement();
 
-        // Update enemies
-        this.enemies.children.entries.forEach(obj => {
-            const enemy = obj as Enemy;
-            if (enemy.active) {
-                enemyManager.updateEnemyAI(enemy, this.time.now);
+        // Skip gameplay updates during size transition (world is frozen)
+        if (!sizeTransitionSystem.isTransitioning) {
+            // Update enemies
+            this.enemies.children.entries.forEach(obj => {
+                const enemy = obj as Enemy;
+                if (enemy.active) {
+                    enemyManager.updateEnemyAI(enemy, this.time.now);
+                }
+            });
+
+            // Update combat stun effects
+            combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
+
+            // Update targeting system (validate target, update reticle)
+            targetingSystem.update(this);
+
+            // Update projectiles
+            projectileManager.updateProjectiles();
+
+            // Update XP orb magnetism
+            xpOrbManager.updateXPOrbMagnetism();
+            
+            // Update companions
+            const companionManager = getCompanionManager();
+            if (companionManager) {
+                companionManager.update(this.game.loop.delta); // delta in ms
             }
-        });
-
-        // Update combat stun effects
-        combatSystem.updateStunEffects(this.enemies, this.player, this.time.now);
-
-        // Update targeting system (validate target, update reticle)
-        targetingSystem.update(this);
-
-        // Update projectiles
-        projectileManager.updateProjectiles();
-
-        // Update XP orb magnetism
-        xpOrbManager.updateXPOrbMagnetism();
-        
-        // Update companions
-        const companionManager = getCompanionManager();
-        if (companionManager) {
-            companionManager.update(this.game.loop.delta); // delta in ms
         }
 
         // Update camera
@@ -250,8 +253,11 @@ export default abstract class BaseGameScene extends Phaser.Scene {
     shutdown(): void {
         const config = this.getSceneConfig();
 
-        // Clean up any active size transition overlay
-        sizeTransitionSystem.cleanup();
+        // Clean up transition overlay, but preserve transition state if a
+        // size transition is in progress (shutdown fires between departure and arrival)
+        if (!gameState.transitionZoom && !gameState.transitionDirection) {
+            sizeTransitionSystem.cleanup();
+        }
 
         // Save enemy states before leaving scene
         gameState.savedEnemies[config.sceneKey] = this.enemies.children.entries

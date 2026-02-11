@@ -12,6 +12,7 @@ export class GameOverScreen {
     messageText: Phaser.GameObjects.Text | null;
     yKey: Phaser.Input.Keyboard.Key | null;
     nKey: Phaser.Input.Keyboard.Key | null;
+    cKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
     onContinue: (() => void) | null;
     onQuit: (() => void) | null;
@@ -24,6 +25,7 @@ export class GameOverScreen {
         this.messageText = null;
         this.yKey = null;
         this.nKey = null;
+        this.cKey = null;
         this.isVisible = false;
         this.onContinue = null;
         this.onQuit = null;
@@ -63,7 +65,7 @@ export class GameOverScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 120,
-            'Continue?\n\nPress Y for Yes\nPress N for No',
+            'Continue?\n\nPress Y for Yes\nPress N for No\nPress C for Credits',
             {
                 fontSize: '32px',
                 color: '#FFFFFF',
@@ -78,11 +80,12 @@ export class GameOverScreen {
         this.messageText.setScrollFactor(0);
         this.messageText.setVisible(false);
 
-        // Setup keyboard input for Y and N
+        // Setup keyboard input for Y, N, and C
         this.yKey = this.scene.input.keyboard!.addKey('Y');
         this.nKey = this.scene.input.keyboard!.addKey('N');
+        this.cKey = this.scene.input.keyboard!.addKey('C');
 
-        // Add listeners for Y and N keys
+        // Add listeners for Y, N, and C keys
         this.yKey.on('down', () => {
             if (this.isVisible) {
                 this.handleContinue();
@@ -92,6 +95,12 @@ export class GameOverScreen {
         this.nKey.on('down', () => {
             if (this.isVisible) {
                 this.handleQuit();
+            }
+        });
+
+        this.cKey.on('down', () => {
+            if (this.isVisible) {
+                this.handleCredits();
             }
         });
     }
@@ -151,6 +160,15 @@ export class GameOverScreen {
     }
 
     /**
+     * Handle credits (C key)
+     */
+    handleCredits(): void {
+        this.hide();
+        this.scene.physics.resume();
+        this.scene.scene.start('CreditsScene', { returnScene: 'MenuScene' });
+    }
+
+    /**
      * Set callback for continue action
      */
     setContinueCallback(callback: () => void): void {
@@ -182,6 +200,9 @@ export class GameOverScreen {
         }
         if (this.nKey) {
             this.nKey.removeAllListeners();
+        }
+        if (this.cKey) {
+            this.cKey.removeAllListeners();
         }
     }
 }

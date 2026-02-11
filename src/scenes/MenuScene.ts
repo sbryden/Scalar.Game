@@ -114,6 +114,9 @@ export default class MenuScene extends Phaser.Scene {
         // Hacks button (bottom right, below robot image)
         this.createOptionsButton(width * 0.8, height - 60);
         
+        // Credits button (bottom left)
+        this.createCreditsButton(width * 0.2, height - 60);
+        
         // Instructions
         const instructions = this.add.text(width / 2, 675, 'Q/E - Change Size  |  A/D - Move  |  SPACE - Jump  |  F/K - Fire', {
             fontSize: '16px',
@@ -525,6 +528,37 @@ export default class MenuScene extends Phaser.Scene {
             } else {
                 this.scene.start('MainGameScene');
             }
+        });
+    }
+    
+    createCreditsButton(centerX: number, y: number): void {
+        const buttonWidth = 200;
+        const buttonHeight = 50;
+        
+        const creditsButton = this.add.rectangle(centerX, y, buttonWidth, buttonHeight, 0x2c3e50);
+        creditsButton.setStrokeStyle(2, 0x3498db);
+        const creditsText = this.add.text(centerX, y, 'CREDITS', {
+            fontSize: '22px',
+            fontFamily: 'Arial, sans-serif',
+            fontStyle: 'bold',
+            color: '#ffffff'
+        });
+        creditsText.setOrigin(0.5);
+        
+        creditsButton.setInteractive({ useHandCursor: true });
+        creditsButton.on('pointerover', () => {
+            creditsButton.setFillStyle(0x3498db);
+            creditsButton.setScale(1.05);
+            creditsText.setScale(1.05);
+        });
+        creditsButton.on('pointerout', () => {
+            creditsButton.setFillStyle(0x2c3e50);
+            creditsButton.setScale(1);
+            creditsText.setScale(1);
+        });
+        creditsButton.on('pointerdown', () => {
+            this.saveMenuPreferences();
+            this.scene.start('CreditsScene', { returnScene: 'MenuScene' });
         });
     }
     

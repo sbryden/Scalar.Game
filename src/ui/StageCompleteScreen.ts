@@ -16,6 +16,7 @@ export class StageCompleteScreen {
     messageText: Phaser.GameObjects.Text | null;
     nKey: Phaser.Input.Keyboard.Key | null;
     mKey: Phaser.Input.Keyboard.Key | null;
+    cKey: Phaser.Input.Keyboard.Key | null;
     isVisible: boolean;
     onNextStage: (() => void) | null;
     onExit: (() => void) | null;
@@ -29,6 +30,7 @@ export class StageCompleteScreen {
         this.messageText = null;
         this.nKey = null;
         this.mKey = null;
+        this.cKey = null;
         this.isVisible = false;
         this.onNextStage = null;
         this.onExit = null;
@@ -95,7 +97,7 @@ export class StageCompleteScreen {
         this.messageText = this.scene.add.text(
             this.scene.cameras.main.width / 2,
             this.scene.cameras.main.height - 100,
-            'Press N for Next Stage\nPress M to Exit to Main Menu',
+            'Press N for Next Stage\nPress M to Exit to Main Menu\nPress C for Credits',
             {
                 fontSize: '24px',
                 color: '#FFFFFF',
@@ -110,11 +112,12 @@ export class StageCompleteScreen {
         this.messageText.setScrollFactor(0);
         this.messageText.setVisible(false);
 
-        // Setup keyboard input for N and M
+        // Setup keyboard input for N, M, and C
         this.nKey = this.scene.input.keyboard!.addKey('N');
         this.mKey = this.scene.input.keyboard!.addKey('M');
+        this.cKey = this.scene.input.keyboard!.addKey('C');
 
-        // Add listeners for N and M keys
+        // Add listeners for N, M, and C keys
         this.nKey.on('down', () => {
             if (this.isVisible) {
                 this.handleNextStage();
@@ -124,6 +127,12 @@ export class StageCompleteScreen {
         this.mKey.on('down', () => {
             if (this.isVisible) {
                 this.handleExit();
+            }
+        });
+
+        this.cKey.on('down', () => {
+            if (this.isVisible) {
+                this.handleCredits();
             }
         });
     }
@@ -231,6 +240,15 @@ export class StageCompleteScreen {
     }
 
     /**
+     * Handle credits (C key)
+     */
+    handleCredits(): void {
+        this.hide();
+        this.scene.physics.resume();
+        this.scene.scene.start('CreditsScene', { returnScene: 'MenuScene' });
+    }
+
+    /**
      * Set the next stage callback
      */
     setNextStageCallback(callback: () => void): void {
@@ -253,6 +271,9 @@ export class StageCompleteScreen {
         }
         if (this.mKey) {
             this.mKey.removeAllListeners();
+        }
+        if (this.cKey) {
+            this.cKey.removeAllListeners();
         }
         if (this.overlay) {
             this.overlay.destroy();

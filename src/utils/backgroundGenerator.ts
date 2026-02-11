@@ -106,6 +106,15 @@ const SKY_PALETTES = [
     { name: 'Morning Sky', base: 0xC2E0F4, grid: 0x82C0E4 },
 ];
 
+// Macro sky palettes – dramatic, grand-scale skies (5 variations)
+const MACRO_SKY_PALETTES = [
+    { name: 'Golden Dusk',    top: 0x1B2838, mid: 0x3B4A6B, bottom: 0xD4875E, sun: 0xF4A844, cloud: 0xBB7744 },
+    { name: 'Crimson Horizon', top: 0x1A1A3A, mid: 0x4A2848, bottom: 0xC25050, sun: 0xE86040, cloud: 0xA04040 },
+    { name: 'Amber Twilight', top: 0x1E2D3D, mid: 0x4E5A4A, bottom: 0xCCA050, sun: 0xF0C060, cloud: 0x9A8040 },
+    { name: 'Violet Sunset',  top: 0x1A1840, mid: 0x4A3060, bottom: 0xB06090, sun: 0xD880A0, cloud: 0x8A4870 },
+    { name: 'Teal Overcast',  top: 0x162830, mid: 0x2E5060, bottom: 0x70A0A0, sun: 0xA0D0C8, cloud: 0x507070 },
+];
+
 // Quantum realm palettes for micro scenes
 const QUANTUM_PALETTES = [
     { 
@@ -227,6 +236,8 @@ const UNDERWATER_MICRO_PALETTES = [
  * Generates a sky background for regular/land scenes
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
+ * @param textureKey - Optional texture key override (defaults to 'background')
+ * @param textureOnly - When true, generates the texture without adding an image to the scene
  */
 export function generateSkyBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
@@ -309,9 +320,151 @@ export function generateSkyBackground(scene: Phaser.Scene, seed?: number, textur
 }
 
 /**
+ * Generates a dramatic macro-scale sky background
+ * Inspired by the normal sky but with deeper colours, layered mountains,
+ * massive cloud banks and an atmospheric sun glow.
+ * @param scene - The Phaser scene to generate the background for
+ * @param seed  - Stage seed for deterministic variation (1-5 variations)
+ * @param textureKey - Optional texture key override (defaults to 'macroBackground')
+ * @param textureOnly - When true, generates the texture without adding an image to the scene
+ */
+export function generateMacroSkyBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
+    const effectiveSeed = seed !== undefined ? seed : 1;
+    const rng = new SeededRandom(effectiveSeed * 56789);
+    const key = textureKey ?? 'macroBackground';
+
+    const basePalette = MACRO_SKY_PALETTES[effectiveSeed % MACRO_SKY_PALETTES.length];
+    if (!basePalette) return;
+
+    const palette = {
+        top:    randomizeDarkColor(basePalette.top, rng),
+        mid:    randomizeDarkColor(basePalette.mid, rng),
+        bottom: randomizeLightColor(basePalette.bottom, rng),
+        sun:    randomizeLightColor(basePalette.sun, rng),
+        cloud:  randomizeDarkColor(basePalette.cloud, rng),
+    };
+
+    const bgGraphics = scene.make.graphics({ x: 0, y: 0 });
+
+    // --- Three-band gradient sky ---
+    // Upper half: top → mid
+    bgGraphics.fillGradientStyle(palette.top, palette.top, palette.mid, palette.mid, 1);
+    bgGraphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT * 0.55);
+    // Lower half: mid → bottom
+    bgGraphics.fillGradientStyle(palette.mid, palette.mid, palette.bottom, palette.bottom, 1);
+    bgGraphics.fillRect(0, WORLD_HEIGHT * 0.55, WORLD_WIDTH, WORLD_HEIGHT * 0.45);
+
+    // --- Sun / celestial glow ---
+    const sunX = rng.between(WORLD_WIDTH * 0.25, WORLD_WIDTH * 0.75);
+    const sunY = WORLD_HEIGHT * 0.60 + rng.between(-40, 40);
+    // Outer glow rings
+    for (let r = 220; r > 0; r -= 40) {
+        const alpha = 0.04 + (220 - r) / 220 * 0.12;
+        bgGraphics.fillStyle(palette.sun, alpha);
+        bgGraphics.fillCircle(sunX, sunY, r);
+    }
+    // Bright core
+    bgGraphics.fillStyle(palette.sun, 0.45);
+    bgGraphics.fillCircle(sunX, sunY, 35);
+
+    // --- Far mountain range (most distant, subtle) ---
+    bgGraphics.fillStyle(palette.mid, 0.35);
+    for (let x = 0; x < WORLD_WIDTH; x += 350) {
+        const h = 160 + rng.between(0, 180);
+        bgGraphics.beginPath();
+        bgGraphics.moveTo(x, WORLD_HEIGHT);
+        bgGraphics.lineTo(x + 80,  WORLD_HEIGHT - h * 0.6);
+        bgGraphics.lineTo(x + 175, WORLD_HEIGHT - h);
+        bgGraphics.lineTo(x + 280, WORLD_HEIGHT - h * 0.5);
+        bgGraphics.lineTo(x + 350, WORLD_HEIGHT);
+        bgGraphics.closePath();
+        bgGraphics.fillPath();
+    }
+
+    // --- Mid mountain range ---
+    bgGraphics.fillStyle(palette.cloud, 0.30);
+    for (let x = -100; x < WORLD_WIDTH; x += 500) {
+        const h = 220 + rng.between(0, 200);
+        bgGraphics.beginPath();
+        bgGraphics.moveTo(x, WORLD_HEIGHT);
+        bgGraphics.lineTo(x + 120, WORLD_HEIGHT - h * 0.7);
+        bgGraphics.lineTo(x + 250, WORLD_HEIGHT - h);
+        bgGraphics.lineTo(x + 400, WORLD_HEIGHT - h * 0.55);
+        bgGraphics.lineTo(x + 500, WORLD_HEIGHT);
+        bgGraphics.closePath();
+        bgGraphics.fillPath();
+    }
+
+    // --- Near mountain silhouettes (darker, foreground) ---
+    bgGraphics.fillStyle(0x0F0F1F, 0.40);
+    for (let x = -50; x < WORLD_WIDTH; x += 600) {
+        const h = 280 + rng.between(0, 160);
+        bgGraphics.beginPath();
+        bgGraphics.moveTo(x, WORLD_HEIGHT);
+        bgGraphics.lineTo(x + 100, WORLD_HEIGHT - h * 0.5);
+        bgGraphics.lineTo(x + 200, WORLD_HEIGHT - h * 0.85);
+        bgGraphics.lineTo(x + 300, WORLD_HEIGHT - h);
+        bgGraphics.lineTo(x + 450, WORLD_HEIGHT - h * 0.6);
+        bgGraphics.lineTo(x + 600, WORLD_HEIGHT);
+        bgGraphics.closePath();
+        bgGraphics.fillPath();
+    }
+
+    // --- Massive layered cloud bank ---
+    for (let layer = 0; layer < 3; layer++) {
+        const alpha = 0.12 + layer * 0.05;
+        bgGraphics.fillStyle(palette.cloud, alpha);
+        const yBase = 80 + layer * 60;
+        const count = 10 + rng.integer(0, 5);
+        for (let i = 0; i < count; i++) {
+            const cx = rng.between(0, WORLD_WIDTH);
+            const cy = yBase + rng.between(-30, 30);
+            const size = 60 + rng.between(0, 100);
+            bgGraphics.fillCircle(cx, cy, size);
+            bgGraphics.fillCircle(cx + size * 0.6, cy + 8, size * 0.85);
+            bgGraphics.fillCircle(cx - size * 0.6, cy + 8, size * 0.85);
+            bgGraphics.fillCircle(cx + size * 0.3, cy - size * 0.3, size * 0.6);
+        }
+    }
+
+    // --- Atmospheric haze band across the horizon ---
+    bgGraphics.fillStyle(palette.bottom, 0.18);
+    bgGraphics.fillRect(0, WORLD_HEIGHT * 0.52, WORLD_WIDTH, WORLD_HEIGHT * 0.12);
+
+    // --- Sparse high-altitude streaky clouds ---
+    bgGraphics.lineStyle(3, 0xFFFFFF, 0.10);
+    for (let i = 0; i < 12; i++) {
+        const sx = rng.between(0, WORLD_WIDTH);
+        const sy = 30 + rng.between(0, 120);
+        const len = 80 + rng.between(0, 200);
+        bgGraphics.lineBetween(sx, sy, sx + len, sy + rng.between(-10, 10));
+    }
+
+    // --- Subtle grid overlay (same feel as normal scene) ---
+    bgGraphics.lineStyle(1, palette.mid, 0.10);
+    for (let i = 0; i < WORLD_WIDTH; i += 100) {
+        bgGraphics.lineBetween(i, 0, i, WORLD_HEIGHT);
+    }
+    for (let i = 0; i < WORLD_HEIGHT; i += 100) {
+        bgGraphics.lineBetween(0, i, WORLD_WIDTH, i);
+    }
+
+    bgGraphics.generateTexture(key, WORLD_WIDTH, WORLD_HEIGHT);
+    bgGraphics.destroy();
+
+    if (!textureOnly) {
+        scene.add.image(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, key)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+    }
+}
+
+/**
  * Generates a quantum realm background for micro scenes
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
+ * @param textureKey - Optional texture key override (defaults to 'microBackground')
+ * @param textureOnly - When true, generates the texture without adding an image to the scene
  */
 export function generateQuantumBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
@@ -422,6 +575,8 @@ export function generateQuantumBackground(scene: Phaser.Scene, seed?: number, te
  * Generates an underwater background
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
+ * @param textureKey - Optional texture key override (defaults to 'underwaterBackground')
+ * @param textureOnly - When true, generates the texture without adding an image to the scene
  */
 export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;
@@ -520,6 +675,8 @@ export function generateUnderwaterBackground(scene: Phaser.Scene, seed?: number,
  * Generates an underwater micro background
  * @param scene - The Phaser scene to generate the background for
  * @param seed - Stage seed for deterministic variation (1-5 variations)
+ * @param textureKey - Optional texture key override (defaults to 'underwaterMicroBackground')
+ * @param textureOnly - When true, generates the texture without adding an image to the scene
  */
 export function generateUnderwaterMicroBackground(scene: Phaser.Scene, seed?: number, textureKey?: string, textureOnly?: boolean): void {
     const effectiveSeed = seed !== undefined ? seed : 1;

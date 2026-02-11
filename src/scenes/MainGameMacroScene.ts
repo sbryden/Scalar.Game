@@ -4,7 +4,7 @@
  */
 import { WORLD_WIDTH, SPAWN_CONFIG, getOptions } from '../config';
 import stageProgressionSystem from '../systems/StageProgressionSystem';
-import { generateSkyBackground } from '../utils/backgroundGenerator';
+import { generateMacroSkyBackground } from '../utils/backgroundGenerator';
 import BaseGameScene from './BaseGameScene';
 import type { SceneConfig } from './BaseGameScene';
 
@@ -35,32 +35,7 @@ export default class MainGameMacroScene extends BaseGameScene {
 
     protected createBackground(): void {
         const currentStage = stageProgressionSystem.getCurrentStage();
-        generateSkyBackground(this, currentStage);
-        
-        // Add distant mountain silhouettes for macro scale feeling
-        this.createMountainSilhouettes();
-    }
-
-    private createMountainSilhouettes(): void {
-        const mountainGraphics = this.add.graphics();
-        mountainGraphics.setScrollFactor(0.3); // Parallax effect
-        mountainGraphics.setDepth(-50);
-        
-        // Dark purple/blue mountains
-        mountainGraphics.fillStyle(0x1a1a3e, 0.6);
-        
-        // Draw several mountain peaks
-        for (let i = 0; i < 5; i++) {
-            const x = (WORLD_WIDTH / 5) * i;
-            const height = 200 + Math.random() * 150;
-            const width = 300 + Math.random() * 200;
-            
-            mountainGraphics.fillTriangle(
-                x, 800,
-                x + width / 2, 800 - height,
-                x + width, 800
-            );
-        }
+        generateMacroSkyBackground(this, currentStage);
     }
 
     protected createGround(): void {

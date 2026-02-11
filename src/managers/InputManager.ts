@@ -53,6 +53,7 @@ export class InputManager {
         if (!isUnderwater) {
             // Jump (only for land environments)
             this.scene.input.keyboard?.on('keydown-SPACE', () => {
+                if (sizeTransitionSystem.isTransitioning) return;
                 this.handleJump();
             });
         }
@@ -73,20 +74,24 @@ export class InputManager {
         
         // Attack - F or K
         this.scene.input.keyboard?.on('keydown-F', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             projectileManager.fireProjectile(this.scene);
         });
         this.scene.input.keyboard?.on('keydown-K', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             projectileManager.fireProjectile(this.scene);
         });
         
         // Tab targeting - cycle through visible enemies
         this.scene.input.keyboard?.on('keydown-TAB', (event: KeyboardEvent) => {
+            if (sizeTransitionSystem.isTransitioning) return;
             event.preventDefault();
             targetingSystem.cycleTarget(this.scene);
         });
 
         // Jet Mech activation - Enter key
         this.scene.input.keyboard?.on('keydown-ENTER', () => {
+            if (sizeTransitionSystem.isTransitioning) return;
             this.handleJetMechActivation();
         });
     }
@@ -151,7 +156,15 @@ export class InputManager {
      */
     handleMovement(): void {
         if (!gameState.player) return;
-        if (sizeTransitionSystem.isTransitioning) return;
+        if (sizeTransitionSystem.isTransitioning) {
+            // Zero velocity so the player doesn't drift during the transition
+            const body = gameState.player.body as Phaser.Physics.Arcade.Body | undefined;
+            if (body) {
+                body.setVelocity(0, 0);
+                body.setAngularVelocity(0);
+            }
+            return;
+        }
         
         const staminaSystem = getStaminaSystem();
         const wasMeleeMode = gameState.player.isMeleeMode || false;

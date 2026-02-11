@@ -118,11 +118,11 @@ class SizeTransitionSystem {
             );
             this.transitionOverlay.setOrigin(0.5, 0.5);
             this.transitionOverlay.setScrollFactor(0);
-            this.transitionOverlay.setDepth(1); // Above current background, below game objects
+            this.transitionOverlay.setDepth(-1); // Above current background, below game objects (which use depth 0)
             this.transitionOverlay.setAlpha(0);
         }
 
-        // --- Pause enemy/projectile physics so they freeze in place ---
+        // --- Freeze all physics bodies (enemies, projectiles, and player) ---
         if (gameState.enemies) {
             gameState.enemies.children.entries.forEach(obj => {
                 const body = (obj as Phaser.Physics.Arcade.Sprite).body;
@@ -138,6 +138,12 @@ class SizeTransitionSystem {
                     body.enable = false;
                 }
             });
+        }
+        // Freeze the player body so they don't drift from residual velocity
+        if (player && player.body) {
+            (player.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
+            (player.body as Phaser.Physics.Arcade.Body).setAngularVelocity(0);
+            player.body.enable = false;
         }
 
         // --- Capture player's current screen position so we can pin it during zoom ---
