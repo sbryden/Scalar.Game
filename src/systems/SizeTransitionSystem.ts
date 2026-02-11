@@ -140,6 +140,12 @@ class SizeTransitionSystem {
             });
         }
 
+        // --- Capture player's current screen position so we can pin it during zoom ---
+        const playerX = player ? player.x : camera.scrollX + camera.width / 2;
+        const playerY = player ? player.y : camera.scrollY + camera.height / 2;
+        const playerScreenX = (playerX - camera.scrollX) * camera.zoom;
+        const playerScreenY = (playerY - camera.scrollY) * camera.zoom;
+
         // --- Run parallel tweens ---
         let tweensComplete = 0;
         const totalTweens = this.transitionOverlay ? 3 : 2; // zoom + player scale + optional bg fade
@@ -151,12 +157,21 @@ class SizeTransitionSystem {
             }
         };
 
-        // 1. Camera zoom tween
+        // 1. Camera zoom tween — recalculate scroll each frame to keep player pinned
         scene.tweens.add({
             targets: camera,
             zoom: targetZoom,
             duration: SIZE_TRANSITION_DURATION,
             ease: TRANSITION_EASE,
+            onUpdate: () => {
+                // Keep the player at the same screen position as zoom changes
+                const newScrollX = playerX - playerScreenX / camera.zoom;
+                const newScrollY = playerY - playerScreenY / camera.zoom;
+                camera.setScroll(
+                    Phaser.Math.Clamp(newScrollX, 0, WORLD_WIDTH - camera.width / camera.zoom),
+                    Phaser.Math.Clamp(newScrollY, 0, WORLD_HEIGHT - camera.height / camera.zoom)
+                );
+            },
             onComplete: onTweenComplete
         });
 
@@ -238,12 +253,27 @@ class SizeTransitionSystem {
         const camera = scene.cameras.main;
         camera.setZoom(startZoom);
 
-        // Tween back to normal zoom
+        // Capture player's screen position at current zoom so we can pin it during the tween
+        const player = gameState.player;
+        const playerX = player ? player.x : camera.scrollX + camera.width / 2;
+        const playerY = player ? player.y : camera.scrollY + camera.height / 2;
+        const playerScreenX = (playerX - camera.scrollX) * camera.zoom;
+        const playerScreenY = (playerY - camera.scrollY) * camera.zoom;
+
+        // Tween back to normal zoom — recalculate scroll each frame to keep player pinned
         scene.tweens.add({
             targets: camera,
             zoom: 1,
             duration: SIZE_TRANSITION_DURATION,
             ease: TRANSITION_EASE,
+            onUpdate: () => {
+                const newScrollX = playerX - playerScreenX / camera.zoom;
+                const newScrollY = playerY - playerScreenY / camera.zoom;
+                camera.setScroll(
+                    Phaser.Math.Clamp(newScrollX, 0, WORLD_WIDTH - camera.width / camera.zoom),
+                    Phaser.Math.Clamp(newScrollY, 0, WORLD_HEIGHT - camera.height / camera.zoom)
+                );
+            },
             onComplete: () => {
                 // Clear transition state
                 gameState.transitionZoom = null;
