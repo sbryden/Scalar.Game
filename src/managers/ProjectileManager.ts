@@ -7,6 +7,7 @@ import { PROJECTILE_CONFIG, WORLD_WIDTH, PHYSICS_CONFIG, COMBAT_CONFIG, VISUAL_C
 import gameState from '../utils/GameContext';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import stageStatsTracker from '../systems/StageStatsTracker';
+import targetingSystem from '../systems/TargetingSystem';
 import type { WASDKeys, Projectile, Enemy } from '../types/game';
 import type { TextureVariant } from '../config/enemies';
 
@@ -64,8 +65,6 @@ class ProjectileManager {
             return;
         }
         
-        this.lastProjectileTime = gameTime;
-        
         const config = PROJECTILE_CONFIG.basic;
         const options = getOptions();
         
@@ -74,6 +73,21 @@ class ProjectileManager {
         
         // Determine direction based on which way the player is facing
         const direction = player.flipX ? -1 : 1;
+        
+        // Check if the targeted enemy is in front of the player.
+        // If behind, block the shot entirely (no cooldown consumed).
+        const targetEnemy = targetingSystem.getTargetedEnemy();
+        if (targetEnemy) {
+            const dx = targetEnemy.x - player.x;
+            // direction 1 = facing right (enemy must be to the right),
+            // direction -1 = facing left (enemy must be to the left)
+            if ((direction === 1 && dx < 0) || (direction === -1 && dx > 0)) {
+                return; // Enemy is behind the player — don't fire, don't consume cooldown
+            }
+        }
+        
+        // Cooldown consumed only after passing the facing check
+        this.lastProjectileTime = gameTime;
         
         // Check if underwater for slower projectile speed
         const isUnderwater = gameState.currentSceneKey === 'UnderwaterScene' || 
@@ -121,7 +135,23 @@ class ProjectileManager {
         body.setAllowGravity(false);
         body.setBounce(0, 0);
         body.setCollideWorldBounds(true);
-        body.setVelocity(velocityX, 0);
+        
+        // If we have a locked target, fire toward the enemy's current position;
+        // otherwise fire horizontally as before.
+        if (targetEnemy && targetEnemy.active && !targetEnemy.isDead) {
+            const angleToTarget = Math.atan2(
+                targetEnemy.y - projectileY,
+                targetEnemy.x - projectileX
+            );
+            const speed = Math.abs(velocityX); // use same speed magnitude
+            body.setVelocity(
+                Math.cos(angleToTarget) * speed,
+                Math.sin(angleToTarget) * speed
+            );
+            projectile.setRotation(angleToTarget);
+        } else {
+            body.setVelocity(velocityX, 0);
+        }
         
         // Set damage (god mode damage or normal)
         projectile.damage = playerStatsSystem.isGodMode() ? COMBAT_CONFIG.godMode.damage : options.playerProjectileDamage;

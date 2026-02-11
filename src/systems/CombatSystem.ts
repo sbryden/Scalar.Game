@@ -6,6 +6,7 @@ import { PROJECTILE_CONFIG, PLAYER_COMBAT_CONFIG, COMBAT_CONFIG, getDifficultyCo
 import playerStatsSystem from './PlayerStatsSystem';
 import stageStatsTracker from './StageStatsTracker';
 import spawnSystem from './SpawnSystem';
+import targetingSystem from './TargetingSystem';
 import gameState from '../utils/GameContext';
 import enemyManager from '../managers/EnemyManager';
 import { getCompanionManager } from '../managers/CompanionManager';
@@ -747,6 +748,9 @@ export class CombatSystem {
         // Mark enemy as dead to prevent further AI/damage processing
         enemy.health = 0;
         enemy.isDead = true;
+        
+        // Clear tab-target if this enemy was the current target
+        targetingSystem.clearIfTarget(enemy);
         
         // Disable physics body so player can pass through during fade-out
         if (enemy.body) {

@@ -5,6 +5,7 @@ import projectileManager from './ProjectileManager';
 import { SIZE_CONFIG, GOD_MODE_CONFIG, STAMINA_UI_CONFIG, COMBAT_CONFIG, JET_MECH_CONFIG, getOptions } from '../config';
 import playerStatsSystem from '../systems/PlayerStatsSystem';
 import { getStaminaSystem } from '../systems/StaminaSystem';
+import targetingSystem from '../systems/TargetingSystem';
 import type { WASDKeys } from '../types/game';
 
 export class InputManager {
@@ -75,6 +76,12 @@ export class InputManager {
             projectileManager.fireProjectile(this.scene);
         });
         
+        // Tab targeting - cycle through visible enemies
+        this.scene.input.keyboard?.on('keydown-TAB', (event: KeyboardEvent) => {
+            event.preventDefault();
+            targetingSystem.cycleTarget(this.scene);
+        });
+
         // Jet Mech activation - Enter key
         this.scene.input.keyboard?.on('keydown-ENTER', () => {
             this.handleJetMechActivation();
